@@ -239,6 +239,7 @@ class TestController:
 
                 # Charging loop
                 self.startPSOutput()
+                self.chargeCC(Charge_current_max)
                 self.setVoltage(Charge_Volt_start)
                 print('Charging')
                 while (datetime.now() < Cend_time):
