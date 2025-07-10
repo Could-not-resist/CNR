@@ -27,7 +27,7 @@ DCHARGE_TIME: int = 5   # s
 NUM_CYCLES: int = 1   # n
 
 # Misc
-TEST_NAME: str = "YUASA"
+TEST_NAME: str = "LG"
 TEMPERATURE: float = 27.0    # °C
 
 
