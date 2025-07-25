@@ -4,7 +4,6 @@ from AlIonBatteryTestSoftware import TestController
 CHARGE_VOLT_START: float = 16.21    # V
 CHARGE_VOLT_END: float = 16.4    # V
 CHARGE_CURRENT_MAX: float = 5.0    # A
-CHARGE_POWER_MAX: float = 100    # Watts #TODO: delete unused variable
 
 DCHARGE_VOLT_MIN: float = 11.0    # V
 DCHARGE_CURRENT_MAX: float = 1    # 
@@ -36,7 +35,7 @@ class TestTypes:
         self.testController = TestController()
 
     def runUPSTest(self,Test_Name: str,Temperature:float,Charge_volt_prot:int,Charge_current_prot:int,Charge_power_prot:int, Charge_Volt_start: float, Charge_volt_end: float,
-                   Charge_current_max: float, Charge_power_max: float, DCharge_volt_min: float,
+                   Charge_current_max: float, DCharge_volt_min: float,
                    DCharge_current_max: float, Slew_volt: float, Slew_current: float,
                    LeadinTime: int, Charge_time: int, DCharge_time: int, numCycles: int):
         import threading
@@ -45,7 +44,7 @@ class TestTypes:
                                           args=(Test_Name,Temperature,Charge_volt_prot,
                                                 Charge_current_prot,Charge_power_prot,
                                                 Charge_Volt_start, Charge_volt_end,
-                                                Charge_current_max, Charge_power_max,
+                                                Charge_current_max,
                                                 DCharge_volt_min, DCharge_current_max,
                                                 Slew_volt, Slew_current,
                                                 LeadinTime, Charge_time,
@@ -66,7 +65,6 @@ def main():
         CHARGE_VOLT_START,
         CHARGE_VOLT_END,
         CHARGE_CURRENT_MAX,
-        CHARGE_POWER_MAX,
         DCHARGE_VOLT_MIN,
         DCHARGE_CURRENT_MAX,
         SLEW_VOLT,
