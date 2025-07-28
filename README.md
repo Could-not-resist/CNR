@@ -61,6 +61,17 @@ The top of `MAIN.py` contains constants used to configure a test run:
 
 Refer to the device programming manuals for the meaning of each setting.
 
+### Rate characteristic test
+
+To evaluate discharge performance versus current draw run:
+
+```bash
+python MAIN.py --rate-test --nominal-capacity <Ah>
+```
+
+Data from each C-rate is stored in the `Data/` directory and a plot
+`<test-name>_rate_characteristic.png` is generated.
+
 
 ## Manufacturer Programming Manuals
 

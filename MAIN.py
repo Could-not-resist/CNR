@@ -104,6 +104,10 @@ def main():
     parser.add_argument("--charge-time", type=int, default=CHARGE_TIME)
     parser.add_argument("--dcharge-time", type=int, default=DCHARGE_TIME)
     parser.add_argument("--num-cycles", type=int, default=NUM_CYCLES)
+    parser.add_argument("--rate-test", action="store_true",
+                        help="run rate characteristic test")
+    parser.add_argument("--nominal-capacity", type=float, default=1.0,
+                        help="cell nominal capacity in Ah")
 
     args = parser.parse_args()
 
@@ -127,7 +131,11 @@ def main():
     )
 
     TObj = TestTypes()
-    TObj.runUPSTest(settings)
+    if args.rate_test:
+        TObj.testController.rate_characteristic_test(
+            args.test_name, args.nominal_capacity)
+    else:
+        TObj.runUPSTest(settings)
 
 
 if __name__ == "__main__":

@@ -339,6 +339,71 @@ class TestController:
         self.event.set()
 
 
+    def rate_characteristic_test(self, test_name: str, nominal_capacity: float,
+                                 rest_time: int = 600,
+                                 dcharge_volt_min: float = 2.75):
+        """Run a simple rate characteristic test.
+
+        The cell is fully charged and rested before each discharge.  It is then
+        discharged at C/10, C/5, C/3, C, 2C, 3C and 4C down to ``dcharge_volt_min``.
+        Delivered capacity for every rate is recorded and a rate-capacity plot is
+        saved in the ``Data`` folder.
+        """
+
+        rates = [0.1, 0.2, 1/3, 1, 2, 3, 4]
+        capacities = []
+
+        for rate in rates:
+            # Charge the cell at 1C to ensure full charge
+            self.startPSOutput()
+            self.chargeCC(nominal_capacity)
+            # Typical lithium cell upper voltage
+            self.setVoltage(4.2)
+            time.sleep(3600)
+            self.stopPSOutput()
+
+            # Rest before discharge
+            time.sleep(rest_time)
+
+            current = nominal_capacity * rate
+            self.stopDischarge()
+            self.setCCLmode()
+            self.setCCcurrentL1(current)
+            self.startDischarge()
+
+            start_time = datetime.now()
+            capacity = 0.0
+            dataStorage = DataStorage()
+            while True:
+                time.sleep(self.timeInterval)
+                tmp = datetime.now() - start_time
+                v = self.getVoltageELC()
+                c = self.getCurrentELC()
+                dataStorage.addTime(tmp.total_seconds())
+                dataStorage.addVoltage(v)
+                dataStorage.addCurrent(c)
+                capacity += c * self.timeInterval / 3600
+                if v <= dcharge_volt_min:
+                    break
+
+            self.stopDischarge()
+            dataStorage.createTable(
+                test_name, rate, 0, 27.0, self.timeInterval, 0)
+            capacities.append(capacity)
+
+        # Create rate-capacity plot
+        os.makedirs("Data", exist_ok=True)
+        plt.figure()
+        plt.plot(rates, capacities, marker="o")
+        plt.xlabel("C-rate")
+        plt.ylabel("Capacity [Ah]")
+        plt.title("Rate characteristic")
+        plot_path = os.path.join(
+            "Data", f"{test_name}_rate_characteristic.png")
+        plt.savefig(plot_path)
+        plt.close()
+
+
     def Capacity_Test(self, test_name: str, 
                    temperature: float, 
                    charge_volt_prot: int, 
