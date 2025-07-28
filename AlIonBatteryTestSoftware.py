@@ -293,7 +293,8 @@ class TestController:
             # Discharging loop
 
             self.stopDischarge()
-            self.setCCLmode()  # set the DC to CC low range mode
+            # self.setCCLmode()  # set the DC to CC low range mode
+            self.setCCMmode()
 
             # if (dcharge_current_max>float(self.getCCcurrentL1MAX())):
             #    self.setCCcurrentL1MAX(dcharge_current_max)
@@ -564,7 +565,7 @@ class TestController:
 
         self.event.set()
 
-    def actual_capacity_test(self, current_1c: float, temperature: float = 20.0):
+    def actual_capacity_test(self, current_1c: float, temperature: float = 20.0): #TODO current should be adjusted based on the charging or discharging
         """Perform an actual capacity test.
 
         The procedure charges the cell at 1C to 4.1 V, rests for one hour and
@@ -603,7 +604,7 @@ class TestController:
 
         # ----- Discharge step -----
         self.stopDischarge()
-        self.setCCLmode()
+        self.setCCLmode() #TODO change to CCH mode ( has to be implemented in the ELC driver)
         self.setCCcurrentL1(current_1c)
         self.startDischarge()
 
