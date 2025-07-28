@@ -109,6 +109,31 @@ The top of `MAIN.py` contains constants used to configure a test run:
 
 Refer to the device programming manuals for the meaning of each setting.
 
+### Command-line options
+
+The parameters above can be overridden on the command line. The most
+common flags accepted by `MAIN.py` are listed below. Run
+`python MAIN.py --help` for the full set of options.
+
+| Option | Description |
+| --- | --- |
+| `--test-name` | Name used for log and output files |
+| `--temperature` | Ambient temperature in °C |
+| `--charge-volt-prot` | Overvoltage protection limit |
+| `--charge-current-prot` | Overcurrent protection limit |
+| `--charge-power-prot` | Overpower protection limit |
+| `--charge-volt-start` | Starting charge voltage |
+| `--charge-volt-end` | Ending charge voltage |
+| `--charge-current-max` | Maximum charge current |
+| `--dcharge-volt-min` | Minimum discharge voltage |
+| `--dcharge-current-max` | Maximum discharge current |
+| `--slew-volt` | Voltage slew rate in V/ms |
+| `--slew-current` | Current slew rate in A/ms |
+| `--leadin-time` | Lead-in delay before measurements |
+| `--charge-time` | Allowed charging time |
+| `--dcharge-time` | Allowed discharging time |
+| `--num-cycles` | Number of charge/discharge cycles |
+
 
 ## Manufacturer Programming Manuals
 
