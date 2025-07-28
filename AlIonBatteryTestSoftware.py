@@ -177,8 +177,9 @@ class TestController:
 
     # Test protocal for testing the capacity of a battery
 
-    def NEWupsTest(self,Test_Name: str,Temperature:float,Charge_volt_prot:int,Charge_current_prot:int,
-                   Charge_power_prot:int, Charge_Volt_start: float, Charge_volt_end: float,
+# This function is called from the TestTypes class to run a UPS test
+    def NEWupsTest(self, Test_Name: str, Temperature: float, Charge_volt_prot: int, Charge_current_prot: int,
+                   Charge_power_prot: int, Charge_Volt_start: float, Charge_volt_end: float,
                    Charge_current_max: float, DCharge_volt_min: float,
                    DCharge_current_max: float, Slew_volt: float, Slew_current: float,
                    LeadinTime: int, Charge_time: int, DCharge_time: int, numCycles: int):
@@ -189,13 +190,15 @@ class TestController:
 
 #        self.powerSupplyController.setVoltage(Charge_Volt_start)
 #        print(f"Set the initial voltage to {Charge_Volt_start}")
+
         print("===========================")
         print(f"Charge time {Charge_time}")
         self.setVoltageLimMax((Charge_volt_end-0.01))
         print(f"Set the final Charge voltage to {(Charge_volt_end-0.01)}")
 
         self.setVoltageProt(Charge_volt_prot)
-        print(f"Set the Charging Over Voltage Protection to {Charge_volt_prot}")
+        print(
+            f"Set the Charging Over Voltage Protection to {Charge_volt_prot}")
 
         self.setCurrentLimMax(Charge_current_max-0.01)
         print(f"Set the max Charge Current to {Charge_current_max-0.01}")
