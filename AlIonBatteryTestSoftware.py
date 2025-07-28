@@ -400,6 +400,8 @@ class TestController:
             "actual_capacity_test", current_1c, 0, temperature, self.timeInterval
         )
 
+        print(f"Accumulated capacity: {capacity:.3f} Ah")
         self.event.set()
+        return capacity
 
 
