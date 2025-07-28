@@ -104,30 +104,38 @@ def main():
     parser.add_argument("--charge-time", type=int, default=CHARGE_TIME)
     parser.add_argument("--dcharge-time", type=int, default=DCHARGE_TIME)
     parser.add_argument("--num-cycles", type=int, default=NUM_CYCLES)
+    parser.add_argument("--actual-capacity-test", action="store_true",
+                        help="run actual capacity test")
+    parser.add_argument("--capacity-current", type=float, default=1.0,
+                        help="1C current in amperes")
 
     args = parser.parse_args()
 
-    settings = UPSSettings(
-        test_name=args.test_name,
-        temperature=args.temperature,
-        charge_volt_prot=args.charge_volt_prot,
-        charge_current_prot=args.charge_current_prot,
-        charge_power_prot=args.charge_power_prot,
-        charge_volt_start=args.charge_volt_start,
-        charge_volt_end=args.charge_volt_end,
-        charge_current_max=args.charge_current_max,
-        dcharge_volt_min=args.dcharge_volt_min,
-        dcharge_current_max=args.dcharge_current_max,
-        slew_volt=args.slew_volt,
-        slew_current=args.slew_current,
-        leadin_time=args.leadin_time,
-        charge_time=args.charge_time,
-        dcharge_time=args.dcharge_time,
-        num_cycles=args.num_cycles,
-    )
+    if args.actual_capacity_test:
+        tc = TestController()
+        tc.actual_capacity_test(args.capacity_current, args.temperature)
+    else:
+        settings = UPSSettings(
+            test_name=args.test_name,
+            temperature=args.temperature,
+            charge_volt_prot=args.charge_volt_prot,
+            charge_current_prot=args.charge_current_prot,
+            charge_power_prot=args.charge_power_prot,
+            charge_volt_start=args.charge_volt_start,
+            charge_volt_end=args.charge_volt_end,
+            charge_current_max=args.charge_current_max,
+            dcharge_volt_min=args.dcharge_volt_min,
+            dcharge_current_max=args.dcharge_current_max,
+            slew_volt=args.slew_volt,
+            slew_current=args.slew_current,
+            leadin_time=args.leadin_time,
+            charge_time=args.charge_time,
+            dcharge_time=args.dcharge_time,
+            num_cycles=args.num_cycles,
+        )
 
-    TObj = TestTypes()
-    TObj.runUPSTest(settings)
+        TObj = TestTypes()
+        TObj.runUPSTest(settings)
 
 
 if __name__ == "__main__":
