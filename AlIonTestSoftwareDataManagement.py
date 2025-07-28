@@ -74,15 +74,13 @@ class DataStorage:
             filePath = f"{data_dir}/{testName}_{c_rate}C_#{cycleNr + 1}_@{temperature}°C_" +\
             str(datetime.now().strftime("%d.%m.%y_%H;%M"))
             # Display the Path for debug purposes
-            print(abs)
+            print(abs_path)
             # Export to CSV file
             self.exportCSVFile(filePath, data, head)
             # Export to XLSX file
-            print(filePath)
-            print("filePath just now")
+            print(f"Saving results to {filePath}")
             self.exportXLSXFile(filePath, chargeTime, timeInterval)
-            print("export xlsx file just now")
-            print(f"Charge time is: {chargeTime}")
+            print(f"Charge time configured: {chargeTime}")
         except:
             print("Data storage failed, check file path")
         # Empty the result values
@@ -164,8 +162,6 @@ class DataStorage:
             # Create a list of Values to graph
             seconds = Reference(sheet, min_col=2, min_row=3,
                                 max_col=2, max_row=len(csvDataframe))
-            print(f"Charge time: {chargeTime}")
-            print(f"Time interval:  {timeInterval}")
             voltageCharging = Reference(sheet, min_col=3, min_row=3, max_col=3, max_row=int(
                 (float(chargeTime) * 60) / float(timeInterval)))
             currentCharging = Reference(sheet, min_col=4, min_row=3, max_col=4, max_row=int(

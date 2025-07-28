@@ -57,7 +57,6 @@ class PowerSupplyControllerMock:
 
     # Functions to read realtime VOLTAGE, CURRENT and POWER from the power supply
     def getVoltage(self):
-        print("mock)")
         return randrange(int(self.Voltage_limmax * 10000000)) / 100000000
 
     def getCurrent(self):
