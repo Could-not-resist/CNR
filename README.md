@@ -25,8 +25,8 @@ pip install pyvisa pandas openpyxl matplotlib tabulate
 
 1. Connect the Chroma 63600 electronic load and Chroma 62000P power supply to
    your PC and ensure the NI-VISA drivers are installed.
-2. Edit the values at the top of `MAIN.py` to set charge/discharge parameters
-   (voltages, currents, number of cycles, etc.).
+2. Adjust the charge/discharge parameters using command-line options or rely on
+   the defaults defined in `MAIN.py`.
 3. Run the test script:
 
 ```bash
@@ -35,7 +35,8 @@ python MAIN.py
 
 By default the parameters in `MAIN.py` define a single cycle with
 16.21&ndash;16.4&nbsp;V charging at 5&nbsp;A and a discharge down to 11&nbsp;V.
-Adjust them as needed for your test setup.
+You can override any of these values using the command-line options
+documented below.
 
 ### Main parameters
 
