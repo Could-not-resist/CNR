@@ -139,7 +139,7 @@ class DataStorage:
             currentChart.series.append(currentSeries)
             currentChart.title = "Current over Time"
             currentChart.x_axis.title = "Time [s]"
-            currentChart.y_axis.title = "Current [mA]"
+            currentChart.y_axis.title = "Current [A]"
 
             # Create a graph for the Power
             powerChart = ScatterChart()
@@ -195,7 +195,7 @@ class DataStorage:
             currentChartCharging.title = f"Current during charging ({chargeTime} s)"
             currentChartCharging.x_axis.tickLblPos = "low"
             currentChartCharging.x_axis.title = "Time [s]"
-            currentChartCharging.y_axis.title = "Current [mA]"
+            currentChartCharging.y_axis.title = "Current [A]"
 
             # Create a graph for the Power during Charging
             powerChartCharging = ScatterChart()
@@ -230,7 +230,7 @@ class DataStorage:
                 (len(csvDataframe) - 2) * float(timeInterval)) / 60 - float(chargeTime))) + " s)"
             currentChartDischarging.x_axis.tickLblPos = "low"
             currentChartDischarging.x_axis.title = "Time [s]"
-            currentChartDischarging.y_axis.title = "Current [mA]"
+            currentChartDischarging.y_axis.title = "Current [A]"
 
             # Create a graph for the Power during Discharging
             powerChartDischarging = ScatterChart()
