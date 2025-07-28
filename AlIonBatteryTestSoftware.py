@@ -35,10 +35,12 @@ class TestController:
             print("Testcontroller succesfully connected to Electronic Load")
             # self.multimeterController = MultimeterController()
             # print("Testcontroller succesfully connected to Multimeter")
-        except:
-            # Connecting to the mock device controllers
+        except Exception:
+            # Connecting to the mock device controllers when the real devices
+            # are not available.  The previous implementation exited before the
+            # mock controllers were created which made running the software
+            # without hardware impossible.
             print("Connection not successful, using mock objects")
-            exit(1)  # Exit if the real devices are not connected
             self.powerSupplyController = PowerSupplyControllerMock()
             self.electronicLoadController = ElectronicLoadControllerMock()
             self.multimeterController = MultimeterControllerMock()
