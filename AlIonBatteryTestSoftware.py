@@ -178,70 +178,73 @@ class TestController:
     # Test protocal for testing the capacity of a battery
 
 # This function is called from the TestTypes class to run a UPS test
-    def NEWupsTest(self, Test_Name: str, 
-                   Temperature: float, 
-                   Charge_volt_prot: int, 
-                   Charge_current_prot: int,
-                   Charge_power_prot: int, 
-                   Charge_Volt_start: float, 
-                   Charge_volt_end: float,
-                   Charge_current_max: float, 
-                   DCharge_volt_min: float,
-                   DCharge_current_max: float, 
-                   Slew_volt: float, 
-                   Slew_current: float,
-                   LeadinTime: int, 
-                   Charge_time: int, 
-                   DCharge_time: int, 
-                   numCycles: int):
+    def NEWupsTest(
+        self,
+        test_name: str,
+        temperature: float,
+        charge_volt_prot: int,
+        charge_current_prot: int,
+        charge_power_prot: int,
+        charge_volt_start: float,
+        charge_volt_end: float,
+        charge_current_max: float,
+        dcharge_volt_min: float,
+        dcharge_current_max: float,
+        slew_volt: float,
+        slew_current: float,
+        leadin_time: int,
+        charge_time: int,
+        dcharge_time: int,
+        num_cycles: int,
+    ):
         TotstartTime = datetime.now()
         # Setting parameters and limits
         self.powerSupplyController.stopOutput()
         print(f"Stopping output from Power Supply")
 
-#        self.powerSupplyController.setVoltage(Charge_Volt_start)
-#        print(f"Set the initial voltage to {Charge_Volt_start}")
+#        self.powerSupplyController.setVoltage(charge_volt_start)
+#        print(f"Set the initial voltage to {charge_volt_start}")
 
         print("===========================")
-        print(f"Charge time {Charge_time}")
-        self.setVoltageLimMax((Charge_volt_end-0.01))
-        print(f"Set the final Charge voltage to {(Charge_volt_end-0.01)}")
+        print(f"Charge time {charge_time}")
+        self.setVoltageLimMax((charge_volt_end-0.01))
+        print(f"Set the final Charge voltage to {(charge_volt_end-0.01)}")
 
-        self.setVoltageProt(Charge_volt_prot)
+        self.setVoltageProt(charge_volt_prot)
         print(
-            f"Set the Charging Over Voltage Protection to {Charge_volt_prot}")
+            f"Set the Charging Over Voltage Protection to {charge_volt_prot}")
 
-        self.setCurrentLimMax(Charge_current_max-0.01)
-        print(f"Set the max Charge Current to {Charge_current_max-0.01}")
+        self.setCurrentLimMax(charge_current_max-0.01)
+        print(f"Set the max Charge Current to {charge_current_max-0.01}")
 
-        self.setCurrentProt(Charge_current_prot)
-        print(f"Set the Over Current Protection to {Charge_current_prot}")
+        self.setCurrentProt(charge_current_prot)
+        print(f"Set the Over Current Protection to {charge_current_prot}")
 
-        self.setVoltageSlew(Slew_volt)
-        print(f"Set the Charging Voltage Slew rate to {Slew_volt}")
+        self.setVoltageSlew(slew_volt)
+        print(f"Set the Charging Voltage Slew rate to {slew_volt}")
 
-        self.setCurrentSlew(Slew_current)
-        print(f"Set the Charging Current Slew rate to {Slew_current}")
+        self.setCurrentSlew(slew_current)
+        print(f"Set the Charging Current Slew rate to {slew_current}")
 
-        self.setPowerProt(Charge_power_prot)
-        print(f"Set the Charging Over Power Protection  {Charge_power_prot}")
+        self.setPowerProt(charge_power_prot)
+        print(f"Set the Charging Over Power Protection  {charge_power_prot}")
         print("===========================")
 
-        print(f"Discharge time {DCharge_time}")
-        print(f"Max Discharge Current {DCharge_current_max}")
+        print(f"Discharge time {dcharge_time}")
+        print(f"Max Discharge Current {dcharge_current_max}")
         print(f"Max allowable discharge current {self.getCCcurrentL1MAX()}")
         print("===========================")
 
-        # Charge each cycle for Charge_time seconds
-        Cduration = timedelta(seconds=Charge_time)
-        # Discharge each cycle for DCharge_time seconds
-        Dduration = timedelta(seconds=DCharge_time)
-        Lduration = timedelta(seconds=LeadinTime)     # Leadin time in seconds
+        # Charge each cycle for charge_time seconds
+        Cduration = timedelta(seconds=charge_time)
+        # Discharge each cycle for dcharge_time seconds
+        Dduration = timedelta(seconds=dcharge_time)
+        Lduration = timedelta(seconds=leadin_time)     # Leadin time in seconds
         # the amount to increase the start Volt to get to end Volt
-        DeltaV = Charge_volt_end-Charge_Volt_start
+        DeltaV = charge_volt_end-charge_volt_start
 
         # Charging/Discharging loop starts
-        for cycleNumber in range(int(numCycles)):
+        for cycleNumber in range(int(num_cycles)):
             # dataStorage object to keep track of test data
             dataStorage = DataStorage()  # one for each cycle
             Cend_time = datetime.now() + Cduration  # set the time when to stop charging
@@ -253,19 +256,19 @@ class TestController:
 
                 # Charging loop
                 self.startPSOutput()
-                self.chargeCC(Charge_current_max)
-                self.setVoltage(Charge_Volt_start)
+                self.chargeCC(charge_current_max)
+                self.setVoltage(charge_volt_start)
                 print('Charging')
                 while (datetime.now() < Cend_time):
                     # while Charging do the following
                     time.sleep(self.timeInterval)  # Wait between measurements
                     tmp = datetime.now()-ChargestartTime
-                    # increases output voltage from Charge_Volt_start to Charge_volt_end in LeadinTime sec.
+                    # increases output voltage from charge_volt_start to charge_volt_end in leadin_time sec.
                     # if (tmp.total_seconds() < Lduration.seconds):
                     #    Lratio = tmp.total_seconds()/float(Lduration.seconds)
-                    #    currentVolt=Charge_Volt_start+DeltaV*Lratio
-                    #    if (currentVolt>Charge_volt_end):
-                    #        currentVolt=Charge_volt_end
+                    #    currentVolt=charge_volt_start+DeltaV*Lratio
+                    #    if (currentVolt>charge_volt_end):
+                    #        currentVolt=charge_volt_end
                     #    self.setVoltage(currentVolt)
                     #    print(currentVolt)
 
@@ -275,7 +278,7 @@ class TestController:
                     # read voltage from electronic load - this is the voltage of the cell
                     v = self.getVoltageELC()
                     c = self.getCurrentPSC()  # read the current from Power Supply
-                    print(f"{cycleNumber} of {numCycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}")
+                    print(f"{cycleNumber} of {num_cycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}")
 
                     dataStorage.addTime(float(tmp.total_seconds()))
                     dataStorage.addVoltage(v)
@@ -297,15 +300,15 @@ class TestController:
             self.stopDischarge()
             self.setCCLmode()  # set the DC to CC low range mode
 
-            # if (DCharge_current_max>float(self.getCCcurrentL1MAX())):
-            #    self.setCCcurrentL1MAX(DCharge_current_max)
+            # if (dcharge_current_max>float(self.getCCcurrentL1MAX())):
+            #    self.setCCcurrentL1MAX(dcharge_current_max)
             #    print(self.getCCcurrentL1MAX())
 
             # Set the desired current of channel L1&L2
-            self.setCCcurrentL1(DCharge_current_max)
+            self.setCCcurrentL1(dcharge_current_max)
             self.startDischarge()  # turn on DC load
 
-            # self.dischargeCC(DCharge_current_max)
+            # self.dischargeCC(dcharge_current_max)
 
             DischargestartTime = datetime.now()
             print('Discharging')
@@ -316,84 +319,84 @@ class TestController:
                 # v = self.getVoltage()  # read the voltage from multimeter 12061
                 v = self.getVoltageELC()  # read voltage from electronic load
                 c = self.getCurrentELC()  # read the current from electronic load
-                print(f"{cycleNumber} of {numCycles} -DISCHARGING- {tmp.total_seconds():03.2f} s of {Dduration.total_seconds():.1f} s - V:{v:.4f} C:{c:.4f}")
+                print(f"{cycleNumber} of {num_cycles} -DISCHARGING- {tmp.total_seconds():03.2f} s of {Dduration.total_seconds():.1f} s - V:{v:.4f} C:{c:.4f}")
                 dataStorage.addTime(float(tmp.total_seconds()))
                 dataStorage.addVoltage(v)
                 dataStorage.addCurrent(c)
-                if (v < DCharge_volt_min):  # Breaking out if minimum voltage has been reached
-                    print(f"below {DCharge_volt_min} volts")
+                if (v < dcharge_volt_min):  # Breaking out if minimum voltage has been reached
+                    print(f"below {dcharge_volt_min} volts")
                     break
             self.stopDischarge()  # Inactivate the electronic load
             # Discharging loop ends
 
             # Create a table from the measurements made in this cycle (27.0 is the temperature - now kept fixed)
             dataStorage.createTable(
-                Test_Name, DCharge_current_max, cycleNumber, Temperature, self.timeInterval, Charge_time)
+                test_name, dcharge_current_max, cycleNumber, temperature, self.timeInterval, charge_time)
 
         # Set the event to indicate that testing is finished
         self.event.set()
 
 
-    def Capacity_Test(self, Test_Name: str, 
-                   Temperature: float, 
-                   Charge_volt_prot: int, 
-                   Charge_current_prot: int,
-                   Charge_power_prot: int, 
-                   Charge_Volt_start: float, 
-                   Charge_volt_end: float,
-                   Charge_current_max: float, 
-                   DCharge_volt_min: float,
-                   DCharge_current_max: float, 
-                   Slew_volt: float, 
-                   Slew_current: float,
-                   LeadinTime: int, 
-                   Charge_time: int, 
-                   DCharge_time: int, 
-                   numCycles: int):
+    def Capacity_Test(self, test_name: str, 
+                   temperature: float, 
+                   charge_volt_prot: int, 
+                   charge_current_prot: int,
+                   charge_power_prot: int, 
+                   charge_volt_start: float, 
+                   charge_volt_end: float,
+                   charge_current_max: float, 
+                   dcharge_volt_min: float,
+                   dcharge_current_max: float, 
+                   slew_volt: float, 
+                   slew_current: float,
+                   leadin_time: int, 
+                   charge_time: int, 
+                   dcharge_time: int, 
+                   num_cycles: int):
         # Setting parameters and limits
         self.powerSupplyController.stopOutput()
         print(f"Stopping output from Power Supply")
 
         print("===========================")
-        print(f"Charge time {Charge_time}")
-        self.setVoltageLimMax((Charge_volt_end-0.01))
-        print(f"Set the final Charge voltage to {(Charge_volt_end-0.01)}")
+        print(f"Charge time {charge_time}")
+        self.setVoltageLimMax((charge_volt_end-0.01))
+        print(f"Set the final Charge voltage to {(charge_volt_end-0.01)}")
 
-        self.setVoltageProt(Charge_volt_prot)
+        self.setVoltageProt(charge_volt_prot)
         print(
-            f"Set the Charging Over Voltage Protection to {Charge_volt_prot}")
+            f"Set the Charging Over Voltage Protection to {charge_volt_prot}")
 
-        self.setCurrentLimMax(Charge_current_max-0.01)
-        print(f"Set the max Charge Current to {Charge_current_max-0.01}")
+        self.setCurrentLimMax(charge_current_max-0.01)
+        print(f"Set the max Charge Current to {charge_current_max-0.01}")
 
-        self.setCurrentProt(Charge_current_prot)
-        print(f"Set the Over Current Protection to {Charge_current_prot}")
+        self.setCurrentProt(charge_current_prot)
+        print(f"Set the Over Current Protection to {charge_current_prot}")
 
-        self.setVoltageSlew(Slew_volt)
-        print(f"Set the Charging Voltage Slew rate to {Slew_volt}")
+        self.setVoltageSlew(slew_volt)
+        print(f"Set the Charging Voltage Slew rate to {slew_volt}")
 
-        self.setCurrentSlew(Slew_current)
-        print(f"Set the Charging Current Slew rate to {Slew_current}")
+        self.setCurrentSlew(slew_current)
+        print(f"Set the Charging Current Slew rate to {slew_current}")
 
-        self.setPowerProt(Charge_power_prot)
-        print(f"Set the Charging Over Power Protection  {Charge_power_prot}")
+        self.setPowerProt(charge_power_prot)
+        print(f"Set the Charging Over Power Protection  {charge_power_prot}")
         print("===========================")
 
-        print(f"Discharge time {DCharge_time}")
-        print(f"Max Discharge Current {DCharge_current_max}")
+        print(f"Discharge time {dcharge_time}")
+        print(f"Max Discharge Current {dcharge_current_max}")
         print(f"Max allowable discharge current {self.getCCcurrentL1MAX()}")
         print("===========================")
 
-        # Charge each cycle for Charge_time seconds
-        Cduration = timedelta(seconds=Charge_time)
-        # Discharge each cycle for DCharge_time seconds
-        Dduration = timedelta(seconds=DCharge_time)
-        Lduration = timedelta(seconds=LeadinTime)     # Leadin time in seconds
+        # Charge each cycle for charge_time seconds
+        Cduration = timedelta(seconds=charge_time)
+        # Discharge each cycle for dcharge_time seconds
+        Dduration = timedelta(seconds=dcharge_time)
+        Lduration = timedelta(seconds=leadin_time)     # Leadin time in seconds
         # the amount to increase the start Volt to get to end Volt
-        DeltaV = Charge_volt_end-Charge_Volt_start
+        DeltaV = charge_volt_end-charge_volt_start
 
         # Charging/Discharging loop starts
-        for cycleNumber in range(int(numCycles)):
+        for cycleNumber in range(int(num_cycles)):
             # dataStorage object to keep track of test data
             dataStorage = DataStorage()  # one for each cycle
             Cend_time = datetime.now() + Cduration  # set the time when to stop charging
@@ -405,8 +408,8 @@ class TestController:
 
                 # Charging loop
                 self.startPSOutput()
-                self.chargeCC(Charge_current_max)
-                self.setVoltage(Charge_Volt_start)
+                self.chargeCC(charge_current_max)
+                self.setVoltage(charge_volt_start)
                 print('Charging')
                 while (datetime.now() < Cend_time):
                     # while Charging do the following
@@ -418,7 +421,7 @@ class TestController:
                     # read voltage from electronic load - this is the voltage of the cell
                     v = self.getVoltageELC()
                     c = self.getCurrentPSC()  # read the current from Power Supply
-                    print(f"{cycleNumber} of {numCycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}")
+                    print(f"{cycleNumber} of {num_cycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}")
 
                     dataStorage.addTime(float(tmp.total_seconds()))
                     dataStorage.addVoltage(v)
@@ -434,10 +437,10 @@ class TestController:
             self.setCCLmode()  # set the DC to CC low range mode
 
             # Set the desired current of channel L1&L2
-            self.setCCcurrentL1(DCharge_current_max)
+            self.setCCcurrentL1(dcharge_current_max)
             self.startDischarge()  # turn on DC load
 
-            # self.dischargeCC(DCharge_current_max)
+            # self.dischargeCC(dcharge_current_max)
 
             DischargestartTime = datetime.now()
             print('Discharging')
@@ -448,19 +451,19 @@ class TestController:
                 # v = self.getVoltage()  # read the voltage from multimeter 12061
                 v = self.getVoltageELC()  # read voltage from electronic load
                 c = self.getCurrentELC()  # read the current from electronic load
-                print(f"{cycleNumber} of {numCycles} -DISCHARGING- {tmp.total_seconds():03.2f} s of {Dduration.total_seconds():.1f} s - V:{v:.4f} C:{c:.4f}")
+                print(f"{cycleNumber} of {num_cycles} -DISCHARGING- {tmp.total_seconds():03.2f} s of {Dduration.total_seconds():.1f} s - V:{v:.4f} C:{c:.4f}")
                 dataStorage.addTime(float(tmp.total_seconds()))
                 dataStorage.addVoltage(v)
                 dataStorage.addCurrent(c)
-                if (v < DCharge_volt_min):  # Breaking out if minimum voltage has been reached
-                    print(f"below {DCharge_volt_min} volts")
+                if (v < dcharge_volt_min):  # Breaking out if minimum voltage has been reached
+                    print(f"below {dcharge_volt_min} volts")
                     break
             self.stopDischarge()  # Inactivate the electronic load
             # Discharging loop ends
 
             # Create a table from the measurements made in this cycle (27.0 is the temperature - now kept fixed)
             dataStorage.createTable(
-                Test_Name, DCharge_current_max, cycleNumber, Temperature, self.timeInterval, Charge_time)
+                test_name, dcharge_current_max, cycleNumber, temperature, self.timeInterval, charge_time)
 
         # Set the event to indicate that testing is finished
         self.event.set()
