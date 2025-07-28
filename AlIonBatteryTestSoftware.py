@@ -399,9 +399,9 @@ class TestController:
             Cend_time = datetime.now() + Cduration  # set the time when to stop charging
             ChargestartTime = datetime.now()
 
-            xx = 2  # temp variable used to bypass the charging part
+            bypassCharging = True  # Set to True to bypass the charging part
 
-            if (xx > 1):
+            if bypassCharging:
 
                 # Charging loop
                 self.startPSOutput()
