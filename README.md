@@ -37,3 +37,8 @@ By default the parameters in `MAIN.py` define a single cycle with 16.21&ndash;16
 charging at 5&nbsp;A and a discharge down to 11&nbsp;V. Adjust them as needed for your
 test setup.
 
+
+## Manufacturer Programming Manuals
+
+A `manuals/` directory is provided for storing manufacturer documentation such as programming manuals.
+Add any PDF or reference files you need for the hardware here. The folder is ignored by Git so large documents won't be committed.
