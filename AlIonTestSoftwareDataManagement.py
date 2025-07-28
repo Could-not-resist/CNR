@@ -57,9 +57,11 @@ class DataStorage:
         today = date.today()
         try:
             # Find the absolute path to the current file
-            abs = os.path.abspath("").replace("\\", "/")
+            abs_path = os.path.abspath("").replace("\\", "/")
             # Use the absolute path to create a path to the Data folder
-            filePath = f"{abs}/Data/{testName}_{c_rate}C_#{cycleNr + 1}_@{temperature}°C_" +\
+            data_dir = f"{abs_path}/Data"
+            os.makedirs(data_dir, exist_ok=True)
+            filePath = f"{data_dir}/{testName}_{c_rate}C_#{cycleNr + 1}_@{temperature}°C_" +\
             str(datetime.now().strftime("%d.%m.%y_%H;%M"))
             # Display the Path for debug purposes
             print(abs)
@@ -102,8 +104,8 @@ class DataStorage:
         if sheet is None:
             sheet = wb.worksheets[0]
 
-        # if (chargeTime == 0):  # Only if chargetime is zero
-        if True:
+        # Only create generic graphs when no dedicated charge time is provided
+        if chargeTime == 0:
             # Create a list of Values to graph
             seconds = Reference(sheet, min_col=1, min_row=3,
                                 max_col=1, max_row=len(csvDataframe))
@@ -173,8 +175,7 @@ class DataStorage:
             voltageSeriesCharging = Series(
                 voltageCharging, seconds, title_from_data=False)
             voltageChartCharging.series.append(voltageSeriesCharging)
-            voltageChartCharging.title = "Voltage during charging (" + \
-                chargeTime + " s)"
+            voltageChartCharging.title = f"Voltage during charging ({chargeTime} s)"
             voltageChartCharging.x_axis.tickLblPos = "low"
             voltageChartCharging.x_axis.title = "Time [s]"
             voltageChartCharging.y_axis.title = "Voltage [V]"
@@ -185,8 +186,7 @@ class DataStorage:
             currentSeriesCharging = Series(
                 currentCharging, seconds, title_from_data=False)
             currentChartCharging.series.append(currentSeriesCharging)
-            currentChartCharging.title = "Current during charging (" + \
-                chargeTime + " s)"
+            currentChartCharging.title = f"Current during charging ({chargeTime} s)"
             currentChartCharging.x_axis.tickLblPos = "low"
             currentChartCharging.x_axis.title = "Time [s]"
             currentChartCharging.y_axis.title = "Current [mA]"
@@ -197,8 +197,7 @@ class DataStorage:
             powerSeriesCharging = Series(
                 powerCharging, seconds, title_from_data=False)
             powerChartCharging.series.append(powerSeriesCharging)
-            powerChartCharging.title = "Power during charging (" + \
-                chargeTime + " s)"
+            powerChartCharging.title = f"Power during charging ({chargeTime} s)"
             powerChartCharging.x_axis.tickLblPos = "low"
             powerChartCharging.x_axis.title = "Time [s]"
             powerChartCharging.y_axis.title = "Power [W]"
