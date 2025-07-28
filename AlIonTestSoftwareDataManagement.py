@@ -64,7 +64,6 @@ class DataStorage:
         if include_capacity:
             head.append("Capacity")
         # Store the table in a text file
-        today = date.today()
         try:
             # Find the absolute path to the current file
             abs_path = os.path.abspath("").replace("\\", "/")

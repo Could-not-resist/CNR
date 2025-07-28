@@ -166,6 +166,9 @@ def main():
             args.pulse_duration,
             args.temperature,
         )
+        capacity = tc.actual_capacity_test(args.capacity_current, args.temperature)
+        print(f"Measured capacity: {capacity:.3f} Ah")
+
     else:
         settings = UPSSettings(
             test_name=args.test_name,
