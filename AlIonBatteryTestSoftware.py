@@ -371,7 +371,7 @@ class TestController:
                 if not in_cv and v >= 4.1:
                     self.chargeCV(4.1)
                     in_cv = True
-                if in_cv and c <= c_rate / 25.0:
+                if in_cv and c <= c_rate / self.CV_CUTOFF_RATIO:
                     break
             self.stopPSOutput()
 
