@@ -421,6 +421,71 @@ class TestController:
         return results
 
 
+    def actual_capacity_test(self, current_1c: float, temperature: float = 20.0):
+        """Perform an actual capacity test.
+
+        The procedure charges the cell at 1C to 4.1 V, rests for one hour and
+        then discharges at 1C down to 2.75 V while logging the cumulative
+        capacity.
+        """
+
+        dataStorage = DataStorage()
+        self.event.clear()
+
+        # ----- Charge step -----
+        self.startPSOutput()
+        self.chargeCC(current_1c)
+        self.setVoltage(4.1)
+
+        elapsed = 0.0
+        capacity = 0.0
+        print("Charging to 4.1 V at 1C")
+        while True:
+            time.sleep(self.timeInterval)
+            elapsed += self.timeInterval
+            v = self.getVoltageELC()
+            c = self.getCurrentPSC()
+            dataStorage.addTime(elapsed)
+            dataStorage.addVoltage(v)
+            dataStorage.addCurrent(c)
+            dataStorage.addCapacity(capacity)
+            if v >= 4.1:
+                break
+
+        self.stopPSOutput()
+
+        # ----- Rest step -----
+        print("Resting for 1 hour")
+        time.sleep(3600)
+
+        # ----- Discharge step -----
+        self.stopDischarge()
+        self.setCCLmode()
+        self.setCCcurrentL1(current_1c)
+        self.startDischarge()
+
+        print("Discharging to 2.75 V at 1C")
+        while True:
+            time.sleep(self.timeInterval)
+            elapsed += self.timeInterval
+            v = self.getVoltageELC()
+            c = self.getCurrentELC()
+            capacity += c * self.timeInterval / 3600.0
+            dataStorage.addTime(elapsed)
+            dataStorage.addVoltage(v)
+            dataStorage.addCurrent(c)
+            dataStorage.addCapacity(capacity)
+            if v <= 2.75:
+                break
+
+        self.stopDischarge()
+        dataStorage.createTable(
+            "actual_capacity_test", current_1c, 0, temperature, self.timeInterval
+        )
+
+        self.event.set()
+
+
 
     def Capacity_Test(self, test_name: str, 
                    temperature: float, 

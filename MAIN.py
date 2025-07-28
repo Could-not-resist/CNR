@@ -104,6 +104,10 @@ def main():
     parser.add_argument("--charge-time", type=int, default=CHARGE_TIME)
     parser.add_argument("--dcharge-time", type=int, default=DCHARGE_TIME)
     parser.add_argument("--num-cycles", type=int, default=NUM_CYCLES)
+    parser.add_argument("--actual-capacity-test", action="store_true",
+                        help="run actual capacity test")
+    parser.add_argument("--capacity-current", type=float, default=1.0,
+                        help="1C current in amperes")
     parser.add_argument("--efficiency-test", action="store_true",
                         help="run efficiency test instead of UPS test")
     parser.add_argument("--c-rate", type=float, default=1.0,
@@ -112,6 +116,11 @@ def main():
                         help="number of cycles for efficiency test")
 
     args = parser.parse_args()
+
+    if args.actual_capacity_test:
+        tc = TestController()
+        tc.actual_capacity_test(args.capacity_current, args.temperature)
+        return
 
     if args.efficiency_test:
         tc = TestController()

@@ -33,6 +33,16 @@ pip install pyvisa pandas openpyxl matplotlib tabulate
 python MAIN.py
 ```
 
+To perform a full capacity measurement instead of the default cycling test run:
+
+```bash
+python MAIN.py --actual-capacity-test --capacity-current 1.0
+```
+
+This charges the cell at 1C to **4.1&nbsp;V**, rests for one hour at
+20&nbsp;±&nbsp;2 °C and then discharges at 1C down to **2.75&nbsp;V** while
+recording the delivered ampere hours.
+
 By default the parameters in `MAIN.py` define a single cycle with
 16.21&ndash;16.4&nbsp;V charging at 5&nbsp;A and a discharge down to 11&nbsp;V.
 You can override any of these values using the command-line options
