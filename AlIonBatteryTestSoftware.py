@@ -338,6 +338,239 @@ class TestController:
         # Set the event to indicate that testing is finished
         self.event.set()
 
+    def efficiency_test(
+        self,
+        charge_current: float,
+        discharge_current: float,
+        charge_voltage: float = 4.1,
+        discharge_voltage: float = 2.75,
+        temperature: float = 20.0,
+    ) -> None:
+        """Perform a round trip efficiency test using a CC–CV charge and CC
+        discharge as described in IEC standards."""
+
+        dataStorage = DataStorage()
+        self.event.clear()
+
+        energy_in = 0.0
+        energy_out = 0.0
+        elapsed = 0.0
+
+        # ----- CC step -----
+        print("Charging (CC stage)")
+        self.startPSOutput()
+        self.chargeCC(charge_current)
+        self.setVoltage(charge_voltage)
+        while True:
+            time.sleep(self.timeInterval)
+            elapsed += self.timeInterval
+            v = self.getVoltagePSC()
+            c = self.getCurrentPSC()
+            energy_in += v * c * self.timeInterval / 3600.0
+            dataStorage.addTime(elapsed)
+            dataStorage.addVoltage(v)
+            dataStorage.addCurrent(c)
+            if v >= charge_voltage:
+                break
+
+        # ----- CV step -----
+        print("Charging (CV stage)")
+        self.chargeCV(charge_voltage)
+        while True:
+            time.sleep(self.timeInterval)
+            elapsed += self.timeInterval
+            v = self.getVoltagePSC()
+            c = self.getCurrentPSC()
+            energy_in += v * c * self.timeInterval / 3600.0
+            dataStorage.addTime(elapsed)
+            dataStorage.addVoltage(v)
+            dataStorage.addCurrent(c)
+            if c <= 0.05 * charge_current:
+                break
+
+        self.stopPSOutput()
+
+        print("Resting for 10 minutes")
+        time.sleep(600)
+
+        # ----- Discharge step -----
+        print("Discharging")
+        self.stopDischarge()
+        self.setCCLmode()
+        self.setCCcurrentL1(discharge_current)
+        self.startDischarge()
+        while True:
+            time.sleep(self.timeInterval)
+            elapsed += self.timeInterval
+            v = self.getVoltageELC()
+            c = self.getCurrentELC()
+            energy_out += v * c * self.timeInterval / 3600.0
+            dataStorage.addTime(elapsed)
+            dataStorage.addVoltage(v)
+            dataStorage.addCurrent(c)
+            if v <= discharge_voltage:
+                break
+
+        self.stopDischarge()
+        efficiency = 0.0
+        if energy_in > 0:
+            efficiency = (energy_out / energy_in) * 100.0
+        print(f"Efficiency: {efficiency:.2f}%")
+        dataStorage.createTable(
+            "efficiency_test", discharge_current, 0, temperature, self.timeInterval
+        )
+
+        self.event.set()
+
+    def rate_characteristic_test(
+        self,
+        discharge_currents,
+        charge_current: float,
+        charge_voltage: float = 4.1,
+        discharge_voltage: float = 2.75,
+        temperature: float = 20.0,
+    ) -> None:
+        """Measure capacity at multiple discharge rates."""
+
+        self.event.clear()
+        for i, d_current in enumerate(discharge_currents):
+            dataStorage = DataStorage()
+            elapsed = 0.0
+
+            # -- charge cell using CC–CV --
+            self.startPSOutput()
+            self.chargeCC(charge_current)
+            self.setVoltage(charge_voltage)
+            while True:
+                time.sleep(self.timeInterval)
+                elapsed += self.timeInterval
+                v = self.getVoltagePSC()
+                c = self.getCurrentPSC()
+                dataStorage.addTime(elapsed)
+                dataStorage.addVoltage(v)
+                dataStorage.addCurrent(c)
+                if v >= charge_voltage:
+                    break
+            self.chargeCV(charge_voltage)
+            while True:
+                time.sleep(self.timeInterval)
+                elapsed += self.timeInterval
+                v = self.getVoltagePSC()
+                c = self.getCurrentPSC()
+                dataStorage.addTime(elapsed)
+                dataStorage.addVoltage(v)
+                dataStorage.addCurrent(c)
+                if c <= 0.05 * charge_current:
+                    break
+            self.stopPSOutput()
+
+            time.sleep(600)  # rest
+
+            # -- discharge step --
+            self.stopDischarge()
+            self.setCCLmode()
+            self.setCCcurrentL1(d_current)
+            self.startDischarge()
+            capacity = 0.0
+            while True:
+                time.sleep(self.timeInterval)
+                elapsed += self.timeInterval
+                v = self.getVoltageELC()
+                c = self.getCurrentELC()
+                capacity += c * self.timeInterval / 3600.0
+                dataStorage.addTime(elapsed)
+                dataStorage.addVoltage(v)
+                dataStorage.addCurrent(c)
+                dataStorage.addCapacity(capacity)
+                if v <= discharge_voltage:
+                    break
+            self.stopDischarge()
+            dataStorage.createTable(
+                f"rate_characteristic_{i}", d_current, i, temperature, self.timeInterval
+            )
+
+        self.event.set()
+
+    def ocv_curve_test(
+        self,
+        step_current: float,
+        steps: int = 10,
+        rest_time: float = 1800.0,
+        temperature: float = 20.0,
+    ) -> None:
+        """Generate an OCV curve by stepping the SOC and measuring the open
+        circuit voltage after each rest period."""
+
+        dataStorage = DataStorage()
+        self.event.clear()
+
+        elapsed = 0.0
+        for i in range(steps + 1):
+            # charge for one step
+            self.startPSOutput()
+            self.chargeCC(step_current)
+            time.sleep(60)
+            self.stopPSOutput()
+
+            print(f"Resting before OCV measurement {i}")
+            time.sleep(rest_time)
+            v = self.getVoltageELC()
+            elapsed += rest_time
+            dataStorage.addTime(elapsed)
+            dataStorage.addVoltage(v)
+            dataStorage.addCurrent(0.0)
+            print(f"Step {i}: OCV {v:.4f} V")
+
+        dataStorage.createTable(
+            "ocv_curve_test", step_current, 0, temperature, self.timeInterval
+        )
+        self.event.set()
+
+    def internal_resistance_test(
+        self,
+        pulse_current: float,
+        pulse_duration: float = 1.0,
+        temperature: float = 20.0,
+    ) -> None:
+        """Measure the DC and AC internal resistance using a current pulse and
+        the multimeter reading."""
+
+        dataStorage = DataStorage()
+        self.event.clear()
+
+        # Open circuit voltage
+        ocv = self.getVoltageELC()
+        print(f"OCV: {ocv:.4f} V")
+
+        # Apply current pulse
+        self.stopDischarge()
+        self.setCCLmode()
+        self.setCCcurrentL1(pulse_current)
+        self.startDischarge()
+        time.sleep(pulse_duration)
+        v_loaded = self.getVoltageELC()
+        self.stopDischarge()
+
+        delta_v = ocv - v_loaded
+        r_dc = 0.0
+        if pulse_current != 0:
+            r_dc = delta_v / pulse_current
+        r_ac = float(self.multimeterController.getResistance())
+        print(f"DC resistance: {r_dc:.4f} ohm, AC resistance: {r_ac}")
+
+        dataStorage.addTime(0.0)
+        dataStorage.addVoltage(ocv)
+        dataStorage.addCurrent(0.0)
+        dataStorage.addTime(pulse_duration)
+        dataStorage.addVoltage(v_loaded)
+        dataStorage.addCurrent(pulse_current)
+
+        dataStorage.createTable(
+            "internal_resistance_test", pulse_current, 0, temperature, self.timeInterval
+        )
+
+        self.event.set()
+
     def actual_capacity_test(self, current_1c: float, temperature: float = 20.0):
         """Perform an actual capacity test.
 

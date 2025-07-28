@@ -108,12 +108,64 @@ def main():
                         help="run actual capacity test")
     parser.add_argument("--capacity-current", type=float, default=1.0,
                         help="1C current in amperes")
+    parser.add_argument("--efficiency-test", action="store_true",
+                        help="run efficiency test")
+    parser.add_argument("--rate-characteristic-test", action="store_true",
+                        help="run rate characteristic test")
+    parser.add_argument("--ocv-curve-test", action="store_true",
+                        help="run OCV curve test")
+    parser.add_argument("--internal-resistance-test", action="store_true",
+                        help="run internal resistance test")
+    parser.add_argument("--rates", default="1.0,0.5,0.2",
+                        help="comma separated discharge rates in A")
+    parser.add_argument("--step-current", type=float, default=1.0,
+                        help="step current for OCV curve")
+    parser.add_argument("--steps", type=int, default=10,
+                        help="number of steps for OCV curve")
+    parser.add_argument("--pulse-current", type=float, default=1.0,
+                        help="pulse current for resistance test")
+    parser.add_argument("--pulse-duration", type=float, default=1.0,
+                        help="pulse duration in seconds")
 
     args = parser.parse_args()
 
     if args.actual_capacity_test:
         tc = TestController()
         tc.actual_capacity_test(args.capacity_current, args.temperature)
+    elif args.efficiency_test:
+        tc = TestController()
+        tc.efficiency_test(
+            args.charge_current_max,
+            args.dcharge_current_max,
+            args.charge_volt_end,
+            args.dcharge_volt_min,
+            args.temperature,
+        )
+    elif args.rate_characteristic_test:
+        rates = [float(r) for r in args.rates.split(',') if r]
+        tc = TestController()
+        tc.rate_characteristic_test(
+            rates,
+            args.charge_current_max,
+            args.charge_volt_end,
+            args.dcharge_volt_min,
+            args.temperature,
+        )
+    elif args.ocv_curve_test:
+        tc = TestController()
+        tc.ocv_curve_test(
+            args.step_current,
+            args.steps,
+            1800.0,
+            args.temperature,
+        )
+    elif args.internal_resistance_test:
+        tc = TestController()
+        tc.internal_resistance_test(
+            args.pulse_current,
+            args.pulse_duration,
+            args.temperature,
+        )
     else:
         settings = UPSSettings(
             test_name=args.test_name,

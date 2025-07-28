@@ -39,6 +39,44 @@ To perform a full capacity measurement instead of the default cycling test run:
 python MAIN.py --actual-capacity-test --capacity-current 1.0
 ```
 
+Additional tests can be invoked with the following flags:
+
+- **Efficiency test**
+
+  ```bash
+  python MAIN.py --efficiency-test
+  ```
+
+  Performs a CC–CV charge followed by a discharge and prints the round
+  trip efficiency.
+
+- **Rate characteristic test**
+
+  ```bash
+  python MAIN.py --rate-characteristic-test --rates 1.0,0.5,0.2
+  ```
+
+  Charges the cell and then discharges sequentially at the specified currents
+  to record the delivered capacity at each rate.
+
+- **OCV curve test**
+
+  ```bash
+  python MAIN.py --ocv-curve-test --step-current 1.0 --steps 10
+  ```
+
+  Steps the state of charge and logs the open circuit voltage after each rest
+  period.
+
+- **Internal resistance test**
+
+  ```bash
+  python MAIN.py --internal-resistance-test --pulse-current 1 --pulse-duration 1
+  ```
+
+  Applies a short current pulse to determine the DC and AC resistance of the
+  cell.
+
 This charges the cell at 1C to **4.1&nbsp;V**, rests for one hour at
 20&nbsp;±&nbsp;2 °C and then discharges at 1C down to **2.75&nbsp;V** while
 recording the delivered ampere hours.
