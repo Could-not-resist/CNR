@@ -38,6 +38,15 @@ By default the parameters in `MAIN.py` define a single cycle with
 You can override any of these values using the command-line options
 documented below.
 
+To run the built-in efficiency test use the `--efficiency-test` flag. The
+1&nbsp;C current is specified with `--c-rate` (in amperes) and the number of
+cycles with `--eff-cycles`. Each cycle's efficiency metrics are printed to
+the console, and the third cycle values are summarised at the end:
+
+```bash
+python MAIN.py --efficiency-test --c-rate 2.0
+```
+
 ### Main parameters
 
 The top of `MAIN.py` contains constants used to configure a test run:

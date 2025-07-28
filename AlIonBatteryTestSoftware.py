@@ -338,6 +338,89 @@ class TestController:
         # Set the event to indicate that testing is finished
         self.event.set()
 
+    def efficiency_test(self, c_rate: float, num_cycles: int = 3):
+        """Run a simple efficiency test.
+
+        The battery is charged using a CC‑CV method to 4.1 V. Charging
+        switches from constant current at ``c_rate`` amps to constant voltage
+        at 4.1 V once the cell reaches that voltage. Charging stops when the
+        current drops below ``c_rate/25``. After charging the cell is
+        discharged at ``c_rate`` amps until 2.75 V.
+
+        Charge and discharge amp‑hours and watt‑hours are logged for each
+        cycle and the coulombic and energy efficiencies are calculated.  The
+        results from the third cycle are printed to stdout.
+        """
+
+        results = []
+        for cycle in range(1, num_cycles + 1):
+            ch_Ah = ch_Wh = 0.0
+            d_Ah = d_Wh = 0.0
+
+            # --- Charge (CC‑CV) ---
+            self.startPSOutput()
+            self.chargeCC(c_rate)
+            self.setVoltage(4.1)
+            in_cv = False
+            while True:
+                time.sleep(self.timeInterval)
+                v = self.getVoltagePSC()
+                c = self.getCurrentPSC()
+                ch_Ah += c * self.timeInterval / 3600.0
+                ch_Wh += v * c * self.timeInterval / 3600.0
+                if not in_cv and v >= 4.1:
+                    self.chargeCV(4.1)
+                    in_cv = True
+                if in_cv and c <= c_rate / 25.0:
+                    break
+            self.stopPSOutput()
+
+            # --- Discharge (1C) ---
+            self.stopDischarge()
+            self.setCCLmode()
+            self.setCCcurrentL1(c_rate)
+            self.startDischarge()
+            while True:
+                time.sleep(self.timeInterval)
+                v = self.getVoltageELC()
+                c = self.getCurrentELC()
+                d_Ah += c * self.timeInterval / 3600.0
+                d_Wh += v * c * self.timeInterval / 3600.0
+                if v <= 2.75:
+                    break
+            self.stopDischarge()
+
+            coul_eff = d_Ah / ch_Ah if ch_Ah else 0.0
+            en_eff = d_Wh / ch_Wh if ch_Wh else 0.0
+            cycle_res = {
+                "cycle": cycle,
+                "charge_Ah": ch_Ah,
+                "charge_Wh": ch_Wh,
+                "discharge_Ah": d_Ah,
+                "discharge_Wh": d_Wh,
+                "coulombic_eff": coul_eff,
+                "energy_eff": en_eff,
+            }
+            results.append(cycle_res)
+            print(
+                f"Cycle {cycle} - Charged: {ch_Ah:.4f} Ah {ch_Wh:.4f} Wh, "
+                f"Discharged: {d_Ah:.4f} Ah {d_Wh:.4f} Wh, "
+                f"Coulombic eff.: {coul_eff:.4f}, Energy eff.: {en_eff:.4f}"
+            )
+
+        if len(results) >= 3:
+            res = results[2]
+            print(
+                "Third cycle summary - "
+                f"Charged: {res['charge_Ah']:.4f} Ah {res['charge_Wh']:.4f} Wh, "
+                f"Discharged: {res['discharge_Ah']:.4f} Ah {res['discharge_Wh']:.4f} Wh, "
+                f"Coulombic eff.: {res['coulombic_eff']:.4f}, "
+                f"Energy eff.: {res['energy_eff']:.4f}"
+            )
+
+        return results
+
+
 
     def Capacity_Test(self, test_name: str, 
                    temperature: float, 
