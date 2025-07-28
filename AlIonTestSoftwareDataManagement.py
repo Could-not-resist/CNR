@@ -22,6 +22,7 @@ class DataStorage:
         self.volts = []
         self.current = []
         self.power = []
+        self.capacity = []
 
     # Function to add time value
     def addTime(self, Mtime_sec: float):
@@ -34,6 +35,10 @@ class DataStorage:
     # Function to add current value
     def addCurrent(self, ampers: float):
         self.current.append(float('{:.4f}'.format(ampers)))
+
+    def addCapacity(self, ah: float):
+        """Store capacity value in ampere-hours."""
+        self.capacity.append(float('{:.4f}'.format(ah)))
 
     # Function for creating a table
     def createTable(self, testName, c_rate: float, cycleNr: int, temperature: float, timeInterval: float, chargeTime=0):
@@ -48,11 +53,16 @@ class DataStorage:
         # NaNs when creating the DataFrame.
         data = []
         # Fill the list with the results
+        include_capacity = len(self.capacity) == len(self.volts) and len(self.capacity) > 0
         for j in range(len(self.volts)):
             d = [float(j) * timeInterval, self.time[j],
                  self.volts[j], self.current[j], self.power[j]]
+            if include_capacity:
+                d.append(self.capacity[j])
             data.append(d)
         head = ["Time in seconds", "time", "Volts", "Current", "Power"]
+        if include_capacity:
+            head.append("Capacity")
         # Store the table in a text file
         today = date.today()
         try:
@@ -80,6 +90,7 @@ class DataStorage:
         self.volts = []
         self.current = []
         self.power = []
+        self.capacity = []
 
     def exportCSVFile(self, filePath, data, head):
         df = pd.DataFrame(data, columns=head)
