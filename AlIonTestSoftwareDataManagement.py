@@ -43,7 +43,10 @@ class DataStorage:
         for i in range(length):
             self.power.append(self.volts[i] * self.current[i])
         # Create a 2 dimensional list for the data
-        data = [[]]
+        # Start with an empty list.  The previous implementation initialised the
+        # data list with an empty inner list which resulted in an extra row of
+        # NaNs when creating the DataFrame.
+        data = []
         # Fill the list with the results
         for j in range(len(self.volts)):
             d = [float(j) * timeInterval, self.time[j],
@@ -117,7 +120,8 @@ class DataStorage:
             voltageChart.series.append(voltageSeries)
             voltageChart.title = "Voltage over Time"
             voltageChart.x_axis.title = "Time [s]"
-            voltageChart.x_axis.title = "Voltage [V]"
+            # Label the y-axis correctly instead of overwriting the x-axis title
+            voltageChart.y_axis.title = "Voltage [V]"
 
             # Create a graph for the Current
             currentChart = ScatterChart()
@@ -125,7 +129,7 @@ class DataStorage:
             currentChart.series.append(currentSeries)
             currentChart.title = "Current over Time"
             currentChart.x_axis.title = "Time [s]"
-            currentChart.x_axis.title = "Current [mA]"
+            currentChart.y_axis.title = "Current [mA]"
 
             # Create a graph for the Power
             powerChart = ScatterChart()
@@ -133,7 +137,7 @@ class DataStorage:
             powerChart.series.append(powerSeries)
             powerChart.title = "Power over Time"
             powerChart.x_axis.title = "Time [s]"
-            powerChart.x_axis.title = "Power [W]"
+            powerChart.y_axis.title = "Power [W]"
 
             # Add our graphs to the sheet
             voltageChart.anchor = "E2"
