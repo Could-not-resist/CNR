@@ -1,16 +1,9 @@
 import openpyxl
-from openpyxl.chart import ScatterChart, Reference, Series # type: ignore
+from openpyxl.chart import ScatterChart, Reference, Series  # type: ignore
 # from openpyxl.chart.series import Series
-import datetime
-from math import floor
-import time
-import matplotlib.pyplot as plt
-from datetime import date
 from datetime import datetime
-import threading
 import os
 import pandas as pd
-import tabulate
 import math
 
 
