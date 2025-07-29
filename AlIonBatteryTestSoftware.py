@@ -580,7 +580,7 @@ class TestController:
         # ----- Charge step -----
         self.startPSOutput()
         self.chargeCC(charge_current_1c)
-        self.setVoltage(4.1)
+        self.setVoltage(4.1) # TODO replace magic number with a parameter
 
         elapsed = 0.0
         capacity = 0.0
@@ -594,14 +594,14 @@ class TestController:
             dataStorage.addVoltage(v)
             dataStorage.addCurrent(c)
             dataStorage.addCapacity(capacity)
-            if v >= 4.1:
+            if v >= 4.1: # TODO replace magic number with a parameter
                 break
 
         self.stopPSOutput()
 
         # ----- Rest step -----
         print("Resting for 1 hour")
-        time.sleep(3600)
+        time.sleep(3600) # TODO change to a parameter, 1hr is too much for some tests
 
         # ----- Discharge step -----
         self.stopDischarge()
