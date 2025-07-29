@@ -19,15 +19,21 @@ class TestController:
     C_rate = 0.0
 
     # Initiating function
-    def __init__(self) -> None:
+    def __init__(self, multimeter_mode: str | None = None) -> None:
+        self.multimeter_mode = multimeter_mode
         try:
             # Trying to connect to the real device controllers
             self.powerSupplyController = PowerSupplyController()
             print("Testcontroller succesfully connected to Power Supply")
             self.electronicLoadController = ElectronicLoadController()
             print("Testcontroller succesfully connected to Electronic Load")
-            # self.multimeterController = MultimeterController()
-            # print("Testcontroller succesfully connected to Multimeter")
+            if multimeter_mode:
+                self.multimeterController = MultimeterController()
+                print("Testcontroller succesfully connected to Multimeter")
+                if multimeter_mode == "tcouple":
+                    self.multimeterController.configure_thermocouple()
+            else:
+                self.multimeterController = MultimeterControllerMock()
         except Exception:
             # Connecting to the mock device controllers when the real devices
             # are not available.  The previous implementation exited before the
@@ -169,6 +175,12 @@ class TestController:
         x = self.powerSupplyController.getCurrent()
         return float(x)
 
+    def getVoltageMM(self):
+        return float(self.multimeterController.getVolts())
+
+    def getTemperatureMM(self):
+        return float(self.multimeterController.getThermocoupleTemp())
+
     # def stopDischarge(self):
     #     self.electronicLoadController.stopDischarge()
 
@@ -195,11 +207,16 @@ class TestController:
         charge_time: int,
         dcharge_time: int,
         num_cycles: int,
+        multimeter_mode: str | None = None,
     ):
         TotstartTime = datetime.now()
         # Setting parameters and limits
         self.powerSupplyController.stopOutput()
         print(f"Stopping output from Power Supply")
+        if multimeter_mode:
+            self.multimeterController.checkDeviceConnection()
+            if multimeter_mode == "tcouple":
+                self.multimeterController.configure_thermocouple()
 
 #        self.powerSupplyController.setVoltage(charge_volt_start)
 #        print(f"Set the initial voltage to {charge_volt_start}")
@@ -280,6 +297,10 @@ class TestController:
                 dataStorage.addTime(float(tmp.total_seconds()))
                 dataStorage.addVoltage(v)
                 dataStorage.addCurrent(c)
+                if multimeter_mode == "voltage":
+                    dataStorage.addMMVoltage(self.getVoltageMM())
+                elif multimeter_mode == "tcouple":
+                    dataStorage.addMMTemperature(self.getTemperatureMM())
             self.stopPSOutput()  # stop the output from the power supply
             # Charging loop ends
 
@@ -321,6 +342,10 @@ class TestController:
                 dataStorage.addTime(float(tmp.total_seconds()))
                 dataStorage.addVoltage(v)
                 dataStorage.addCurrent(c)
+                if multimeter_mode == "voltage":
+                    dataStorage.addMMVoltage(self.getVoltageMM())
+                elif multimeter_mode == "tcouple":
+                    dataStorage.addMMTemperature(self.getTemperatureMM())
                 if (v < dcharge_volt_min):  # Breaking out if minimum voltage has been reached
                     print(f"below {dcharge_volt_min} volts")
                     break

@@ -81,7 +81,12 @@ ELECTRONIC_LOAD_COMMANDS = {
 # MultimeterController SCPI mappings
 MULTIMETER_COMMANDS = {
     "checkDeviceConnection": "*IDN?",
-    "getTemperature": "MEAS:TEMP?",
+    "configure_thermocouple": [
+        'SENSe:FUNCtion "TCOUple"',
+        'SENSe:TCOUple:TYPE {type}',
+        'SENSe:TCOUple:RANGe DEF, DEF',
+    ],
+    "getTemperature": "MEASure:TCOUple?",
     "getVolts": "MEAS:VOLT:DC?",
     "getResistance": "MEAS:RES?",
 }

@@ -16,6 +16,8 @@ class DataStorage:
         self.current = []
         self.power = []
         self.capacity = []
+        self.mm_volts = []
+        self.mm_temp = []
 
     # Function to add time value
     def addTime(self, Mtime_sec: float):
@@ -28,6 +30,12 @@ class DataStorage:
     # Function to add current value
     def addCurrent(self, ampers: float):
         self.current.append(float('{:.4f}'.format(ampers)))
+
+    def addMMVoltage(self, volts: float):
+        self.mm_volts.append(float('{:.4f}'.format(volts)))
+
+    def addMMTemperature(self, temp_c: float):
+        self.mm_temp.append(float('{:.4f}'.format(temp_c)))
 
     def addCapacity(self, ah: float):
         """Store capacity value in ampere-hours."""
@@ -47,15 +55,25 @@ class DataStorage:
         data = []
         # Fill the list with the results
         include_capacity = len(self.capacity) == len(self.volts) and len(self.capacity) > 0
+        include_mm = (
+            len(self.mm_volts) == len(self.volts)
+            and len(self.mm_temp) == len(self.volts)
+            and len(self.mm_volts) > 0
+        )
         for j in range(len(self.volts)):
             d = [float(j) * timeInterval, self.time[j],
                  self.volts[j], self.current[j], self.power[j]]
             if include_capacity:
                 d.append(self.capacity[j])
+            if include_mm:
+                d.append(self.mm_volts[j])
+                d.append(self.mm_temp[j])
             data.append(d)
         head = ["Time in seconds", "time", "Volts", "Current", "Power"]
         if include_capacity:
             head.append("Capacity")
+        if include_mm:
+            head.extend(["MM_Volts", "MM_Temp"])
         # Store the table in a text file
         try:
             # Find the absolute path to the current file
@@ -81,6 +99,8 @@ class DataStorage:
         self.current = []
         self.power = []
         self.capacity = []
+        self.mm_volts = []
+        self.mm_temp = []
 
     def exportCSVFile(self, filePath, data, head):
         df = pd.DataFrame(data, columns=head)

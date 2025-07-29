@@ -57,6 +57,7 @@ class UPSSettings:
     charge_time: int = CHARGE_TIME
     dcharge_time: int = DCHARGE_TIME
     num_cycles: int = NUM_CYCLES
+    multimeter_mode: str | None = None
 
 
 def load_config(config_path: str, profile: str) -> dict:
@@ -69,8 +70,8 @@ def load_config(config_path: str, profile: str) -> dict:
 
 
 class TestTypes:
-    def __init__(self):
-        self.testController = TestController()
+    def __init__(self, multimeter_mode: str | None = None):
+        self.testController = TestController(multimeter_mode)
 
     def runUPSTest(self, settings: UPSSettings):
         """Start a UPS test using the provided settings."""
@@ -95,6 +96,7 @@ class TestTypes:
                 settings.charge_time,
                 settings.dcharge_time,
                 settings.num_cycles,
+                settings.multimeter_mode,
             ),
         )
         self.upsThread.start()
@@ -144,8 +146,21 @@ def main():
                         help="pulse current for resistance test")
     parser.add_argument("--pulse-duration", type=float, default=1.0,
                         help="pulse duration in seconds")
+    parser.add_argument(
+        "--multimeter-mode",
+        choices=["voltage", "tcouple"],
+        help="log measurement with multimeter (voltage or thermocouple)"
+    )
+    parser.add_argument(
+        "--use-multimeter",
+        action="store_true",
+        help="DEPRECATED: same as --multimeter-mode voltage"
+    )
 
     args = parser.parse_args()
+
+    if args.multimeter_mode is None and args.use_multimeter:
+        args.multimeter_mode = "voltage"
 
     profile = args.profile or args.test_name or TEST_NAME
     config = {}
@@ -161,7 +176,7 @@ def main():
             pass
 
     if args.actual_capacity_test:
-        tc = TestController()
+        tc = TestController(args.multimeter_mode)
         tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
@@ -170,7 +185,7 @@ def main():
             args.temperature,
         )
     elif args.efficiency_test:
-        tc = TestController()
+        tc = TestController(args.multimeter_mode)
         tc.efficiency_test(
             args.charge_current_max,
             args.dcharge_current_max,
@@ -180,7 +195,7 @@ def main():
         )
     elif args.rate_characteristic_test:
         rates = [float(r) for r in args.rates.split(',') if r]
-        tc = TestController()
+        tc = TestController(args.multimeter_mode)
         tc.rate_characteristic_test(
             rates,
             args.charge_current_max,
@@ -189,7 +204,7 @@ def main():
             args.temperature,
         )
     elif args.ocv_curve_test:
-        tc = TestController()
+        tc = TestController(args.multimeter_mode)
         tc.ocv_curve_test(
             args.step_current,
             args.steps,
@@ -197,7 +212,7 @@ def main():
             args.temperature,
         )
     elif args.internal_resistance_test:
-        tc = TestController()
+        tc = TestController(args.multimeter_mode)
         tc.internal_resistance_test(
             args.pulse_current,
             args.pulse_duration,
@@ -220,7 +235,7 @@ def main():
                 kwargs[field] = val
         settings = UPSSettings(**kwargs)
 
-        TObj = TestTypes()
+        TObj = TestTypes(args.multimeter_mode)
         TObj.runUPSTest(settings)
 
 
