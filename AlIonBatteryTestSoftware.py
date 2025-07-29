@@ -126,6 +126,10 @@ class TestController:
         # Switch to CC mode Medium Range (max 8 amper)
         self.electronicLoadController.setCCMmode()
 
+    def setCCHmode(self):
+        # Switch to CC mode High Range
+        self.electronicLoadController.setCCHmode()
+
     def setCCcurrentL1(self, amper: float):
         self.electronicLoadController.setCCcurrentL1(
             amper)  # Set the desired current of Channel L1
@@ -605,7 +609,7 @@ class TestController:
 
         # ----- Discharge step -----
         self.stopDischarge()
-        self.setCCLmode() #TODO change to CCH mode ( has to be implemented in the ELC driver)
+        self.setCCHmode()
         self.setCCcurrentL1(discharge_current_1c)
         self.startDischarge()
 

@@ -143,6 +143,9 @@ class ElectronicLoadController:
     def setCCMmode(self):
         self.electronicLoad.write("MODE CCM") # Switch to CC mode Medium Range
 
+    def setCCHmode(self):
+        self.electronicLoad.write("MODE CCH") # Switch to CC mode High Range
+
     def setCCcurrentL1(self, amps):
         self.electronicLoad.write("CURR:STAT:L1 " + str(amps))  # Set the desired current of Channel L1
 
