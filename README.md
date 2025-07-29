@@ -129,7 +129,7 @@ common flags accepted by `MAIN.py` are listed below. Run
 | `--dcharge-current-max` | Maximum discharge current |
 | `--slew-volt` | Voltage slew rate in V/ms |
 | `--slew-current` | Current slew rate in A/ms |
-| `--leadin-time` | Lead-in delay before measurements |
+| `--leadin-time` | Lead-in delay before measurements; overrides `--slew-volt` and ramps from the start to end voltage |
 | `--charge-time` | Allowed charging time |
 | `--dcharge-time` | Allowed discharging time |
 | `--num-cycles` | Number of charge/discharge cycles |
