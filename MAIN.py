@@ -243,3 +243,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+# This allows running the script directly from the command line
+# Example usage:
+# python MAIN.py --actual-capacity-test --capacity-charge-current 4.6 --capacity-discharge-current 46 --multimeter-mode tcouple
