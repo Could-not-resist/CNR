@@ -107,8 +107,10 @@ def main():
     parser.add_argument("--num-cycles", type=int, default=NUM_CYCLES)
     parser.add_argument("--actual-capacity-test", action="store_true",
                         help="run actual capacity test")
-    parser.add_argument("--capacity-current", type=float, default=1.0,
-                        help="1C current in amperes") #TODO current should be adjusted based on the charging or discharging
+    parser.add_argument("--capacity-charge-current", type=float, default=1.0,
+                        help="charge current for capacity test in amperes")
+    parser.add_argument("--capacity-discharge-current", type=float, default=1.0,
+                        help="discharge current for capacity test in amperes")
     parser.add_argument("--efficiency-test", action="store_true",
                         help="run efficiency test")
     parser.add_argument("--rate-characteristic-test", action="store_true",
@@ -132,7 +134,11 @@ def main():
 
     if args.actual_capacity_test:
         tc = TestController()
-        tc.actual_capacity_test(args.capacity_current, args.temperature)
+        tc.actual_capacity_test(
+            args.capacity_charge_current,
+            args.capacity_discharge_current,
+            args.temperature,
+        )
     elif args.efficiency_test:
         tc = TestController()
         tc.efficiency_test(
@@ -167,7 +173,11 @@ def main():
             args.pulse_duration,
             args.temperature,
         )
-        capacity = tc.actual_capacity_test(args.capacity_current, args.temperature)
+        capacity = tc.actual_capacity_test(
+            args.capacity_charge_current,
+            args.capacity_discharge_current,
+            args.temperature,
+        )
         print(f"Measured capacity: {capacity:.3f} Ah")
 
     else:

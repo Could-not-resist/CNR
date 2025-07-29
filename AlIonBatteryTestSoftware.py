@@ -565,12 +565,17 @@ class TestController:
 
         self.event.set()
 
-    def actual_capacity_test(self, current_1c: float, temperature: float = 20.0): #TODO current should be adjusted based on the charging or discharging
+    def actual_capacity_test(
+        self,
+        charge_current_1c: float,
+        discharge_current_1c: float,
+        temperature: float = 20.0,
+    ) -> float:
         """Perform an actual capacity test.
 
-        The procedure charges the cell at 1C to 4.1 V, rests for one hour and
-        then discharges at 1C down to 2.75 V while logging the cumulative
-        capacity.
+        The procedure charges the cell at ``charge_current_1c`` up to 4.1 V,
+        rests for one hour and then discharges at ``discharge_current_1c`` down
+        to 2.75 V while logging the cumulative capacity.
         """
 
         dataStorage = DataStorage()
@@ -578,12 +583,12 @@ class TestController:
 
         # ----- Charge step -----
         self.startPSOutput()
-        self.chargeCC(current_1c)
+        self.chargeCC(charge_current_1c)
         self.setVoltage(4.1)
 
         elapsed = 0.0
         capacity = 0.0
-        print("Charging to 4.1 V at 1C")
+        print(f"Charging to 4.1 V at {charge_current_1c} A")
         while True:
             time.sleep(self.timeInterval)
             elapsed += self.timeInterval
@@ -605,10 +610,10 @@ class TestController:
         # ----- Discharge step -----
         self.stopDischarge()
         self.setCCLmode() #TODO change to CCH mode ( has to be implemented in the ELC driver)
-        self.setCCcurrentL1(current_1c)
+        self.setCCcurrentL1(discharge_current_1c)
         self.startDischarge()
 
-        print("Discharging to 2.75 V at 1C")
+        print(f"Discharging to 2.75 V at {discharge_current_1c} A")
         while True:
             time.sleep(self.timeInterval)
             elapsed += self.timeInterval
@@ -624,7 +629,7 @@ class TestController:
 
         self.stopDischarge()
         dataStorage.createTable(
-            "actual_capacity_test", current_1c, 0, temperature, self.timeInterval
+            "actual_capacity_test", discharge_current_1c, 0, temperature, self.timeInterval
         )
 
         print(f"Accumulated capacity: {capacity:.3f} Ah")
