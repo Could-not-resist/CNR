@@ -565,13 +565,15 @@ class TestController:
         self,
         charge_current_1c: float,
         discharge_current_1c: float,
+        rest_time: float = 3600.0,
         temperature: float = 20.0,
     ) -> float:
         """Perform an actual capacity test.
 
         The procedure charges the cell at ``charge_current_1c`` up to 4.1 V,
-        rests for one hour and then discharges at ``discharge_current_1c`` down
-        to 2.75 V while logging the cumulative capacity.
+        rests for ``rest_time`` seconds and then discharges at
+        ``discharge_current_1c`` down to 2.75 V while logging the cumulative
+        capacity.
         """
 
         dataStorage = DataStorage()
@@ -600,8 +602,8 @@ class TestController:
         self.stopPSOutput()
 
         # ----- Rest step -----
-        print("Resting for 1 hour")
-        time.sleep(3600) # TODO change to a parameter, 1hr is too much for some tests
+        print(f"Resting for {rest_time} seconds")
+        time.sleep(rest_time)
 
         # ----- Discharge step -----
         self.stopDischarge()
