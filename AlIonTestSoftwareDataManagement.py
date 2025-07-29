@@ -24,12 +24,12 @@ class DataStorage:
         self.time.append(float('{:.4f}'.format(Mtime_sec)))
 
     # Function to add voltage value
-    def addVoltage(self, votls: float):
-        self.volts.append(float('{:.4f}'.format(votls)))
+    def addVoltage(self, volts: float):
+        self.volts.append(float('{:.4f}'.format(volts)))
 
     # Function to add current value
-    def addCurrent(self, ampers: float):
-        self.current.append(float('{:.4f}'.format(ampers)))
+    def addCurrent(self, amps: float):
+        self.current.append(float('{:.4f}'.format(amps)))
 
     def addMMVoltage(self, volts: float):
         self.mm_volts.append(float('{:.4f}'.format(volts)))
