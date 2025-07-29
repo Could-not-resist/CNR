@@ -79,14 +79,14 @@ class PowerSupplyController:
         return self.powerSupply.query("FETCH:POW?")
         
 
-    # Function for constant CURRENT charging, taking in current in ampers
-    def chargeCC (self, ampers : int):
+    # Function for constant CURRENT charging, taking in current in amps
+    def chargeCC (self, amps : int):
         # Turn of all output
         self.powerSupply.write("CONF:OUTP OFF")
         # Set the voltage amount to max
         self.powerSupply.write("SOUR:VOLT MAX")
         # Set desired current
-        self.powerSupply.write("SOUR:CURR " + str(ampers))
+        self.powerSupply.write("SOUR:CURR " + str(amps))
         # Turn on output
         self.powerSupply.write("CONF:OUTP ON")
 
@@ -103,7 +103,7 @@ class PowerSupplyController:
     def chargeCP(self, watts : int):
         # Turn of all output
         self.powerSupply.write("CONF:OUTP OFF")
-        # Set desired voltiage
+        # Set desired voltage
         self.powerSupply.write("PROG:CP:POW " + str(watts))
         # Turn on output
         self.powerSupply.write("CONF:OUTP ON")

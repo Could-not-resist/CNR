@@ -49,9 +49,9 @@ class TestController:
 
     # Defining basic functionality of all remote devices through the device controller
     #####  62000P Power supply #####
-    # Function for constant CURRENT charging, taking in current in ampers
-    def chargeCC(self, ampers):
-        self.powerSupplyController.chargeCC(ampers)
+    # Function for constant CURRENT charging, taking in current in amps
+    def chargeCC(self, amps):
+        self.powerSupplyController.chargeCC(amps)
 
     # Function for constant VOLTAGE charging, taking in voltage in volts
     def chargeCV(self, volts):

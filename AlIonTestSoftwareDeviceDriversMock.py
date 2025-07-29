@@ -66,8 +66,8 @@ class PowerSupplyControllerMock:
         return randrange(int(self.Power_limmax * 10000000)) / 100000000
         
 
-    # Function for constant CURRENT charging, taking in current in ampers
-    def chargeCC (self, ampers : float):
+    # Function for constant CURRENT charging, taking in current in amps
+    def chargeCC (self, amps : float):
         pass
 
     # Function for constant VOLTAGE charging, taking in voltage in volts
