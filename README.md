@@ -121,6 +121,9 @@ The top of `MAIN.py` contains constants used to configure a test run:
 | `DCHARGE_TIME` | `5` | s |
 | `NUM_CYCLES` | `1` | &ndash; |
 
+`LEADIN_TIME` controls how long the power supply ramps from
+`CHARGE_VOLT_START` to `CHARGE_VOLT_END` at the beginning of each charge cycle.
+
 Refer to the device programming manuals for the meaning of each setting.
 
 ### Command-line options
@@ -143,7 +146,7 @@ common flags accepted by `MAIN.py` are listed below. Run
 | `--dcharge-current-max` | Maximum discharge current |
 | `--slew-volt` | Voltage slew rate in V/ms |
 | `--slew-current` | Current slew rate in A/ms |
-| `--leadin-time` | Lead-in delay before measurements |
+| `--leadin-time` | Time in seconds used to ramp the supply from the starting to the ending charge voltage |
 | `--charge-time` | Allowed charging time |
 | `--dcharge-time` | Allowed discharging time |
 | `--num-cycles` | Number of charge/discharge cycles |

@@ -253,15 +253,17 @@ class TestController:
             while (datetime.now() < Cend_time):
                 # while Charging do the following
                 time.sleep(self.timeInterval)  # Wait between measurements
-                tmp = datetime.now()-ChargestartTime
-                # increases output voltage from charge_volt_start to charge_volt_end in leadin_time sec.
-                # if (tmp.total_seconds() < Lduration.seconds):
-                #    Lratio = tmp.total_seconds()/float(Lduration.seconds)
-                #    currentVolt=charge_volt_start+DeltaV*Lratio
-                #    if (currentVolt>charge_volt_end):
-                #        currentVolt=charge_volt_end
-                #    self.setVoltage(currentVolt)
-                #    print(currentVolt)
+                tmp = datetime.now() - ChargestartTime
+                # gradually ramp voltage from charge_volt_start to
+                # charge_volt_end during the lead-in period
+                if leadin_time > 0:
+                    ratio = min(tmp.total_seconds() / float(leadin_time), 1.0)
+                else:
+                    ratio = 1.0
+                currentVolt = charge_volt_start + DeltaV * ratio
+                if currentVolt > charge_volt_end:
+                    currentVolt = charge_volt_end
+                self.setVoltage(currentVolt)
 
                 # print(tmp.total_seconds())
                 # read the voltage from Power Supply - this is the applied voltage
