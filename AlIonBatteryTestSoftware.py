@@ -42,7 +42,15 @@ class TestController:
             # are not available.  The previous implementation exited before the
             # mock controllers were created which made running the software
             # without hardware impossible.
-            print("Connection not successful, using mock objects")
+            print("Connection not successful.")
+            answer = input(
+                "Devices not detected. Continue with mock drivers? [y/N]: "
+            ).strip().lower()
+            if answer not in ("y", "yes"):
+                raise SystemExit(
+                    "Aborting: no connection to hardware and user declined mock drivers"
+                )
+            print("Using mock objects")
             self.powerSupplyController = PowerSupplyControllerMock()
             self.electronicLoadController = ElectronicLoadControllerMock()
             self.multimeterController = MultimeterControllerMock()

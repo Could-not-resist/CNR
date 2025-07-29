@@ -32,6 +32,8 @@ pip install pyvisa pandas openpyxl matplotlib tabulate
 ```bash
 python MAIN.py
 ```
+   If no hardware connection is detected the program will ask whether to
+   continue using mock drivers.
 
 To perform a full capacity measurement instead of the default cycling test run:
 
