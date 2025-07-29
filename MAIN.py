@@ -5,14 +5,14 @@ from pathlib import Path
 from AlIonBatteryTestSoftware import TestController
 
 # Charge/discharge voltage and current limits
-CHARGE_VOLT_START: float = 16.21    # V
-CHARGE_VOLT_END: float = 16.4    # V
+CHARGE_VOLT_START: float = 4.1    # V
+CHARGE_VOLT_END: float = 4.1    # V
 CHARGE_CURRENT_MAX: float = 5.0    # A
 
-DCHARGE_VOLT_MIN: float = 11.0    # V
-DCHARGE_CURRENT_MAX: float = 1    # 
+DCHARGE_VOLT_MIN: float = 2.75    # V
+DCHARGE_CURRENT_MAX: float = 20    # A
 
-CHARGE_VOLT_PROT: int = 20    # V
+CHARGE_VOLT_PROT: int = 10    # V
 CHARGE_CURRENT_PROT: int = 10    # A
 CHARGE_POWER_PROT: int = 2000    # Watts
 
@@ -23,6 +23,7 @@ SLEW_CURRENT: float = 0.1    # A/ms
 
 # Timing (in seconds)
 LEADIN_TIME: int = 1    # s #TODO: fix the implementation of leadin time
+
 CHARGE_TIME: int = 5    # s
 DCHARGE_TIME: int = 5   # s
 
@@ -30,8 +31,8 @@ DCHARGE_TIME: int = 5   # s
 NUM_CYCLES: int = 1   # n
 
 # Misc
-TEST_NAME: str = "LG"
-TEMPERATURE: float = 27.0    # °C
+TEST_NAME: str = "YUASA"
+TEMPERATURE: float = 23.4    # °C
 
 
 @dataclass
@@ -119,8 +120,10 @@ def main():
     parser.add_argument("--num-cycles", type=int)
     parser.add_argument("--actual-capacity-test", action="store_true",
                         help="run actual capacity test")
-    parser.add_argument("--capacity-current", type=float, default=1.0,
-                        help="1C current in amperes")
+    parser.add_argument("--capacity-charge-current", type=float, default=1.0,
+                        help="charge current for capacity test in amperes")
+    parser.add_argument("--capacity-discharge-current", type=float, default=1.0,
+                        help="discharge current for capacity test in amperes")
     parser.add_argument("--efficiency-test", action="store_true",
                         help="run efficiency test")
     parser.add_argument("--rate-characteristic-test", action="store_true",
@@ -157,7 +160,11 @@ def main():
 
     if args.actual_capacity_test:
         tc = TestController()
-        tc.actual_capacity_test(args.capacity_current, args.temperature)
+        tc.actual_capacity_test(
+            args.capacity_charge_current,
+            args.capacity_discharge_current,
+            args.temperature,
+        )
     elif args.efficiency_test:
         tc = TestController()
         tc.efficiency_test(
@@ -192,7 +199,11 @@ def main():
             args.pulse_duration,
             args.temperature,
         )
-        capacity = tc.actual_capacity_test(args.capacity_current, args.temperature)
+        capacity = tc.actual_capacity_test(
+            args.capacity_charge_current,
+            args.capacity_discharge_current,
+            args.temperature,
+        )
         print(f"Measured capacity: {capacity:.3f} Ah")
 
     else:

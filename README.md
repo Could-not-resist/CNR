@@ -36,7 +36,9 @@ python MAIN.py
 To perform a full capacity measurement instead of the default cycling test run:
 
 ```bash
-python MAIN.py --actual-capacity-test --capacity-current 1.0
+python MAIN.py --actual-capacity-test \
+  --capacity-charge-current 1.0 \
+  --capacity-discharge-current 1.0
 ```
 
 Additional tests can be invoked with the following flags:
