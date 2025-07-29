@@ -10,10 +10,15 @@ import math
 
 
 class DataStorage:
-    """Collect measurement data and export it to CSV and XLSX."""
+    """Collect measurement data during a test run.
+
+    The class buffers time stamped voltage and current readings and can
+    export the accumulated data to ``.csv`` or ``.xlsx`` files.  Excel files
+    are optional and disabled by default when calling :meth:`createTable`.
+    """
 
     def __init__(self) -> None:
-        # Empty arrays for data
+        """Initialize empty buffers for measurement values."""
         self.time = []
         self.volts = []
         self.current = []
@@ -24,20 +29,25 @@ class DataStorage:
 
     # Function to add time value
     def addTime(self, Mtime_sec: float):
+        """Record a timestamp in seconds."""
         self.time.append(float('{:.4f}'.format(Mtime_sec)))
 
     # Function to add voltage value
     def addVoltage(self, volts: float):
+        """Append a voltage measurement in volts."""
         self.volts.append(float('{:.4f}'.format(volts)))
 
     # Function to add current value
     def addCurrent(self, amps: float):
+        """Append a current reading in amperes."""
         self.current.append(float('{:.4f}'.format(amps)))
 
     def addMMVoltage(self, volts: float):
+        """Append a multimeter voltage reading."""
         self.mm_volts.append(float('{:.4f}'.format(volts)))
 
     def addMMTemperature(self, temp_c: float):
+        """Append a temperature measurement from the multimeter."""
         self.mm_temp.append(float('{:.4f}'.format(temp_c)))
 
     def addCapacity(self, ah: float):
@@ -45,7 +55,36 @@ class DataStorage:
         self.capacity.append(float('{:.4f}'.format(ah)))
 
     # Function for creating a table
-    def createTable(self, testName, c_rate: float, cycleNr: int, temperature: float, timeInterval: float, chargeTime=0):
+    def createTable(
+        self,
+        testName,
+        c_rate: float,
+        cycleNr: int,
+        temperature: float,
+        timeInterval: float,
+        chargeTime=0,
+        export_xlsx: bool = False,
+    ):
+        """Write collected results to disk.
+
+        Parameters
+        ----------
+        testName : str
+            Base name for the created files.
+        c_rate : float
+            Charge or discharge rate used in the cycle.
+        cycleNr : int
+            Index of the current cycle.
+        temperature : float
+            Ambient temperature in degrees Celsius.
+        timeInterval : float
+            Sampling interval used for the measurements.
+        chargeTime : float, optional
+            Length of the charge step when generating graphs.
+        export_xlsx : bool, optional
+            If ``True`` an Excel file with graphs is also generated.  By
+            default only a CSV file is written.
+        """
         # Get the number of measurements
         length = len(self.volts)
         # Fill in power list with voltage and current values
@@ -83,6 +122,7 @@ class DataStorage:
             abs_path = os.path.abspath("").replace("\\", "/")
             # Use the absolute path to create a path to the Data folder
             data_dir = f"{abs_path}/Data"
+            # Ensure the output directory exists
             os.makedirs(data_dir, exist_ok=True)
             filePath = f"{data_dir}/{testName}_{c_rate}C_#{cycleNr + 1}_@{temperature}°C_" +\
             str(datetime.now().strftime("%d.%m.%y_%H;%M"))
@@ -90,10 +130,11 @@ class DataStorage:
             print(abs_path)
             # Export to CSV file
             self.exportCSVFile(filePath, data, head)
-            # Export to XLSX file
-            print(f"Saving results to {filePath}")
-            self.exportXLSXFile(filePath, chargeTime, timeInterval)
-            print(f"Charge time configured: {chargeTime}")
+            if export_xlsx:
+                # Optional Excel output with graphs
+                print(f"Saving results to {filePath}.xlsx")
+                self.exportXLSXFile(filePath, chargeTime, timeInterval)
+                print(f"Charge time configured: {chargeTime}")
         except:
             print("Data storage failed, check file path")
         # Empty the result values
@@ -106,11 +147,13 @@ class DataStorage:
         self.mm_temp = []
 
     def exportCSVFile(self, filePath, data, head):
+        """Write the collected data to a CSV file."""
         df = pd.DataFrame(data, columns=head)
         df.to_csv(filePath + ".csv", index=False)
 
     def exportXLSXFile(self, filePath, chargeTime, timeInterval):
-        # Read in our csv file
+        """Create an Excel workbook with optional graphs."""
+        # Read in the CSV file that was just created
         csvDataframe = pd.read_csv(filePath + ".csv")
         # Create our excel file
         xlsxDataframe = pd.ExcelWriter(filePath + ".xlsx", engine='openpyxl')
