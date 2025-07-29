@@ -1,3 +1,5 @@
+"""Mock implementations of the device drivers for testing without hardware."""
+
 from random import randrange
 import tkinter
 

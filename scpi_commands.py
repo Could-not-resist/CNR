@@ -1,3 +1,5 @@
+"""SCPI command mappings and instrument resource strings."""
+
 # scpi_commands.py
 # Support file providing SCPI command mappings for device driver methods.
 # Designed for use by OpenAI Codex for code completion and reference.

@@ -1,7 +1,10 @@
+"""Device driver wrappers using NI-VISA to control test equipment."""
+
 import pyvisa
 
 # Class for communication with the NI-VISA driver to control the power supply
 class PowerSupplyController:
+    """Control a Chroma 62000P power supply via SCPI commands."""
     # Variable to keep the resource name of the power supply
     powerSupplyName = "USB0::0x1698::0x0837::011000000136::INSTR"
 
@@ -118,6 +121,7 @@ class PowerSupplyController:
 
 # Class for communication with the NI-VISA driver to control the electronic load
 class ElectronicLoadController:
+    """Interface to a Chroma 63600 electronic load for discharging cells."""
     # Variable to keep the resource name of the electronic load
     electronicLoadName = "USB0::0x0A69::0x083E::000000000001::INSTR"
 
@@ -209,6 +213,7 @@ class ElectronicLoadController:
 
 # Class for communication with the NI-VISA driver to control the multimeter
 class MultimeterController:
+    """Read measurements from a Chroma 51101 multimeter."""
     
     # Variable to keep the resource name of the mutimeter
     multimeterName = "USB0::0x1698::0x083F::TW00014586::INSTR"
