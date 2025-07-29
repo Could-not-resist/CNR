@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 import argparse
+import json
+from pathlib import Path
 from AlIonBatteryTestSoftware import TestController
 
 # Charge/discharge voltage and current limits
@@ -54,6 +56,15 @@ class UPSSettings:
     num_cycles: int = NUM_CYCLES
 
 
+def load_config(config_path: str, profile: str) -> dict:
+    """Load settings for a given cell profile from a JSON configuration file."""
+    try:
+        data = json.loads(Path(config_path).read_text())
+        return data.get(profile, {}) if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
 class TestTypes:
     def __init__(self):
         self.testController = TestController()
@@ -88,22 +99,24 @@ class TestTypes:
 
 def main():
     parser = argparse.ArgumentParser(description="Run UPS test")
-    parser.add_argument("--test-name", default=TEST_NAME)
-    parser.add_argument("--temperature", type=float, default=TEMPERATURE)
-    parser.add_argument("--charge-volt-prot", type=int, default=CHARGE_VOLT_PROT)
-    parser.add_argument("--charge-current-prot", type=int, default=CHARGE_CURRENT_PROT)
-    parser.add_argument("--charge-power-prot", type=int, default=CHARGE_POWER_PROT)
-    parser.add_argument("--charge-volt-start", type=float, default=CHARGE_VOLT_START)
-    parser.add_argument("--charge-volt-end", type=float, default=CHARGE_VOLT_END)
-    parser.add_argument("--charge-current-max", type=float, default=CHARGE_CURRENT_MAX)
-    parser.add_argument("--dcharge-volt-min", type=float, default=DCHARGE_VOLT_MIN)
-    parser.add_argument("--dcharge-current-max", type=float, default=DCHARGE_CURRENT_MAX)
-    parser.add_argument("--slew-volt", type=float, default=SLEW_VOLT)
-    parser.add_argument("--slew-current", type=float, default=SLEW_CURRENT)
-    parser.add_argument("--leadin-time", type=int, default=LEADIN_TIME)
-    parser.add_argument("--charge-time", type=int, default=CHARGE_TIME)
-    parser.add_argument("--dcharge-time", type=int, default=DCHARGE_TIME)
-    parser.add_argument("--num-cycles", type=int, default=NUM_CYCLES)
+    parser.add_argument("--config-file", help="JSON file with cell settings")
+    parser.add_argument("--profile", help="cell profile name in config file")
+    parser.add_argument("--test-name")
+    parser.add_argument("--temperature", type=float)
+    parser.add_argument("--charge-volt-prot", type=int)
+    parser.add_argument("--charge-current-prot", type=int)
+    parser.add_argument("--charge-power-prot", type=int)
+    parser.add_argument("--charge-volt-start", type=float)
+    parser.add_argument("--charge-volt-end", type=float)
+    parser.add_argument("--charge-current-max", type=float)
+    parser.add_argument("--dcharge-volt-min", type=float)
+    parser.add_argument("--dcharge-current-max", type=float)
+    parser.add_argument("--slew-volt", type=float)
+    parser.add_argument("--slew-current", type=float)
+    parser.add_argument("--leadin-time", type=int)
+    parser.add_argument("--charge-time", type=int)
+    parser.add_argument("--dcharge-time", type=int)
+    parser.add_argument("--num-cycles", type=int)
     parser.add_argument("--actual-capacity-test", action="store_true",
                         help="run actual capacity test")
     parser.add_argument("--capacity-current", type=float, default=1.0,
@@ -128,6 +141,19 @@ def main():
                         help="pulse duration in seconds")
 
     args = parser.parse_args()
+
+    profile = args.profile or args.test_name or TEST_NAME
+    config = {}
+    if args.config_file:
+        config = load_config(args.config_file, profile)
+
+    for field in UPSSettings.__annotations__.keys():
+        if getattr(args, field) is None:
+            if field in config:
+                setattr(args, field, config[field])
+        if getattr(args, field) is None:
+            # fall back to dataclass default by leaving as None
+            pass
 
     if args.actual_capacity_test:
         tc = TestController()
@@ -170,24 +196,12 @@ def main():
         print(f"Measured capacity: {capacity:.3f} Ah")
 
     else:
-        settings = UPSSettings(
-            test_name=args.test_name,
-            temperature=args.temperature,
-            charge_volt_prot=args.charge_volt_prot,
-            charge_current_prot=args.charge_current_prot,
-            charge_power_prot=args.charge_power_prot,
-            charge_volt_start=args.charge_volt_start,
-            charge_volt_end=args.charge_volt_end,
-            charge_current_max=args.charge_current_max,
-            dcharge_volt_min=args.dcharge_volt_min,
-            dcharge_current_max=args.dcharge_current_max,
-            slew_volt=args.slew_volt,
-            slew_current=args.slew_current,
-            leadin_time=args.leadin_time,
-            charge_time=args.charge_time,
-            dcharge_time=args.dcharge_time,
-            num_cycles=args.num_cycles,
-        )
+        kwargs = {}
+        for field in UPSSettings.__annotations__.keys():
+            val = getattr(args, field, None)
+            if val is not None:
+                kwargs[field] = val
+        settings = UPSSettings(**kwargs)
 
         TObj = TestTypes()
         TObj.runUPSTest(settings)

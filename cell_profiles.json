@@ -1,0 +1,41 @@
+{
+  "YUASA": {
+    "charge_volt_start": 16.21,
+    "charge_volt_end": 16.4,
+    "charge_current_max": 5.0,
+    "dcharge_volt_min": 11.0,
+    "dcharge_current_max": 1,
+    "charge_volt_prot": 20,
+    "charge_current_prot": 10,
+    "charge_power_prot": 2000,
+    "slew_volt": 0.1,
+    "slew_current": 0.1,
+    "leadin_time": 1,
+    "charge_time": 5,
+    "dcharge_time": 5,
+    "num_cycles": 1,
+    "temperature": 27.0,
+    "test_name": "YUASA"
+  },
+  "SAMSUNG": {
+    "charge_volt_start": 16.21,
+    "charge_volt_end": 16.4,
+    "charge_current_max": 5.0,
+    "dcharge_volt_min": 11.0,
+    "dcharge_current_max": 1,
+    "charge_volt_prot": 20,
+    "charge_current_prot": 10,
+    "charge_power_prot": 2000,
+    "slew_volt": 0.1,
+    "slew_current": 0.1,
+    "leadin_time": 1,
+    "charge_time": 5,
+    "dcharge_time": 5,
+    "num_cycles": 1,
+    "temperature": 27.0,
+    "test_name": "SAMSUNG"
+  },
+  "LG": {
+    "test_name": "LG"
+  }
+}
