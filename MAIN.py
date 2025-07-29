@@ -22,7 +22,9 @@ SLEW_VOLT: float = 0.1    # V/ms
 SLEW_CURRENT: float = 0.1    # A/ms
 
 # Timing (in seconds)
-LEADIN_TIME: int = 1    # s #TODO: fix the implementation of leadin time
+# Ramp duration for increasing the charge voltage from CHARGE_VOLT_START
+# to CHARGE_VOLT_END at the beginning of each cycle
+LEADIN_TIME: int = 1    # s
 
 CHARGE_TIME: int = 5    # s
 DCHARGE_TIME: int = 5   # s
