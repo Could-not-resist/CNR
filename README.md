@@ -25,8 +25,8 @@ pip install pyvisa pandas openpyxl matplotlib tabulate
 
 1. Connect the Chroma 63600 electronic load and Chroma 62000P power supply to
    your PC and ensure the NI-VISA drivers are installed.
-2. Adjust the charge/discharge parameters using command-line options or rely on
-   the defaults defined in `MAIN.py`.
+2. Adjust the charge/discharge parameters using command-line options, or
+   provide a JSON configuration file with cell profiles.
 3. Run the test script:
 
 ```bash
@@ -76,6 +76,18 @@ Additional tests can be invoked with the following flags:
 
   Applies a short current pulse to determine the DC and AC resistance of the
   cell.
+
+### Using configuration files
+
+Instead of specifying every parameter on the command line you can store
+cell profiles in a JSON file. A sample `cell_profiles.json` is included in
+the repository. Select a profile like this:
+
+```bash
+python MAIN.py --config-file cell_profiles.json --profile YUASA
+```
+
+Command-line options still override the values loaded from the profile.
 
 This charges the cell at 1C to **4.1&nbsp;V**, rests for one hour at
 20&nbsp;±&nbsp;2 °C and then discharges at 1C down to **2.75&nbsp;V** while
