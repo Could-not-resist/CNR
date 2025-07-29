@@ -1,3 +1,5 @@
+"""Core routines for controlling UPS battery test sequences."""
+
 import time
 from datetime import datetime
 from datetime import timedelta
@@ -9,6 +11,7 @@ from AlIonTestSoftwareDataManagement import DataStorage
 
 # Class used to control test procedures
 class TestController:
+    """Coordinate power supply, load and measurement devices for tests."""
     # Indicates the number of seconds between each measurement
     timeInterval = 0.2
     # Variable for keeping track of the open circuit voltage of a full battery

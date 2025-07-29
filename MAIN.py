@@ -1,3 +1,5 @@
+"""Command line interface for running UPS battery tests."""
+
 from dataclasses import dataclass
 import argparse
 import json

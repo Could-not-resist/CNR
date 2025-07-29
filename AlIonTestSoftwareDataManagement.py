@@ -1,3 +1,5 @@
+"""Utilities for storing measurement data and exporting results."""
+
 import openpyxl
 from openpyxl.chart import ScatterChart, Reference, Series  # type: ignore
 # from openpyxl.chart.series import Series
@@ -8,6 +10,7 @@ import math
 
 
 class DataStorage:
+    """Collect measurement data and export it to CSV and XLSX."""
 
     def __init__(self) -> None:
         # Empty arrays for data
