@@ -148,7 +148,7 @@ class TestController:
         # Read the maximum amp setting of Channel 1
         return self.electronicLoadController.getCCcurrentL1MAX()
 
-    ###### ###### á eftir að taka til fyrir neðan ###### ######
+    # Helper methods for discharging and reading instrument values
 
     def dischargeCC(self, amper):
         self.electronicLoadController.dischargeCC(amper)
