@@ -58,25 +58,25 @@ class DataStorage:
         data = []
         # Fill the list with the results
         include_capacity = len(self.capacity) == len(self.volts) and len(self.capacity) > 0
-        include_mm = (
-            len(self.mm_volts) == len(self.volts)
-            and len(self.mm_temp) == len(self.volts)
-            and len(self.mm_volts) > 0
-        )
+        include_mm_volts = len(self.mm_volts) == len(self.volts) and len(self.mm_volts) > 0
+        include_mm_temp = len(self.mm_temp) == len(self.volts) and len(self.mm_temp) > 0
         for j in range(len(self.volts)):
             d = [float(j) * timeInterval, self.time[j],
                  self.volts[j], self.current[j], self.power[j]]
             if include_capacity:
                 d.append(self.capacity[j])
-            if include_mm:
+            if include_mm_volts:
                 d.append(self.mm_volts[j])
+            if include_mm_temp:
                 d.append(self.mm_temp[j])
             data.append(d)
         head = ["Time in seconds", "time", "Volts", "Current", "Power"]
         if include_capacity:
             head.append("Capacity")
-        if include_mm:
-            head.extend(["MM_Volts", "MM_Temp"])
+        if include_mm_volts:
+            head.append("MM_Volts")
+        if include_mm_temp:
+            head.append("MM_Temp")
         # Store the table in a text file
         try:
             # Find the absolute path to the current file
