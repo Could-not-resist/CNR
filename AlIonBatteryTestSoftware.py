@@ -215,8 +215,14 @@ class TestController:
         self.setCurrentProt(charge_current_prot)
         print(f"Set the Over Current Protection to {charge_current_prot}")
 
-        self.setVoltageSlew(slew_volt)
-        print(f"Set the Charging Voltage Slew rate to {slew_volt}")
+        if leadin_time and leadin_time > 0:
+            delta_v = charge_volt_end - charge_volt_start
+            slew_v = delta_v / leadin_time / 1000.0
+            self.setVoltageSlew(slew_v)
+            print(f"Set the Charging Voltage Slew rate to {slew_v}")
+        else:
+            self.setVoltageSlew(slew_volt)
+            print(f"Set the Charging Voltage Slew rate to {slew_volt}")
 
         self.setCurrentSlew(slew_current)
         print(f"Set the Charging Current Slew rate to {slew_current}")
@@ -234,9 +240,7 @@ class TestController:
         Cduration = timedelta(seconds=charge_time)
         # Discharge each cycle for dcharge_time seconds
         Dduration = timedelta(seconds=dcharge_time)
-        Lduration = timedelta(seconds=leadin_time)     # Leadin time in seconds
-        # the amount to increase the start Volt to get to end Volt
-        DeltaV = charge_volt_end-charge_volt_start
+        # Lead-in time controls the ramp duration
 
         # Charging/Discharging loop starts
         for cycleNumber in range(int(num_cycles)):
@@ -250,24 +254,16 @@ class TestController:
             if (xx > 1):
 
                 # Charging loop
+                self.setVoltage(charge_volt_start)
                 self.startPSOutput()
                 self.chargeCC(charge_current_max)
-                self.setVoltage(charge_volt_start)
+                self.setVoltage(charge_volt_end)
                 print('Charging')
                 while (datetime.now() < Cend_time):
                     # while Charging do the following
                     time.sleep(self.timeInterval)  # Wait between measurements
                     tmp = datetime.now()-ChargestartTime
-                    # increases output voltage from charge_volt_start to charge_volt_end in leadin_time sec.
-                    # if (tmp.total_seconds() < Lduration.seconds):
-                    #    Lratio = tmp.total_seconds()/float(Lduration.seconds)
-                    #    currentVolt=charge_volt_start+DeltaV*Lratio
-                    #    if (currentVolt>charge_volt_end):
-                    #        currentVolt=charge_volt_end
-                    #    self.setVoltage(currentVolt)
-                    #    print(currentVolt)
-
-                    # print(tmp.total_seconds())
+                    # ramping handled automatically by the power supply
                     # read the voltage from Power Supply - this is the applied voltage
                     v_ps = self.getVoltagePSC()
                     # read voltage from electronic load - this is the voltage of the cell

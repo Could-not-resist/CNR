@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 import argparse
 from AlIonBatteryTestSoftware import TestController
 
@@ -47,7 +48,7 @@ class UPSSettings:
     charge_current_max: float = CHARGE_CURRENT_MAX
     dcharge_volt_min: float = DCHARGE_VOLT_MIN
     dcharge_current_max: float = DCHARGE_CURRENT_MAX
-    slew_volt: float = SLEW_VOLT
+    slew_volt: Optional[float] = SLEW_VOLT
     slew_current: float = SLEW_CURRENT
     leadin_time: int = LEADIN_TIME
     charge_time: int = CHARGE_TIME
@@ -99,9 +100,14 @@ def main():
     parser.add_argument("--charge-current-max", type=float, default=CHARGE_CURRENT_MAX)
     parser.add_argument("--dcharge-volt-min", type=float, default=DCHARGE_VOLT_MIN)
     parser.add_argument("--dcharge-current-max", type=float, default=DCHARGE_CURRENT_MAX)
-    parser.add_argument("--slew-volt", type=float, default=SLEW_VOLT)
+    parser.add_argument("--slew-volt", type=float,
+                        help="Voltage slew rate in V/ms")
+    parser.add_argument(
+        "--leadin-time",
+        type=int,
+        help="Lead-in delay before measurements (overrides --slew-volt)",
+    )
     parser.add_argument("--slew-current", type=float, default=SLEW_CURRENT)
-    parser.add_argument("--leadin-time", type=int, default=LEADIN_TIME)
     parser.add_argument("--charge-time", type=int, default=CHARGE_TIME)
     parser.add_argument("--dcharge-time", type=int, default=DCHARGE_TIME)
     parser.add_argument("--num-cycles", type=int, default=NUM_CYCLES)
@@ -181,6 +187,12 @@ def main():
         print(f"Measured capacity: {capacity:.3f} Ah")
 
     else:
+        lead_time = args.leadin_time if args.leadin_time is not None else LEADIN_TIME
+        if args.leadin_time is not None:
+            slew_v = None
+        else:
+            slew_v = args.slew_volt if args.slew_volt is not None else SLEW_VOLT
+
         settings = UPSSettings(
             test_name=args.test_name,
             temperature=args.temperature,
@@ -192,9 +204,9 @@ def main():
             charge_current_max=args.charge_current_max,
             dcharge_volt_min=args.dcharge_volt_min,
             dcharge_current_max=args.dcharge_current_max,
-            slew_volt=args.slew_volt,
+            slew_volt=slew_v,
             slew_current=args.slew_current,
-            leadin_time=args.leadin_time,
+            leadin_time=lead_time,
             charge_time=args.charge_time,
             dcharge_time=args.dcharge_time,
             num_cycles=args.num_cycles,
