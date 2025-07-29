@@ -177,33 +177,40 @@ def main():
             # fall back to dataclass default by leaving as None
             pass
 
+    # apply defaults for standalone tests
+    charge_volt_end = args.charge_volt_end if args.charge_volt_end is not None else CHARGE_VOLT_END
+    dcharge_volt_min = args.dcharge_volt_min if args.dcharge_volt_min is not None else DCHARGE_VOLT_MIN
+    charge_current_max = args.charge_current_max if args.charge_current_max is not None else CHARGE_CURRENT_MAX
+    dcharge_current_max = args.dcharge_current_max if args.dcharge_current_max is not None else DCHARGE_CURRENT_MAX
+    temperature = args.temperature if args.temperature is not None else TEMPERATURE
+
     if args.actual_capacity_test:
         tc = TestController(args.multimeter_mode)
         tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
             3600.0,
-            args.charge_volt_end,
-            args.temperature,
+            charge_volt_end,
+            temperature,
         )
     elif args.efficiency_test:
         tc = TestController(args.multimeter_mode)
         tc.efficiency_test(
-            args.charge_current_max,
-            args.dcharge_current_max,
-            args.charge_volt_end,
-            args.dcharge_volt_min,
-            args.temperature,
+            charge_current_max,
+            dcharge_current_max,
+            charge_volt_end,
+            dcharge_volt_min,
+            temperature,
         )
     elif args.rate_characteristic_test:
         rates = [float(r) for r in args.rates.split(',') if r]
         tc = TestController(args.multimeter_mode)
         tc.rate_characteristic_test(
             rates,
-            args.charge_current_max,
-            args.charge_volt_end,
-            args.dcharge_volt_min,
-            args.temperature,
+            charge_current_max,
+            charge_volt_end,
+            dcharge_volt_min,
+            temperature,
         )
     elif args.ocv_curve_test:
         tc = TestController(args.multimeter_mode)
@@ -211,21 +218,21 @@ def main():
             args.step_current,
             args.steps,
             1800.0,
-            args.temperature,
+            temperature,
         )
     elif args.internal_resistance_test:
         tc = TestController(args.multimeter_mode)
         tc.internal_resistance_test(
             args.pulse_current,
             args.pulse_duration,
-            args.temperature,
+            temperature,
         )
         capacity = tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
             3600.0,
-            args.charge_volt_end,
-            args.temperature,
+            charge_volt_end,
+            temperature,
         )
         print(f"Measured capacity: {capacity:.3f} Ah")
 
