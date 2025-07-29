@@ -49,6 +49,7 @@ ELECTRONIC_LOAD_COMMANDS = {
     "stopDischarge": "LOAD OFF",
     "setCCLmode": "MODE CCL",
     "setCCMmode": "MODE CCM",
+    "setCCHmode": "MODE CCH",
     "setCCcurrentL1": "CURR:STAT:L1 {amps}",
     "setCCcurrentL1MAX": "CURR:STAT:L1 MAX {amps}",
     "getCCcurrentL1MAX": "CURR:STAT:L1? MAX",

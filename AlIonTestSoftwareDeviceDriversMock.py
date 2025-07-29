@@ -116,6 +116,10 @@ class ElectronicLoadControllerMock:
         # Switch to CC mode Medium Range (max 8 amper)
         pass
 
+    def setCCHmode(self):
+        # Switch to CC mode High Range
+        pass
+
     def setCCcurrentL1(self, amper: float):
         # Set the desired current of Channel L1
         self.current_L1 = amper
