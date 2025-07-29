@@ -7,6 +7,7 @@ from datetime import datetime
 import os
 import pandas as pd
 import math
+import statistics
 
 
 class DataStorage:
@@ -124,8 +125,16 @@ class DataStorage:
             data_dir = f"{abs_path}/Data"
             # Ensure the output directory exists
             os.makedirs(data_dir, exist_ok=True)
-            filePath = f"{data_dir}/{testName}_{c_rate}C_#{cycleNr + 1}_@{temperature}°C_" +\
-            str(datetime.now().strftime("%d.%m.%y_%H;%M"))
+            if include_mm_temp:
+                avg_temp = statistics.mean(self.mm_temp)
+                file_temp = f"{avg_temp:.1f}"
+            else:
+                file_temp = f"{temperature}"
+
+            filePath = (
+                f"{data_dir}/{testName}_{c_rate}C_#{cycleNr + 1}_@{file_temp}°C_"
+                + str(datetime.now().strftime("%d.%m.%y_%H;%M"))
+            )
             # Display the Path for debug purposes
             print(abs_path)
             # Export to CSV file

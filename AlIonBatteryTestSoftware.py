@@ -399,9 +399,15 @@ class TestController:
             self.stopDischarge()  # Inactivate the electronic load
             # Discharging loop ends
 
-            # Create a table from the measurements made in this cycle (27.0 is the temperature - now kept fixed)
+            # Use multimeter temperature in filename when available
             dataStorage.createTable(
-                test_name, dcharge_current_max, cycleNumber, temperature, self.timeInterval, charge_time)
+                test_name,
+                dcharge_current_max,
+                cycleNumber,
+                temperature,
+                self.timeInterval,
+                charge_time,
+            )
 
         # Set the event to indicate that testing is finished
         self.event.set()
