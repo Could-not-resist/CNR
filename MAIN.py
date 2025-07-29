@@ -163,6 +163,7 @@ def main():
         tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
+            args.charge_volt_end,
             args.temperature,
         )
     elif args.efficiency_test:
@@ -202,6 +203,7 @@ def main():
         capacity = tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
+            args.charge_volt_end,
             args.temperature,
         )
         print(f"Measured capacity: {capacity:.3f} Ah")

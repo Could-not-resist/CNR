@@ -569,13 +569,15 @@ class TestController:
         self,
         charge_current_1c: float,
         discharge_current_1c: float,
+        charge_voltage: float = 4.1,
         temperature: float = 20.0,
     ) -> float:
         """Perform an actual capacity test.
 
-        The procedure charges the cell at ``charge_current_1c`` up to 4.1 V,
-        rests for one hour and then discharges at ``discharge_current_1c`` down
-        to 2.75 V while logging the cumulative capacity.
+        The procedure charges the cell at ``charge_current_1c`` up to
+        ``charge_voltage``, rests for one hour and then discharges at
+        ``discharge_current_1c`` down to 2.75 V while logging the cumulative
+        capacity.
         """
 
         dataStorage = DataStorage()
@@ -584,11 +586,11 @@ class TestController:
         # ----- Charge step -----
         self.startPSOutput()
         self.chargeCC(charge_current_1c)
-        self.setVoltage(4.1) # TODO replace magic number with a parameter
+        self.setVoltage(charge_voltage)
 
         elapsed = 0.0
         capacity = 0.0
-        print(f"Charging to 4.1 V at {charge_current_1c} A")
+        print(f"Charging to {charge_voltage} V at {charge_current_1c} A")
         while True:
             time.sleep(self.timeInterval)
             elapsed += self.timeInterval
@@ -598,7 +600,7 @@ class TestController:
             dataStorage.addVoltage(v)
             dataStorage.addCurrent(c)
             dataStorage.addCapacity(capacity)
-            if v >= 4.1: # TODO replace magic number with a parameter
+            if v >= charge_voltage:
                 break
 
         self.stopPSOutput()

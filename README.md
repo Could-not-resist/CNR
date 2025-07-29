@@ -38,7 +38,8 @@ To perform a full capacity measurement instead of the default cycling test run:
 ```bash
 python MAIN.py --actual-capacity-test \
   --capacity-charge-current 1.0 \
-  --capacity-discharge-current 1.0
+  --capacity-discharge-current 1.0 \
+  --charge-volt-end 4.1
 ```
 
 Additional tests can be invoked with the following flags:
@@ -91,7 +92,8 @@ python MAIN.py --config-file cell_profiles.json --profile YUASA
 
 Command-line options still override the values loaded from the profile.
 
-This charges the cell at 1C to **4.1&nbsp;V**, rests for one hour at
+This charges the cell at 1C up to the voltage specified by
+`--charge-volt-end` (default **4.1&nbsp;V**), rests for one hour at
 20&nbsp;±&nbsp;2 °C and then discharges at 1C down to **2.75&nbsp;V** while
 recording the delivered ampere hours.
 
