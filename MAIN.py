@@ -163,6 +163,7 @@ def main():
         tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
+            3600.0,
             args.charge_volt_end,
             args.temperature,
         )
@@ -203,6 +204,7 @@ def main():
         capacity = tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
+            3600.0,
             args.charge_volt_end,
             args.temperature,
         )

@@ -93,9 +93,9 @@ python MAIN.py --config-file cell_profiles.json --profile YUASA
 Command-line options still override the values loaded from the profile.
 
 This charges the cell at 1C up to the voltage specified by
-`--charge-volt-end` (default **4.1&nbsp;V**), rests for one hour at
-20&nbsp;±&nbsp;2 °C and then discharges at 1C down to **2.75&nbsp;V** while
-recording the delivered ampere hours.
+`--charge-volt-end` (default **4.1&nbsp;V**), rests for a configurable
+period (default one hour) at 20&nbsp;±&nbsp;2 °C and then discharges at 1C
+down to **2.75&nbsp;V** while recording the delivered ampere hours.
 
 By default the parameters in `MAIN.py` define a single cycle with
 16.21&ndash;16.4&nbsp;V charging at 5&nbsp;A and a discharge down to 11&nbsp;V.
