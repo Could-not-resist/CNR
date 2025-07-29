@@ -213,7 +213,7 @@ class MultimeterController:
     # Variable to keep the resource name of the mutimeter
     multimeterName = "USB0::0x1698::0x083F::TW00014586::INSTR"
 
-    # Constructor that establishes connection to the mutimeter
+    # Constructor that establishes connection to the multimeter
     def __init__(self) -> None:
         self.resourceManager = pyvisa.ResourceManager()
         self.multimeter = self.resourceManager.open_resource(self.multimeterName)
@@ -222,9 +222,11 @@ class MultimeterController:
     def checkDeviceConnection(self):
         print(self.multimeter.query("*IDN?"))
 
-    # Function that returns the temperature from the multimeter
+    # Function that returns the temperature from the multimeter. This uses the
+    # thermocouple measurement mode which must be configured with
+    # ``configure_thermocouple`` beforehand.
     def getTemperature(self):
-        return self.multimeter.query("MEAS:TEMP?")
+        return self.multimeter.query("MEASure:TCOUple?")
 
     # Function that returns the voltage from the multimeter
     def getVolts(self):
@@ -233,3 +235,16 @@ class MultimeterController:
     # Function that returns the resistance from the multimeter
     def getResistance(self):
         return self.multimeter.query("MEAS:RES?")
+
+    # Configure thermocouple measurement mode. The commands match the
+    # manufacturer's SCPI specification. This avoids hard coding the
+    # measurement function elsewhere in the code.
+    def configure_thermocouple(self, tc_type: str = "K") -> None:
+        self.multimeter.write('SENSe:FUNCtion "TCOUple"')
+        self.multimeter.write(f'SENSe:TCOUple:TYPE {tc_type}')
+        # Use default range/resolution
+        self.multimeter.write('SENSe:TCOUple:RANGe DEF, DEF')
+
+    # Read the temperature using the thermocouple input
+    def getThermocoupleTemp(self):
+        return self.multimeter.query('MEASure:TCOUple?')

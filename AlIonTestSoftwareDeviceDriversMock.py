@@ -171,6 +171,13 @@ class MultimeterControllerMock:
     def getTemperature(self):
         return randrange(10000000) / 10000000
 
+    def configure_thermocouple(self, tc_type: str = "K") -> None:
+        # Mock method does nothing
+        pass
+
+    def getThermocoupleTemp(self):
+        return randrange(10000000) / 10000000
+
     def getVolts(self):
         return randrange(10000000) / 10000000
 
