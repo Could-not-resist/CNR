@@ -245,41 +245,37 @@ class TestController:
             Cend_time = datetime.now() + Cduration  # set the time when to stop charging
             ChargestartTime = datetime.now()
 
-            xx = 2  # temp variable used to bypass the charging part
+            # Charging loop
+            self.startPSOutput()
+            self.chargeCC(charge_current_max)
+            self.setVoltage(charge_volt_start)
+            print('Charging')
+            while (datetime.now() < Cend_time):
+                # while Charging do the following
+                time.sleep(self.timeInterval)  # Wait between measurements
+                tmp = datetime.now()-ChargestartTime
+                # increases output voltage from charge_volt_start to charge_volt_end in leadin_time sec.
+                # if (tmp.total_seconds() < Lduration.seconds):
+                #    Lratio = tmp.total_seconds()/float(Lduration.seconds)
+                #    currentVolt=charge_volt_start+DeltaV*Lratio
+                #    if (currentVolt>charge_volt_end):
+                #        currentVolt=charge_volt_end
+                #    self.setVoltage(currentVolt)
+                #    print(currentVolt)
 
-            if (xx > 1):
+                # print(tmp.total_seconds())
+                # read the voltage from Power Supply - this is the applied voltage
+                v_ps = self.getVoltagePSC()
+                # read voltage from electronic load - this is the voltage of the cell
+                v = self.getVoltageELC()
+                c = self.getCurrentPSC()  # read the current from Power Supply
+                print(f"{cycleNumber} of {num_cycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}")
 
-                # Charging loop
-                self.startPSOutput()
-                self.chargeCC(charge_current_max)
-                self.setVoltage(charge_volt_start)
-                print('Charging')
-                while (datetime.now() < Cend_time):
-                    # while Charging do the following
-                    time.sleep(self.timeInterval)  # Wait between measurements
-                    tmp = datetime.now()-ChargestartTime
-                    # increases output voltage from charge_volt_start to charge_volt_end in leadin_time sec.
-                    # if (tmp.total_seconds() < Lduration.seconds):
-                    #    Lratio = tmp.total_seconds()/float(Lduration.seconds)
-                    #    currentVolt=charge_volt_start+DeltaV*Lratio
-                    #    if (currentVolt>charge_volt_end):
-                    #        currentVolt=charge_volt_end
-                    #    self.setVoltage(currentVolt)
-                    #    print(currentVolt)
-
-                    # print(tmp.total_seconds())
-                    # read the voltage from Power Supply - this is the applied voltage
-                    v_ps = self.getVoltagePSC()
-                    # read voltage from electronic load - this is the voltage of the cell
-                    v = self.getVoltageELC()
-                    c = self.getCurrentPSC()  # read the current from Power Supply
-                    print(f"{cycleNumber} of {num_cycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}")
-
-                    dataStorage.addTime(float(tmp.total_seconds()))
-                    dataStorage.addVoltage(v)
-                    dataStorage.addCurrent(c)
-                self.stopPSOutput()  # stop the output from the power supply
-                # Charging loop ends
+                dataStorage.addTime(float(tmp.total_seconds()))
+                dataStorage.addVoltage(v)
+                dataStorage.addCurrent(c)
+            self.stopPSOutput()  # stop the output from the power supply
+            # Charging loop ends
 
                 # # for finding where charging ends and discharging starts
                 # dataStorage.addTime(9.9999)
