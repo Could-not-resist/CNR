@@ -197,6 +197,59 @@ class TestController:
 
     # Functions to read realtime VOLTAGE, CURRENT and POWER from the power supply
 
+    def apply_safety_limits(
+        self,
+        charge_volt_prot: int | None = None,
+        charge_current_prot: int | None = None,
+        charge_power_prot: int | None = None,
+        charge_volt_end: float | None = None,
+        charge_current_max: float | None = None,
+        slew_volt: float | None = None,
+        slew_current: float | None = None,
+    ) -> None:
+        """Disable outputs and configure protection limits.
+
+        If parameters are omitted, values are loaded from ``MAIN`` or fall back
+        to the defaults in ``cell_profiles.json``.
+        """
+
+        try:
+            from MAIN import (
+                CHARGE_VOLT_PROT,
+                CHARGE_CURRENT_PROT,
+                CHARGE_POWER_PROT,
+                CHARGE_VOLT_END,
+                CHARGE_CURRENT_MAX,
+                SLEW_VOLT,
+                SLEW_CURRENT,
+            )
+        except Exception:
+            CHARGE_VOLT_PROT = 10
+            CHARGE_CURRENT_PROT = 10
+            CHARGE_POWER_PROT = 2000
+            CHARGE_VOLT_END = 4.1
+            CHARGE_CURRENT_MAX = 5.0
+            SLEW_VOLT = 0.1
+            SLEW_CURRENT = 0.1
+
+        charge_volt_prot = CHARGE_VOLT_PROT if charge_volt_prot is None else charge_volt_prot
+        charge_current_prot = CHARGE_CURRENT_PROT if charge_current_prot is None else charge_current_prot
+        charge_power_prot = CHARGE_POWER_PROT if charge_power_prot is None else charge_power_prot
+        charge_volt_end = CHARGE_VOLT_END if charge_volt_end is None else charge_volt_end
+        charge_current_max = CHARGE_CURRENT_MAX if charge_current_max is None else charge_current_max
+        slew_volt = SLEW_VOLT if slew_volt is None else slew_volt
+        slew_current = SLEW_CURRENT if slew_current is None else slew_current
+
+        self.stopPSOutput()
+        self.stopDischarge()
+        self.setVoltageLimMax(charge_volt_end - 0.01)
+        self.setVoltageProt(charge_volt_prot)
+        self.setCurrentLimMax(charge_current_max - 0.01)
+        self.setCurrentProt(charge_current_prot)
+        self.setVoltageSlew(slew_volt)
+        self.setCurrentSlew(slew_current)
+        self.setPowerProt(charge_power_prot)
+
     # Test protocal for testing the capacity of a battery
 
 # This function is called from the TestTypes class to run a UPS test
@@ -221,40 +274,23 @@ class TestController:
         multimeter_mode: str | None = None,
     ):
         TotstartTime = datetime.now()
-        # Setting parameters and limits
-        self.powerSupplyController.stopOutput()
-        print(f"Stopping output from Power Supply")
+        # Configure safety limits before running
         if multimeter_mode:
             self.multimeterController.checkDeviceConnection()
             if multimeter_mode == "tcouple":
                 self.multimeterController.configure_thermocouple()
 
-#        self.powerSupplyController.setVoltage(charge_volt_start)
-#        print(f"Set the initial voltage to {charge_volt_start}")
-
         print("===========================")
         print(f"Charge time {charge_time}")
-        self.setVoltageLimMax((charge_volt_end-0.01))
-        print(f"Set the final Charge voltage to {(charge_volt_end-0.01)}")
-
-        self.setVoltageProt(charge_volt_prot)
-        print(
-            f"Set the Charging Over Voltage Protection to {charge_volt_prot}")
-
-        self.setCurrentLimMax(charge_current_max-0.01)
-        print(f"Set the max Charge Current to {charge_current_max-0.01}")
-
-        self.setCurrentProt(charge_current_prot)
-        print(f"Set the Over Current Protection to {charge_current_prot}")
-
-        self.setVoltageSlew(slew_volt)
-        print(f"Set the Charging Voltage Slew rate to {slew_volt}")
-
-        self.setCurrentSlew(slew_current)
-        print(f"Set the Charging Current Slew rate to {slew_current}")
-
-        self.setPowerProt(charge_power_prot)
-        print(f"Set the Charging Over Power Protection  {charge_power_prot}")
+        self.apply_safety_limits(
+            charge_volt_prot,
+            charge_current_prot,
+            charge_power_prot,
+            charge_volt_end,
+            charge_current_max,
+            slew_volt,
+            slew_current,
+        )
         print("===========================")
 
         print(f"Discharge time {dcharge_time}")
@@ -383,6 +419,10 @@ class TestController:
 
         dataStorage = DataStorage()
         self.event.clear()
+        self.apply_safety_limits(
+            charge_volt_end=charge_voltage,
+            charge_current_max=charge_current,
+        )
 
         energy_in = 0.0
         energy_out = 0.0
@@ -465,6 +505,10 @@ class TestController:
         """Measure capacity at multiple discharge rates."""
 
         self.event.clear()
+        self.apply_safety_limits(
+            charge_volt_end=charge_voltage,
+            charge_current_max=charge_current,
+        )
         for i, d_current in enumerate(discharge_currents):
             dataStorage = DataStorage()
             elapsed = 0.0
@@ -535,6 +579,7 @@ class TestController:
 
         dataStorage = DataStorage()
         self.event.clear()
+        self.apply_safety_limits(charge_current_max=step_current)
 
         elapsed = 0.0
         for i in range(steps + 1):
@@ -571,6 +616,7 @@ class TestController:
         self.event.clear()
 
         # Open circuit voltage
+        self.apply_safety_limits(charge_current_max=pulse_current)
         ocv = self.getVoltageELC()
         print(f"OCV: {ocv:.4f} V")
 
@@ -622,6 +668,10 @@ class TestController:
         self.event.clear()
 
         # ----- Charge step -----
+        self.apply_safety_limits(
+            charge_volt_end=charge_voltage,
+            charge_current_max=charge_current_1c,
+        )
         self.startPSOutput()
         self.chargeCC(charge_current_1c)
         self.setVoltage(charge_voltage)
