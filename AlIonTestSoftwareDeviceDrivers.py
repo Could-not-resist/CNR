@@ -33,7 +33,7 @@ class PowerSupplyController:
         self.powerSupply.write("SOUR:VOLT:SLEW " + str((volts[0])))
 
     # def setVoltageMax(self):
-    #     self.powerSupply.write("SOUR:VOLT:LIMIT:HIGH MAX")  # HEF EKKI FUNDIÐ MAX Í MANUAL
+    #     self.powerSupply.write("SOUR:VOLT:LIMIT:HIGH MAX")  # Could not find MAX command in manual
 
     #### CURRENT #### CURRENT #### CURRENT #### CURRENT ####
     def setCurrent(self, amps):
@@ -52,14 +52,14 @@ class PowerSupplyController:
         self.powerSupply.write("SOUR:CURR:SLEW " + str(amps))
 
     # def setCurrentMax(self):
-    #     self.powerSupply.write("SOUR:CURR:LIMIT:HIGH MAX") # HEF EKKI FUNDIÐ MAX Í MANUAL
+    #     self.powerSupply.write("SOUR:CURR:LIMIT:HIGH MAX")  # Could not find MAX command in manual
 
     #### POWER #### POWER #### POWER #### POWER #### POWER ####
     def setPowerProt(self, *watt):
         self.powerSupply.write("SOUR:POW:PROT:HIGH " + str(watt[0]))
 
     # def setPowerMax(self):
-    #     self.powerSupply.write("SOUR:POW:PROT:HIGH MAX") # HEF EKKI FUNDIÐ MAX Í MANUAL
+    #     self.powerSupply.write("SOUR:POW:PROT:HIGH MAX")  # Could not find MAX command in manual
 
     #### DC RISE/FALL #### DC RISE/FALL #### DC RISE/FALL ####
     def setDC_Rise(self, *volts):
