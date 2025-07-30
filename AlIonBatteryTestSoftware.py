@@ -369,8 +369,10 @@ class TestController:
                         dataStorage.addVoltage(v)
                         dataStorage.addCurrent(c)
                         if multimeter_mode == "voltage":
+                            assert mm is not None
                             dataStorage.addMMVoltage(mm)
                         elif multimeter_mode == "tcouple":
+                            assert mm is not None
                             dataStorage.addMMTemperature(mm)
                     self.stopPSOutput()
 
@@ -400,8 +402,10 @@ class TestController:
                         dataStorage.addVoltage(v)
                         dataStorage.addCurrent(c)
                         if multimeter_mode == "voltage":
+                            assert mm is not None
                             dataStorage.addMMVoltage(mm)
                         elif multimeter_mode == "tcouple":
+                            assert mm is not None
                             dataStorage.addMMTemperature(mm)
                         if v < dcharge_volt_min:
                             print(f"below {dcharge_volt_min} volts")
@@ -749,8 +753,10 @@ class TestController:
                     dataStorage.addVoltage(v)
                     dataStorage.addCurrent(c)
                     if self.multimeter_mode == "voltage":
+                        assert mm is not None
                         dataStorage.addMMVoltage(mm)
                     elif self.multimeter_mode == "tcouple":
+                        assert mm is not None
                         dataStorage.addMMTemperature(mm)
                     dataStorage.addCapacity(capacity)
                     if c <= finish_current:
@@ -788,8 +794,10 @@ class TestController:
                     dataStorage.addVoltage(v)
                     dataStorage.addCurrent(c)
                     if self.multimeter_mode == "voltage":
+                        assert mm is not None
                         dataStorage.addMMVoltage(mm)
                     elif self.multimeter_mode == "tcouple":
+                        assert mm is not None
                         dataStorage.addMMTemperature(mm)
                     dataStorage.addCapacity(capacity)
                     if v <= min_voltage:
