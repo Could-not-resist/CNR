@@ -46,6 +46,15 @@ python MAIN.py --actual-capacity-test \
 
 ``--charge-volt-end`` defaults to **4.1&nbsp;V** if not specified.
 
+You can also supply defaults for the capacity test via a JSON file:
+
+```bash
+python MAIN.py --actual-capacity-test --capacity-config tests/capacity_defaults.json
+```
+
+The file may define ``rest_time``, ``charge_voltage`` and ``min_voltage`` keys.
+Any command-line options take precedence over the values loaded from the file.
+
 Additional tests can be invoked with the following flags:
 
 - **Efficiency test**

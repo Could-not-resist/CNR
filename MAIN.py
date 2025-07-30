@@ -117,6 +117,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run UPS test")
     parser.add_argument("--config-file", help="JSON file with cell settings")
     parser.add_argument("--profile", help="cell profile name in config file")
+    parser.add_argument("--capacity-config", help="JSON defaults for capacity test")
     parser.add_argument("--test-name")
     parser.add_argument("--temperature", type=float)
     parser.add_argument("--charge-volt-prot", type=int)
@@ -178,6 +179,14 @@ def main():
     if args.config_file:
         config = load_config(args.config_file, profile)
 
+    capacity_defaults = {}
+    if args.capacity_config:
+        try:
+            capacity_defaults = json.loads(Path(args.capacity_config).read_text())
+        except Exception as exc:
+            print(f"Failed to load capacity config: {exc}")
+            capacity_defaults = {}
+
     for field in UPSSettings.__annotations__.keys():
         if getattr(args, field) is None:
             if field in config:
@@ -195,12 +204,20 @@ def main():
 
     if args.actual_capacity_test:
         tc = TestController(args.multimeter_mode)
+        rest_time = capacity_defaults.get("rest_time", 3600.0)
+        cap_charge_volt = charge_volt_end
+        if args.charge_volt_end is None and "charge_voltage" in capacity_defaults:
+            cap_charge_volt = capacity_defaults["charge_voltage"]
+        cap_min_volt = dcharge_volt_min
+        if args.dcharge_volt_min is None and "min_voltage" in capacity_defaults:
+            cap_min_volt = capacity_defaults["min_voltage"]
+
         tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
-            3600.0,
-            charge_volt_end,
-            dcharge_volt_min,
+            rest_time,
+            cap_charge_volt,
+            cap_min_volt,
             temperature,
         )
     elif args.efficiency_test:
@@ -237,12 +254,20 @@ def main():
             args.pulse_duration,
             temperature,
         )
+        rest_time = capacity_defaults.get("rest_time", 3600.0)
+        cap_charge_volt = charge_volt_end
+        if args.charge_volt_end is None and "charge_voltage" in capacity_defaults:
+            cap_charge_volt = capacity_defaults["charge_voltage"]
+        cap_min_volt = dcharge_volt_min
+        if args.dcharge_volt_min is None and "min_voltage" in capacity_defaults:
+            cap_min_volt = capacity_defaults["min_voltage"]
+
         capacity = tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
-            3600.0,
-            charge_volt_end,
-            dcharge_volt_min,
+            rest_time,
+            cap_charge_volt,
+            cap_min_volt,
             temperature,
         )
         print(f"Measured capacity: {capacity:.3f} Ah")
