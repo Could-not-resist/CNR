@@ -4,5 +4,5 @@
   "min_voltage": 2.75,
   "charge_current": 1.0,
   "discharge_current": 1.0,
-  "multimeter_mode": "voltage"
+  "multimeter_mode": "tcouple"
 }
