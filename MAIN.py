@@ -184,7 +184,7 @@ def main():
     args = parser.parse_args()
 
     if args.multimeter_mode is None and args.use_multimeter:
-        args.multimeter_mode = "voltage"
+        args.multimeter_mode = "tcouple"
 
     profile = args.profile or args.test_name or TEST_NAME
     config = {}
