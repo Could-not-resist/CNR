@@ -72,8 +72,8 @@ def load_config(config_path: str, profile: str) -> dict:
 
 
 class TestTypes:
-    def __init__(self, multimeter_mode: str | None = None):
-        self.testController = TestController(multimeter_mode)
+    def __init__(self, multimeter_mode: str | None = None, debug: bool = False):
+        self.testController = TestController(multimeter_mode, debug)
         self.upsThread = None
 
     def runUPSTest(self, settings: UPSSettings):
@@ -174,6 +174,12 @@ def main():
         action="store_true",
         help="DEPRECATED: same as --multimeter-mode voltage"
     )
+    parser.add_argument(
+        "-d",
+        "--debug",
+        action="store_true",
+        help="print detailed progress information",
+    )
 
     args = parser.parse_args()
 
@@ -227,7 +233,7 @@ def main():
             cap_min_volt = dcharge_volt_min
 
     if args.actual_capacity_test:
-        tc = TestController(args.multimeter_mode)
+        tc = TestController(args.multimeter_mode, args.debug)
         tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
@@ -237,7 +243,7 @@ def main():
             temperature,
         )
     elif args.efficiency_test:
-        tc = TestController(args.multimeter_mode)
+        tc = TestController(args.multimeter_mode, args.debug)
         tc.efficiency_test(
             charge_current_max,
             dcharge_current_max,
@@ -247,7 +253,7 @@ def main():
         )
     elif args.rate_characteristic_test:
         rates = [float(r) for r in args.rates.split(',') if r]
-        tc = TestController(args.multimeter_mode)
+        tc = TestController(args.multimeter_mode, args.debug)
         tc.rate_characteristic_test(
             rates,
             charge_current_max,
@@ -256,7 +262,7 @@ def main():
             temperature,
         )
     elif args.ocv_curve_test:
-        tc = TestController(args.multimeter_mode)
+        tc = TestController(args.multimeter_mode, args.debug)
         tc.ocv_curve_test(
             args.step_current,
             args.steps,
@@ -264,7 +270,7 @@ def main():
             temperature,
         )
     elif args.internal_resistance_test:
-        tc = TestController(args.multimeter_mode)
+        tc = TestController(args.multimeter_mode, args.debug)
         tc.internal_resistance_test(
             args.pulse_current,
             args.pulse_duration,
@@ -288,7 +294,7 @@ def main():
                 kwargs[field] = val
         settings = UPSSettings(**kwargs)
 
-        TObj = TestTypes(args.multimeter_mode)
+        TObj = TestTypes(args.multimeter_mode, args.debug)
         thread = TObj.runUPSTest(settings)
         try:
             while thread.is_alive():

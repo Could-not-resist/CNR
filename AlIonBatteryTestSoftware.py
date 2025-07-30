@@ -19,8 +19,9 @@ class TestController:
     # Variable for keeping track of the C-rate of the battery
 
     # Initiating function
-    def __init__(self, multimeter_mode: str | None = None) -> None:
+    def __init__(self, multimeter_mode: str | None = None, debug: bool = False) -> None:
         self.multimeter_mode = multimeter_mode
+        self.debug = debug
         try:
             # Trying to connect to the real device controllers
             self.powerSupplyController = PowerSupplyController()
@@ -56,6 +57,11 @@ class TestController:
         self.event = threading.Event()
         # Event used to gracefully abort a running test
         self.stop_event = threading.Event()
+
+    def _debug(self, message: str) -> None:
+        """Print debug message when debug mode is enabled."""
+        if self.debug:
+            print(message)
 
     def abort(self) -> None:
         """Stop all outputs and signal running loops to exit."""
@@ -344,7 +350,9 @@ class TestController:
                         v_ps = self.getVoltagePSC()
                         v = self.getVoltageELC()
                         c = self.getCurrentPSC()
-                        print(f"{cycleNumber} of {num_cycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}")
+                        self._debug(
+                            f"{cycleNumber} of {num_cycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}"
+                        )
                         dataStorage.addTime(float(tmp.total_seconds()))
                         dataStorage.addVoltage(v)
                         dataStorage.addCurrent(c)
@@ -367,7 +375,9 @@ class TestController:
                         tmp = datetime.now()-DischargestartTime
                         v = self.getVoltageELC()
                         c = self.getCurrentELC()
-                        print(f"{cycleNumber} of {num_cycles} -DISCHARGING- {tmp.total_seconds():03.2f} s of {Dduration.total_seconds():.1f} s - V:{v:.4f} C:{c:.4f}")
+                        self._debug(
+                            f"{cycleNumber} of {num_cycles} -DISCHARGING- {tmp.total_seconds():03.2f} s of {Dduration.total_seconds():.1f} s - V:{v:.4f} C:{c:.4f}"
+                        )
                         dataStorage.addTime(float(tmp.total_seconds()))
                         dataStorage.addVoltage(v)
                         dataStorage.addCurrent(c)
@@ -437,6 +447,9 @@ class TestController:
             elapsed += self.timeInterval
             v = self.getVoltagePSC()
             c = self.getCurrentPSC()
+            self._debug(
+                f"CC Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f}"
+            )
             energy_in += v * c * self.timeInterval / 3600.0
             dataStorage.addTime(elapsed)
             dataStorage.addVoltage(v)
@@ -452,6 +465,9 @@ class TestController:
             elapsed += self.timeInterval
             v = self.getVoltagePSC()
             c = self.getCurrentPSC()
+            self._debug(
+                f"CV Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f}"
+            )
             energy_in += v * c * self.timeInterval / 3600.0
             dataStorage.addTime(elapsed)
             dataStorage.addVoltage(v)
@@ -475,6 +491,9 @@ class TestController:
             elapsed += self.timeInterval
             v = self.getVoltageELC()
             c = self.getCurrentELC()
+            self._debug(
+                f"Discharging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f}"
+            )
             energy_out += v * c * self.timeInterval / 3600.0
             dataStorage.addTime(elapsed)
             dataStorage.addVoltage(v)
@@ -521,6 +540,9 @@ class TestController:
                 elapsed += self.timeInterval
                 v = self.getVoltagePSC()
                 c = self.getCurrentPSC()
+                self._debug(
+                    f"CC Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f}"
+                )
                 dataStorage.addTime(elapsed)
                 dataStorage.addVoltage(v)
                 dataStorage.addCurrent(c)
@@ -532,6 +554,9 @@ class TestController:
                 elapsed += self.timeInterval
                 v = self.getVoltagePSC()
                 c = self.getCurrentPSC()
+                self._debug(
+                    f"CV Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f}"
+                )
                 dataStorage.addTime(elapsed)
                 dataStorage.addVoltage(v)
                 dataStorage.addCurrent(c)
@@ -553,6 +578,9 @@ class TestController:
                 v = self.getVoltageELC()
                 c = self.getCurrentELC()
                 capacity += c * self.timeInterval / 3600.0
+                self._debug(
+                    f"Discharging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}"
+                )
                 dataStorage.addTime(elapsed)
                 dataStorage.addVoltage(v)
                 dataStorage.addCurrent(c)
@@ -680,18 +708,23 @@ class TestController:
                 self.chargeCC(charge_current_1c)
                 self.setVoltage(charge_voltage)
 
-                print(f"Charging to {charge_voltage} V at {charge_current_1c} A")
-                while True:
-                    time.sleep(self.timeInterval)
-                    elapsed += self.timeInterval
-                    v = self.getVoltageELC()
-                    c = self.getCurrentPSC()
-                    dataStorage.addTime(elapsed)
-                    dataStorage.addVoltage(v)
-                    dataStorage.addCurrent(c)
-                    dataStorage.addCapacity(capacity)
-                    if c <= 1.5:
-                        break
+        elapsed = 0.0
+        capacity = 0.0
+        print(f"Charging to {charge_voltage} V at {charge_current_1c} A")
+        while True:
+            time.sleep(self.timeInterval)
+            elapsed += self.timeInterval
+            v = self.getVoltageELC()
+            c = self.getCurrentPSC()
+            self._debug(
+                f"Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}"
+            )
+            dataStorage.addTime(elapsed)
+            dataStorage.addVoltage(v)
+            dataStorage.addCurrent(c)
+            dataStorage.addCapacity(capacity)
+            if c <= 1.5:
+                break
 
                 self.stopPSOutput()
 
@@ -705,19 +738,22 @@ class TestController:
                 self.setCCcurrentL1(discharge_current_1c)
                 self.startDischarge()
 
-                print(f"Discharging to {min_voltage} V at {discharge_current_1c} A")
-                while True:
-                    time.sleep(self.timeInterval)
-                    elapsed += self.timeInterval
-                    v = self.getVoltageELC()
-                    c = self.getCurrentELC()
-                    capacity += c * self.timeInterval / 3600.0
-                    dataStorage.addTime(elapsed)
-                    dataStorage.addVoltage(v)
-                    dataStorage.addCurrent(c)
-                    dataStorage.addCapacity(capacity)
-                    if v <= min_voltage:
-                        break
+        print(f"Discharging to {min_voltage} V at {discharge_current_1c} A")
+        while True:
+            time.sleep(self.timeInterval)
+            elapsed += self.timeInterval
+            v = self.getVoltageELC()
+            c = self.getCurrentELC()
+            capacity += c * self.timeInterval / 3600.0
+            self._debug(
+                f"Discharging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}"
+            )
+            dataStorage.addTime(elapsed)
+            dataStorage.addVoltage(v)
+            dataStorage.addCurrent(c)
+            dataStorage.addCapacity(capacity)
+            if v <= min_voltage:
+                break
 
                 self.stopDischarge()
             except KeyboardInterrupt:
