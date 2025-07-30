@@ -702,12 +702,14 @@ class TestController:
         charge_voltage: float = 4.1,
         min_voltage: float = 2.75,
         temperature: float = 20.0,
+        finish_current: float = 1.5,
     ) -> float:
         """Perform an actual capacity test.
 
         The procedure charges the cell at ``charge_current_1c`` up to ``charge_voltage``,
         rests for ``rest_time`` seconds and then discharges at ``discharge_current_1c``
-        down to ``min_voltage`` while logging the cumulative capacity.
+        down to ``min_voltage`` while logging the cumulative capacity. The
+        charging phase ends once the supply current drops below ``finish_current``.
         """
 
         dataStorage = DataStorage()
@@ -751,7 +753,7 @@ class TestController:
                     elif self.multimeter_mode == "tcouple":
                         dataStorage.addMMTemperature(mm)
                     dataStorage.addCapacity(capacity)
-                    if c <= 1.5:
+                    if c <= finish_current:
                         break
 
                 self.stopPSOutput()

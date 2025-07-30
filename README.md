@@ -44,7 +44,8 @@ python MAIN.py --actual-capacity-test \
   --capacity-discharge-current 1.0 \
   [--capacity-rest-time 3600] \
   [--capacity-charge-voltage 4.1] \
-  [--capacity-min-voltage 2.75]
+  [--capacity-min-voltage 2.75] \
+  [--capacity-finish-current 1.5]
 ```
 ``--capacity-charge-voltage`` defaults to the value of ``--charge-volt-end``
 (or ``4.1``&nbsp;V). ``--capacity-rest-time`` and ``--capacity-min-voltage``
@@ -58,7 +59,8 @@ python MAIN.py --actual-capacity-test --capacity-config tests/capacity_defaults.
 ```
 
 The file may define ``rest_time``, ``charge_voltage``, ``min_voltage``,
-``charge_current``, ``discharge_current`` and ``multimeter_mode`` keys.
+``charge_current``, ``discharge_current``, ``finish_current`` and
+``multimeter_mode`` keys.
 These values override the built‑in defaults in ``MAIN.py`` but any
 command-line options still take precedence.
 
