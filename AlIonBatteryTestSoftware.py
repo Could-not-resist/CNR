@@ -667,60 +667,78 @@ class TestController:
         dataStorage = DataStorage()
         self.event.clear()
 
-        # ----- Charge step -----
-        self.apply_safety_limits(
-            charge_volt_end=charge_voltage,
-            charge_current_max=charge_current_1c,
-        )
-        self.startPSOutput()
-        self.chargeCC(charge_current_1c)
-        self.setVoltage(charge_voltage)
-
         elapsed = 0.0
         capacity = 0.0
-        print(f"Charging to {charge_voltage} V at {charge_current_1c} A")
-        while True:
-            time.sleep(self.timeInterval)
-            elapsed += self.timeInterval
-            v = self.getVoltageELC()
-            c = self.getCurrentPSC()
-            dataStorage.addTime(elapsed)
-            dataStorage.addVoltage(v)
-            dataStorage.addCurrent(c)
-            dataStorage.addCapacity(capacity)
-            if c <= 1.5:
-                break
+        try:
+            try:
+                # ----- Charge step -----
+                self.apply_safety_limits(
+                    charge_volt_end=charge_voltage,
+                    charge_current_max=charge_current_1c,
+                )
+                self.startPSOutput()
+                self.chargeCC(charge_current_1c)
+                self.setVoltage(charge_voltage)
 
-        self.stopPSOutput()
+                print(f"Charging to {charge_voltage} V at {charge_current_1c} A")
+                while True:
+                    time.sleep(self.timeInterval)
+                    elapsed += self.timeInterval
+                    v = self.getVoltageELC()
+                    c = self.getCurrentPSC()
+                    dataStorage.addTime(elapsed)
+                    dataStorage.addVoltage(v)
+                    dataStorage.addCurrent(c)
+                    dataStorage.addCapacity(capacity)
+                    if c <= 1.5:
+                        break
 
-        # ----- Rest step -----
-        print(f"Resting for {rest_time} seconds")
-        time.sleep(rest_time)
+                self.stopPSOutput()
 
-        # ----- Discharge step -----
-        self.stopDischarge()
-        self.setCCHmode()
-        self.setCCcurrentL1(discharge_current_1c)
-        self.startDischarge()
+                # ----- Rest step -----
+                print(f"Resting for {rest_time} seconds")
+                time.sleep(rest_time)
 
-        print(f"Discharging to {min_voltage} V at {discharge_current_1c} A")
-        while True:
-            time.sleep(self.timeInterval)
-            elapsed += self.timeInterval
-            v = self.getVoltageELC()
-            c = self.getCurrentELC()
-            capacity += c * self.timeInterval / 3600.0
-            dataStorage.addTime(elapsed)
-            dataStorage.addVoltage(v)
-            dataStorage.addCurrent(c)
-            dataStorage.addCapacity(capacity)
-            if v <= min_voltage:
-                break
+                # ----- Discharge step -----
+                self.stopDischarge()
+                self.setCCHmode()
+                self.setCCcurrentL1(discharge_current_1c)
+                self.startDischarge()
 
-        self.stopDischarge()
-        dataStorage.createTable(
-            "actual_capacity_test", discharge_current_1c, 0, temperature, self.timeInterval
-        )
+                print(f"Discharging to {min_voltage} V at {discharge_current_1c} A")
+                while True:
+                    time.sleep(self.timeInterval)
+                    elapsed += self.timeInterval
+                    v = self.getVoltageELC()
+                    c = self.getCurrentELC()
+                    capacity += c * self.timeInterval / 3600.0
+                    dataStorage.addTime(elapsed)
+                    dataStorage.addVoltage(v)
+                    dataStorage.addCurrent(c)
+                    dataStorage.addCapacity(capacity)
+                    if v <= min_voltage:
+                        break
+
+                self.stopDischarge()
+            except KeyboardInterrupt:
+                print("Keyboard interrupt - aborting test")
+                self.abort()
+                raise
+            finally:
+                dataStorage.createTable(
+                    "actual_capacity_test",
+                    discharge_current_1c,
+                    0,
+                    temperature,
+                    self.timeInterval,
+                )
+                self.stopPSOutput()
+                self.stopDischarge()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            self.stopPSOutput()
+            self.stopDischarge()
 
         print(f"Accumulated capacity: {capacity:.3f} Ah")
         self.event.set()
