@@ -713,7 +713,8 @@ class TestController:
         The procedure charges the cell at ``charge_current_1c`` up to ``charge_voltage``,
         rests for ``rest_time`` seconds and then discharges at ``discharge_current_1c``
         down to ``min_voltage`` while logging the cumulative capacity. The
-        charging phase ends once the supply current drops below ``finish_current``.
+        charging phase ends once the supply current stays below ``finish_current``
+        for at least 10 seconds.
         """
 
         dataStorage = DataStorage()
@@ -735,6 +736,7 @@ class TestController:
                 elapsed = 0.0
                 capacity = 0.0
                 print(f"Charging to {charge_voltage} V at {charge_current_1c} A")
+                low_current_time = 0.0
                 while True:
                     time.sleep(self.timeInterval)
                     elapsed += self.timeInterval
@@ -760,7 +762,11 @@ class TestController:
                         dataStorage.addMMTemperature(mm)
                     dataStorage.addCapacity(capacity)
                     if c <= finish_current:
-                        break
+                        low_current_time += self.timeInterval
+                        if low_current_time >= 10.0:
+                            break
+                    else:
+                        low_current_time = 0.0
 
                 self.stopPSOutput()
 
