@@ -200,6 +200,7 @@ def main():
             args.capacity_discharge_current,
             3600.0,
             charge_volt_end,
+            dcharge_volt_min,
             temperature,
         )
     elif args.efficiency_test:
@@ -241,6 +242,7 @@ def main():
             args.capacity_discharge_current,
             3600.0,
             charge_volt_end,
+            dcharge_volt_min,
             temperature,
         )
         print(f"Measured capacity: {capacity:.3f} Ah")
