@@ -34,6 +34,7 @@ python MAIN.py
 ```
    If no hardware connection is detected the program will ask whether to
    continue using mock drivers.
+   Use the `-d` flag to print detailed progress messages during a test.
 
 To perform a full capacity measurement instead of the default cycling test run:
 
@@ -173,6 +174,7 @@ common flags accepted by `MAIN.py` are listed below. Run
 | `--dcharge-time` | Allowed discharging time |
 | `--num-cycles` | Number of charge/discharge cycles |
 | `--multimeter-mode` | Log measurement using the multimeter (`voltage` or `tcouple`) |
+| `-d`, `--debug` | Print detailed progress information |
 
 
 ## Manufacturer Programming Manuals
