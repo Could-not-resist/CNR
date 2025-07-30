@@ -74,6 +74,7 @@ def load_config(config_path: str, profile: str) -> dict:
 class TestTypes:
     def __init__(self, multimeter_mode: str | None = None):
         self.testController = TestController(multimeter_mode)
+        self.upsThread = None
 
     def runUPSTest(self, settings: UPSSettings):
         """Start a UPS test using the provided settings."""
@@ -102,6 +103,14 @@ class TestTypes:
             ),
         )
         self.upsThread.start()
+        return self.upsThread
+
+    def stop(self):
+        """Abort the running test and wait for it to finish."""
+        if self.testController:
+            self.testController.abort()
+        if self.upsThread is not None:
+            self.upsThread.join()
 
 
 def main():
@@ -245,7 +254,13 @@ def main():
         settings = UPSSettings(**kwargs)
 
         TObj = TestTypes(args.multimeter_mode)
-        TObj.runUPSTest(settings)
+        thread = TObj.runUPSTest(settings)
+        try:
+            while thread.is_alive():
+                thread.join(0.5)
+        except KeyboardInterrupt:
+            print("Keyboard interrupt received, stopping test")
+            TObj.stop()
 
 
 if __name__ == "__main__":
