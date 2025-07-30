@@ -58,10 +58,16 @@ class TestController:
         # Event used to gracefully abort a running test
         self.stop_event = threading.Event()
 
-    def _debug(self, message: str) -> None:
-        """Print debug message when debug mode is enabled."""
+    def _debug(self, message: str, mm_value: float | None = None) -> None:
+        """Print debug message when debug mode is enabled.
+
+        If ``mm_value`` is given the measurement is appended to the output.
+        """
         if self.debug:
-            print(message)
+            if mm_value is not None:
+                print(f"{message} MM:{mm_value:.4f}")
+            else:
+                print(message)
 
     def abort(self) -> None:
         """Stop all outputs and signal running loops to exit."""
@@ -350,16 +356,22 @@ class TestController:
                         v_ps = self.getVoltagePSC()
                         v = self.getVoltageELC()
                         c = self.getCurrentPSC()
+                        mm = None
+                        if multimeter_mode == "voltage":
+                            mm = self.getVoltageMM()
+                        elif multimeter_mode == "tcouple":
+                            mm = self.getTemperatureMM()
                         self._debug(
-                            f"{cycleNumber} of {num_cycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}"
+                            f"{cycleNumber} of {num_cycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}",
+                            mm,
                         )
                         dataStorage.addTime(float(tmp.total_seconds()))
                         dataStorage.addVoltage(v)
                         dataStorage.addCurrent(c)
                         if multimeter_mode == "voltage":
-                            dataStorage.addMMVoltage(self.getVoltageMM())
+                            dataStorage.addMMVoltage(mm)
                         elif multimeter_mode == "tcouple":
-                            dataStorage.addMMTemperature(self.getTemperatureMM())
+                            dataStorage.addMMTemperature(mm)
                     self.stopPSOutput()
 
                     Dend_time = datetime.now() + Dduration
@@ -375,16 +387,22 @@ class TestController:
                         tmp = datetime.now()-DischargestartTime
                         v = self.getVoltageELC()
                         c = self.getCurrentELC()
+                        mm = None
+                        if multimeter_mode == "voltage":
+                            mm = self.getVoltageMM()
+                        elif multimeter_mode == "tcouple":
+                            mm = self.getTemperatureMM()
                         self._debug(
-                            f"{cycleNumber} of {num_cycles} -DISCHARGING- {tmp.total_seconds():03.2f} s of {Dduration.total_seconds():.1f} s - V:{v:.4f} C:{c:.4f}"
+                            f"{cycleNumber} of {num_cycles} -DISCHARGING- {tmp.total_seconds():03.2f} s of {Dduration.total_seconds():.1f} s - V:{v:.4f} C:{c:.4f}",
+                            mm,
                         )
                         dataStorage.addTime(float(tmp.total_seconds()))
                         dataStorage.addVoltage(v)
                         dataStorage.addCurrent(c)
                         if multimeter_mode == "voltage":
-                            dataStorage.addMMVoltage(self.getVoltageMM())
+                            dataStorage.addMMVoltage(mm)
                         elif multimeter_mode == "tcouple":
-                            dataStorage.addMMTemperature(self.getTemperatureMM())
+                            dataStorage.addMMTemperature(mm)
                         if v < dcharge_volt_min:
                             print(f"below {dcharge_volt_min} volts")
                             break
@@ -716,16 +734,22 @@ class TestController:
                     elapsed += self.timeInterval
                     v = self.getVoltageELC()
                     c = self.getCurrentPSC()
+                    mm = None
+                    if self.multimeter_mode == "voltage":
+                        mm = self.getVoltageMM()
+                    elif self.multimeter_mode == "tcouple":
+                        mm = self.getTemperatureMM()
                     self._debug(
-                        f"Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}"
+                        f"Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}",
+                        mm,
                     )
                     dataStorage.addTime(elapsed)
                     dataStorage.addVoltage(v)
                     dataStorage.addCurrent(c)
                     if self.multimeter_mode == "voltage":
-                        dataStorage.addMMVoltage(self.getVoltageMM())
+                        dataStorage.addMMVoltage(mm)
                     elif self.multimeter_mode == "tcouple":
-                        dataStorage.addMMTemperature(self.getTemperatureMM())
+                        dataStorage.addMMTemperature(mm)
                     dataStorage.addCapacity(capacity)
                     if c <= 1.5:
                         break
@@ -749,16 +773,22 @@ class TestController:
                     v = self.getVoltageELC()
                     c = self.getCurrentELC()
                     capacity += c * self.timeInterval / 3600.0
+                    mm = None
+                    if self.multimeter_mode == "voltage":
+                        mm = self.getVoltageMM()
+                    elif self.multimeter_mode == "tcouple":
+                        mm = self.getTemperatureMM()
                     self._debug(
-                        f"Discharging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}"
+                        f"Discharging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}",
+                        mm,
                     )
                     dataStorage.addTime(elapsed)
                     dataStorage.addVoltage(v)
                     dataStorage.addCurrent(c)
                     if self.multimeter_mode == "voltage":
-                        dataStorage.addMMVoltage(self.getVoltageMM())
+                        dataStorage.addMMVoltage(mm)
                     elif self.multimeter_mode == "tcouple":
-                        dataStorage.addMMTemperature(self.getTemperatureMM())
+                        dataStorage.addMMTemperature(mm)
                     dataStorage.addCapacity(capacity)
                     if v <= min_voltage:
                         break
