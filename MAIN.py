@@ -140,7 +140,7 @@ def main():
                         help="charge current for capacity test in amperes")
     parser.add_argument("--capacity-discharge-current", type=float, default=1.0,
                         help="discharge current for capacity test in amperes")
-    parser.add_argument("--capacity-rest-time", type=float, default=3600.0,
+    parser.add_argument("--capacity-rest-time", type=float,
                         help="rest time before discharge in seconds")
     parser.add_argument("--capacity-charge-voltage", type=float,
                         help="charge voltage for capacity test")
@@ -208,26 +208,32 @@ def main():
     dcharge_current_max = args.dcharge_current_max if args.dcharge_current_max is not None else DCHARGE_CURRENT_MAX
     temperature = args.temperature if args.temperature is not None else TEMPERATURE
 
-    capacity_rest_time = args.capacity_rest_time
-    capacity_charge_voltage = args.capacity_charge_voltage if args.capacity_charge_voltage is not None else charge_volt_end
-    capacity_min_voltage = args.capacity_min_voltage if args.capacity_min_voltage is not None else dcharge_volt_min
+    rest_time = args.capacity_rest_time
+    if rest_time is None:
+        rest_time = capacity_defaults.get("rest_time", 3600.0)
+
+    cap_charge_volt = args.capacity_charge_voltage
+    if cap_charge_volt is None:
+        if args.charge_volt_end is None and "charge_voltage" in capacity_defaults:
+            cap_charge_volt = capacity_defaults["charge_voltage"]
+        else:
+            cap_charge_volt = charge_volt_end
+
+    cap_min_volt = args.capacity_min_voltage
+    if cap_min_volt is None:
+        if args.dcharge_volt_min is None and "min_voltage" in capacity_defaults:
+            cap_min_volt = capacity_defaults["min_voltage"]
+        else:
+            cap_min_volt = dcharge_volt_min
 
     if args.actual_capacity_test:
         tc = TestController(args.multimeter_mode)
-        rest_time = capacity_defaults.get("rest_time", 3600.0)
-        cap_charge_volt = charge_volt_end
-        if args.charge_volt_end is None and "charge_voltage" in capacity_defaults:
-            cap_charge_volt = capacity_defaults["charge_voltage"]
-        cap_min_volt = dcharge_volt_min
-        if args.dcharge_volt_min is None and "min_voltage" in capacity_defaults:
-            cap_min_volt = capacity_defaults["min_voltage"]
-
         tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
-            capacity_rest_time,
-            capacity_charge_voltage,
-            capacity_min_voltage,
+            rest_time,
+            cap_charge_volt,
+            cap_min_volt,
             temperature,
         )
     elif args.efficiency_test:
@@ -264,20 +270,12 @@ def main():
             args.pulse_duration,
             temperature,
         )
-        rest_time = capacity_defaults.get("rest_time", 3600.0)
-        cap_charge_volt = charge_volt_end
-        if args.charge_volt_end is None and "charge_voltage" in capacity_defaults:
-            cap_charge_volt = capacity_defaults["charge_voltage"]
-        cap_min_volt = dcharge_volt_min
-        if args.dcharge_volt_min is None and "min_voltage" in capacity_defaults:
-            cap_min_volt = capacity_defaults["min_voltage"]
-
         capacity = tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
-            capacity_rest_time,
-            capacity_charge_voltage,
-            capacity_min_voltage,
+            rest_time,
+            cap_charge_volt,
+            cap_min_volt,
             temperature,
         )
         print(f"Measured capacity: {capacity:.3f} Ah")

@@ -45,9 +45,10 @@ python MAIN.py --actual-capacity-test \
   [--capacity-charge-voltage 4.1] \
   [--capacity-min-voltage 2.75]
 ```
-``--capacity-charge-voltage`` defaults to the value of ``--charge-volt-end`` (or
-``4.1``&nbsp;V), ``--capacity-rest-time`` defaults to one hour and
-``--capacity-min-voltage`` defaults to ``2.75``&nbsp;V if not specified.
+``--capacity-charge-voltage`` defaults to the value of ``--charge-volt-end``
+(or ``4.1``&nbsp;V). ``--capacity-rest-time`` and ``--capacity-min-voltage``
+fall back to the values in the file passed with ``--capacity-config`` or,
+if that option is omitted, to one hour and ``2.75``&nbsp;V respectively.
 
 You can also supply defaults for the capacity test via a JSON file:
 
@@ -56,7 +57,8 @@ python MAIN.py --actual-capacity-test --capacity-config tests/capacity_defaults.
 ```
 
 The file may define ``rest_time``, ``charge_voltage`` and ``min_voltage`` keys.
-Any command-line options take precedence over the values loaded from the file.
+These values override the built‑in defaults in ``MAIN.py`` but any
+command-line options still take precedence.
 
 Additional tests can be invoked with the following flags:
 
