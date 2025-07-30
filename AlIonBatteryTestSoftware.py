@@ -663,8 +663,8 @@ class TestController:
         """Perform an actual capacity test.
 
         The procedure charges the cell at ``charge_current_1c`` up to ``charge_voltage``,
-        rests for one hour and then discharges at ``discharge_current_1c`` down
-        to ``min_voltage`` while logging the cumulative capacity.
+        rests for ``rest_time`` seconds and then discharges at ``discharge_current_1c``
+        down to ``min_voltage`` while logging the cumulative capacity.
         """
 
         dataStorage = DataStorage()

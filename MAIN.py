@@ -140,6 +140,12 @@ def main():
                         help="charge current for capacity test in amperes")
     parser.add_argument("--capacity-discharge-current", type=float, default=1.0,
                         help="discharge current for capacity test in amperes")
+    parser.add_argument("--capacity-rest-time", type=float, default=3600.0,
+                        help="rest time before discharge in seconds")
+    parser.add_argument("--capacity-charge-voltage", type=float,
+                        help="charge voltage for capacity test")
+    parser.add_argument("--capacity-min-voltage", type=float,
+                        help="minimum discharge voltage for capacity test")
     parser.add_argument("--efficiency-test", action="store_true",
                         help="run efficiency test")
     parser.add_argument("--rate-characteristic-test", action="store_true",
@@ -202,6 +208,10 @@ def main():
     dcharge_current_max = args.dcharge_current_max if args.dcharge_current_max is not None else DCHARGE_CURRENT_MAX
     temperature = args.temperature if args.temperature is not None else TEMPERATURE
 
+    capacity_rest_time = args.capacity_rest_time
+    capacity_charge_voltage = args.capacity_charge_voltage if args.capacity_charge_voltage is not None else charge_volt_end
+    capacity_min_voltage = args.capacity_min_voltage if args.capacity_min_voltage is not None else dcharge_volt_min
+
     if args.actual_capacity_test:
         tc = TestController(args.multimeter_mode)
         rest_time = capacity_defaults.get("rest_time", 3600.0)
@@ -215,9 +225,9 @@ def main():
         tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
-            rest_time,
-            cap_charge_volt,
-            cap_min_volt,
+            capacity_rest_time,
+            capacity_charge_voltage,
+            capacity_min_voltage,
             temperature,
         )
     elif args.efficiency_test:
@@ -265,9 +275,9 @@ def main():
         capacity = tc.actual_capacity_test(
             args.capacity_charge_current,
             args.capacity_discharge_current,
-            rest_time,
-            cap_charge_volt,
-            cap_min_volt,
+            capacity_rest_time,
+            capacity_charge_voltage,
+            capacity_min_voltage,
             temperature,
         )
         print(f"Measured capacity: {capacity:.3f} Ah")
