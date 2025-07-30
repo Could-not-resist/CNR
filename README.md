@@ -57,7 +57,8 @@ You can also supply defaults for the capacity test via a JSON file:
 python MAIN.py --actual-capacity-test --capacity-config tests/capacity_defaults.json
 ```
 
-The file may define ``rest_time``, ``charge_voltage`` and ``min_voltage`` keys.
+The file may define ``rest_time``, ``charge_voltage``, ``min_voltage``,
+``charge_current``, ``discharge_current`` and ``multimeter_mode`` keys.
 These values override the built‑in defaults in ``MAIN.py`` but any
 command-line options still take precedence.
 

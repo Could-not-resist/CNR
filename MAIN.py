@@ -136,9 +136,9 @@ def main():
     parser.add_argument("--num-cycles", type=int)
     parser.add_argument("--actual-capacity-test", action="store_true",
                         help="run actual capacity test")
-    parser.add_argument("--capacity-charge-current", type=float, default=1.0,
+    parser.add_argument("--capacity-charge-current", type=float,
                         help="charge current for capacity test in amperes")
-    parser.add_argument("--capacity-discharge-current", type=float, default=1.0,
+    parser.add_argument("--capacity-discharge-current", type=float,
                         help="discharge current for capacity test in amperes")
     parser.add_argument("--capacity-rest-time", type=float,
                         help="rest time before discharge in seconds")
@@ -218,6 +218,20 @@ def main():
     if rest_time is None:
         rest_time = capacity_defaults.get("rest_time", 3600.0)
 
+    cap_charge_current = args.capacity_charge_current
+    if cap_charge_current is None:
+        cap_charge_current = capacity_defaults.get("charge_current", 1.0)
+
+    cap_discharge_current = args.capacity_discharge_current
+    if cap_discharge_current is None:
+        cap_discharge_current = capacity_defaults.get("discharge_current", 1.0)
+
+    multimeter_mode = args.multimeter_mode
+    if multimeter_mode is None:
+        multimeter_mode = capacity_defaults.get("multimeter_mode")
+        if multimeter_mode is None and args.use_multimeter:
+            multimeter_mode = "voltage"
+
     cap_charge_volt = args.capacity_charge_voltage
     if cap_charge_volt is None:
         if args.charge_volt_end is None and "charge_voltage" in capacity_defaults:
@@ -235,8 +249,8 @@ def main():
     if args.actual_capacity_test:
         tc = TestController(args.multimeter_mode, args.debug)
         tc.actual_capacity_test(
-            args.capacity_charge_current,
-            args.capacity_discharge_current,
+            cap_charge_current,
+            cap_discharge_current,
             rest_time,
             cap_charge_volt,
             cap_min_volt,
@@ -277,8 +291,8 @@ def main():
             temperature,
         )
         capacity = tc.actual_capacity_test(
-            args.capacity_charge_current,
-            args.capacity_discharge_current,
+            cap_charge_current,
+            cap_discharge_current,
             rest_time,
             cap_charge_volt,
             cap_min_volt,

@@ -1,5 +1,8 @@
 {
   "rest_time": 60,
   "charge_voltage": 4.1,
-  "min_voltage": 2.75
+  "min_voltage": 2.75,
+  "charge_current": 1.0,
+  "discharge_current": 1.0,
+  "multimeter_mode": "voltage"
 }
