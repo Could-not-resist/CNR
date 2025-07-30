@@ -3,6 +3,7 @@
   "charge_voltage": 4.1,
   "min_voltage": 2.75,
   "charge_current": 46.0,
+  "finish_current": 1.5,
   "discharge_current": 46.0,
   "multimeter_mode": "tcouple"
 }

@@ -146,6 +146,8 @@ def main():
                         help="charge voltage for capacity test")
     parser.add_argument("--capacity-min-voltage", type=float,
                         help="minimum discharge voltage for capacity test")
+    parser.add_argument("--capacity-finish-current", type=float,
+                        help="current threshold to end charging during capacity test")
     parser.add_argument("--efficiency-test", action="store_true",
                         help="run efficiency test")
     parser.add_argument("--rate-characteristic-test", action="store_true",
@@ -246,6 +248,10 @@ def main():
         else:
             cap_min_volt = dcharge_volt_min
 
+    finish_current = args.capacity_finish_current
+    if finish_current is None:
+        finish_current = capacity_defaults.get("finish_current", 1.5)
+
     if args.actual_capacity_test:
         tc = TestController(multimeter_mode, args.debug)
         tc.actual_capacity_test(
@@ -255,6 +261,7 @@ def main():
             cap_charge_volt,
             cap_min_volt,
             temperature,
+            finish_current,
         )
     elif args.efficiency_test:
         tc = TestController(multimeter_mode, args.debug)
@@ -297,6 +304,7 @@ def main():
             cap_charge_volt,
             cap_min_volt,
             temperature,
+            finish_current,
         )
         print(f"Measured capacity: {capacity:.3f} Ah")
 
