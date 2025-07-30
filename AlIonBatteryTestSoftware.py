@@ -694,7 +694,7 @@ class TestController:
             dataStorage.addVoltage(v)
             dataStorage.addCurrent(c)
             dataStorage.addCapacity(capacity)
-            if v >= charge_voltage:
+            if c <= 1.5:
                 break
 
         self.stopPSOutput()
