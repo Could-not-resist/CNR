@@ -657,13 +657,14 @@ class TestController:
         discharge_current_1c: float,
         rest_time: float = 3600.0,
         charge_voltage: float = 4.1,
+        min_voltage: float = 2.75,
         temperature: float = 20.0,
     ) -> float:
         """Perform an actual capacity test.
 
         The procedure charges the cell at ``charge_current_1c`` up to ``charge_voltage``,
         rests for one hour and then discharges at ``discharge_current_1c`` down
-        to 2.75 V while logging the cumulative capacity.
+        to ``min_voltage`` V while logging the cumulative capacity.
         """
 
         dataStorage = DataStorage()
@@ -705,7 +706,7 @@ class TestController:
         self.setCCcurrentL1(discharge_current_1c)
         self.startDischarge()
 
-        print(f"Discharging to 2.75 V at {discharge_current_1c} A")
+        print(f"Discharging to {min_voltage} V at {discharge_current_1c} A")
         while True:
             time.sleep(self.timeInterval)
             elapsed += self.timeInterval
@@ -716,7 +717,7 @@ class TestController:
             dataStorage.addVoltage(v)
             dataStorage.addCurrent(c)
             dataStorage.addCapacity(capacity)
-            if v <= 2.75:
+            if v <= min_voltage:
                 break
 
         self.stopDischarge()
