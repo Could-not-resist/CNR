@@ -784,7 +784,9 @@ class TestController:
                 while True:
                     time.sleep(self.timeInterval)
                     elapsed += self.timeInterval
-                    v = self.getVoltageELC()
+                    # Temporary workaround: use the power supply voltage once
+                    # discharging starts until Vsense wiring is available
+                    v = self.getVoltagePSC()
                     c = self.getCurrentELC()
                     capacity += c * self.timeInterval / 3600.0
                     mm = None

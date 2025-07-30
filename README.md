@@ -64,6 +64,11 @@ The file may define ``rest_time``, ``charge_voltage``, ``min_voltage``,
 These values override the built‑in defaults in ``MAIN.py`` but any
 command-line options still take precedence.
 
+Note: during the discharge stage of ``actual_capacity_test`` the
+voltage is temporarily read from the power supply. Once sensing cables
+are connected to the electronic load's Vsense terminal this workaround
+will be removed.
+
 Additional tests can be invoked with the following flags:
 
 - **Efficiency test**
