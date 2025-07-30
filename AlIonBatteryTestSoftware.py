@@ -15,11 +15,8 @@ class TestController:
     # Indicates the number of seconds between each measurement
     timeInterval = 0.2
     # Variable for keeping track of the open circuit voltage of a full battery
-    OCVFull = 0.0
     # Variable for keeping track of the open circuit voltage of an empty battery
-    OCVEmpty = 0.0
     # Variable for keeping track of the C-rate of the battery
-    C_rate = 0.0
 
     # Initiating function
     def __init__(self, multimeter_mode: str | None = None) -> None:
