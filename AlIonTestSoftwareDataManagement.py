@@ -21,6 +21,7 @@ class DataStorage:
     def __init__(self) -> None:
         """Initialize empty buffers for measurement values."""
         self.time = []
+        self.timestamp = []
         self.volts = []
         self.current = []
         self.power = []
@@ -30,7 +31,9 @@ class DataStorage:
 
     # Function to add time value
     def addTime(self, Mtime_sec: float):
-        """Record a timestamp in seconds."""
+        """Record the measurement timestamp and elapsed time."""
+        timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+        self.timestamp.append(timestamp)
         self.time.append(float('{:.4f}'.format(Mtime_sec)))
 
     # Function to add voltage value
@@ -105,7 +108,7 @@ class DataStorage:
         include_mm_volts = len(self.mm_volts) == len(self.volts) and len(self.mm_volts) > 0
         include_mm_temp = len(self.mm_temp) == len(self.volts) and len(self.mm_temp) > 0
         for j in range(len(self.volts)):
-            d = [float(j) * timeInterval, self.time[j],
+            d = [self.timestamp[j], self.time[j],
                  self.volts[j], self.current[j], self.power[j]]
             if include_capacity:
                 d.append(self.capacity[j])
@@ -114,7 +117,7 @@ class DataStorage:
             if include_mm_temp:
                 d.append(self.mm_temp[j])
             data.append(d)
-        head = ["Time in seconds", "time", "Volts", "Current", "Power"]
+        head = ["Timestamp", "Time [s]", "Volts", "Current", "Power"]
         if include_capacity:
             head.append("Capacity")
         if include_mm_volts:
@@ -155,6 +158,7 @@ class DataStorage:
             print("Data storage failed, check file path")
         # Empty the result values
         self.time = []
+        self.timestamp = []
         self.volts = []
         self.current = []
         self.power = []
@@ -190,8 +194,8 @@ class DataStorage:
         # Only create generic graphs when no dedicated charge time is provided
         if chargeTime == 0:
             # Create a list of Values to graph
-            seconds = Reference(sheet, min_col=1, min_row=3,
-                                max_col=1, max_row=len(csvDataframe))
+            seconds = Reference(sheet, min_col=2, min_row=3,
+                                max_col=2, max_row=len(csvDataframe))
             voltage = Reference(sheet, min_col=3, min_row=3,
                                 max_col=3, max_row=len(csvDataframe))
             current = Reference(sheet, min_col=4, min_row=3,
