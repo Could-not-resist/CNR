@@ -148,6 +148,13 @@ def main():
                         help="minimum discharge voltage for capacity test")
     parser.add_argument("--capacity-finish-current", type=float,
                         help="current threshold to end charging during capacity test")
+    parser.add_argument(
+        "-skip",
+        "--skip",
+        dest="skip_charge",
+        action="store_true",
+        help="skip the charging phase of actual capacity test",
+    )
     parser.add_argument("--efficiency-test", action="store_true",
                         help="run efficiency test")
     parser.add_argument("--rate-characteristic-test", action="store_true",
@@ -262,6 +269,7 @@ def main():
             cap_min_volt,
             temperature,
             finish_current,
+            skip_charge=args.skip_charge,
         )
     elif args.efficiency_test:
         tc = TestController(multimeter_mode, args.debug)
@@ -305,6 +313,7 @@ def main():
             cap_min_volt,
             temperature,
             finish_current,
+            skip_charge=args.skip_charge,
         )
         print(f"Measured capacity: {capacity:.3f} Ah")
 

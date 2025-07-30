@@ -707,14 +707,16 @@ class TestController:
         min_voltage: float = 2.75,
         temperature: float = 20.0,
         finish_current: float = 1.5,
+        skip_charge: bool = False,
     ) -> float:
         """Perform an actual capacity test.
 
-        The procedure charges the cell at ``charge_current_1c`` up to ``charge_voltage``,
-        rests for ``rest_time`` seconds and then discharges at ``discharge_current_1c``
-        down to ``min_voltage`` while logging the cumulative capacity. The
-        charging phase ends once the supply current stays below ``finish_current``
-        for at least 10 seconds.
+        The procedure charges the cell at ``charge_current_1c`` up to ``charge_voltage``
+        (unless ``skip_charge`` is ``True``). After charging it rests for ``rest_time``
+        seconds before discharging at ``discharge_current_1c`` down to ``min_voltage``
+        while logging the cumulative capacity. When ``skip_charge`` is enabled, both
+        the charging and resting phases are skipped. The charging phase normally ends
+        once the supply current stays below ``finish_current`` for at least 10 seconds.
         """
 
         dataStorage = DataStorage()
@@ -724,55 +726,60 @@ class TestController:
         capacity = 0.0
         try:
             try:
-                # ----- Charge step -----
-                self.apply_safety_limits(
-                    charge_volt_end=charge_voltage,
-                    charge_current_max=charge_current_1c,
-                )
-                self.startPSOutput()
-                self.chargeCC(charge_current_1c)
-                self.setVoltage(charge_voltage)
-
-                elapsed = 0.0
-                capacity = 0.0
-                print(f"Charging to {charge_voltage} V at {charge_current_1c} A")
-                low_current_time = 0.0
-                while True:
-                    time.sleep(self.timeInterval)
-                    elapsed += self.timeInterval
-                    v = self.getVoltageELC()
-                    c = self.getCurrentPSC()
-                    mm = None
-                    if self.multimeter_mode == "voltage":
-                        mm = self.getVoltageMM()
-                    elif self.multimeter_mode == "tcouple":
-                        mm = self.getTemperatureMM()
-                    self._debug(
-                        f"Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}",
-                        mm,
+                if not skip_charge:
+                    # ----- Charge step -----
+                    self.apply_safety_limits(
+                        charge_volt_end=charge_voltage,
+                        charge_current_max=charge_current_1c,
                     )
-                    dataStorage.addTime(elapsed)
-                    dataStorage.addVoltage(v)
-                    dataStorage.addCurrent(c)
-                    if self.multimeter_mode == "voltage":
-                        assert mm is not None
-                        dataStorage.addMMVoltage(mm)
-                    elif self.multimeter_mode == "tcouple":
-                        assert mm is not None
-                        dataStorage.addMMTemperature(mm)
-                    dataStorage.addCapacity(capacity)
-                    if c <= finish_current:
-                        low_current_time += self.timeInterval
-                        if low_current_time >= 10.0:
-                            break
-                    else:
-                        low_current_time = 0.0
+                    self.startPSOutput()
+                    self.chargeCC(charge_current_1c)
+                    self.setVoltage(charge_voltage)
 
-                self.stopPSOutput()
+                    elapsed = 0.0
+                    capacity = 0.0
+                    print(
+                        f"Charging to {charge_voltage} V at {charge_current_1c} A"
+                    )
+                    low_current_time = 0.0
+                    while True:
+                        time.sleep(self.timeInterval)
+                        elapsed += self.timeInterval
+                        v = self.getVoltageELC()
+                        c = self.getCurrentPSC()
+                        mm = None
+                        if self.multimeter_mode == "voltage":
+                            mm = self.getVoltageMM()
+                        elif self.multimeter_mode == "tcouple":
+                            mm = self.getTemperatureMM()
+                        self._debug(
+                            f"Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}",
+                            mm,
+                        )
+                        dataStorage.addTime(elapsed)
+                        dataStorage.addVoltage(v)
+                        dataStorage.addCurrent(c)
+                        if self.multimeter_mode == "voltage":
+                            assert mm is not None
+                            dataStorage.addMMVoltage(mm)
+                        elif self.multimeter_mode == "tcouple":
+                            assert mm is not None
+                            dataStorage.addMMTemperature(mm)
+                        dataStorage.addCapacity(capacity)
+                        if c <= finish_current:
+                            low_current_time += self.timeInterval
+                            if low_current_time >= 10.0:
+                                break
+                        else:
+                            low_current_time = 0.0
 
-                # ----- Rest step -----
-                print(f"Resting for {rest_time} seconds")
-                time.sleep(rest_time)
+                    self.stopPSOutput()
+
+                    # ----- Rest step -----
+                    print(f"Resting for {rest_time} seconds")
+                    time.sleep(rest_time)
+                else:
+                    print("Skipping charge and rest steps")
 
                 # ----- Discharge step -----
                 self.stopDischarge()
