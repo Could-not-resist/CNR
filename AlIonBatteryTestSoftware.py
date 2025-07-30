@@ -717,6 +717,7 @@ class TestController:
         while logging the cumulative capacity. When ``skip_charge`` is enabled, both
         the charging and resting phases are skipped. The charging phase normally ends
         once the supply current stays below ``finish_current`` for at least 10 seconds.
+
         """
 
         dataStorage = DataStorage()

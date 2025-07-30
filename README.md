@@ -54,6 +54,7 @@ if that option is omitted, to one hour and ``2.75``&nbsp;V respectively.
 Use the ``-skip`` flag to resume discharging without running the charge or
 rest steps when continuing an interrupted capacity test.
 
+
 You can also supply defaults for the capacity test via a JSON file:
 
 ```bash
