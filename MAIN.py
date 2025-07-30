@@ -332,3 +332,4 @@ if __name__ == "__main__":
 # This allows running the script directly from the command line
 # Example usage:
 # python MAIN.py --actual-capacity-test --capacity-charge-current 4.6 --capacity-discharge-current 46 --multimeter-mode tcouple
+# python MAIN.py --actual-capacity-test --capacity-config tests/capacity_defaults.json -d
