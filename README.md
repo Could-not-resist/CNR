@@ -190,3 +190,8 @@ python -m py_compile *.py
 ```
 
 at the repository root. This ensures all Python files compile cleanly.
+
+## Stopping a running test
+
+Press `Ctrl+C` while a test is active to abort safely. The program turns off
+all outputs and saves the results collected so far before exiting.

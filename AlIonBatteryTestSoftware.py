@@ -57,6 +57,20 @@ class TestController:
 
         # Create an event to indicate if test is running
         self.event = threading.Event()
+        # Event used to gracefully abort a running test
+        self.stop_event = threading.Event()
+
+    def abort(self) -> None:
+        """Stop all outputs and signal running loops to exit."""
+        self.stop_event.set()
+        try:
+            self.stopPSOutput()
+        except Exception:
+            pass
+        try:
+            self.stopDischarge()
+        except Exception:
+            pass
 
     # Defining basic functionality of all remote devices through the device controller
     #####  62000P Power supply #####
@@ -274,6 +288,7 @@ class TestController:
         multimeter_mode: str | None = None,
     ):
         TotstartTime = datetime.now()
+        self.stop_event.clear()
         # Configure safety limits before running
         if multimeter_mode:
             self.multimeterController.checkDeviceConnection()
@@ -307,107 +322,88 @@ class TestController:
         DeltaV = charge_volt_end-charge_volt_start
 
         # Charging/Discharging loop starts
-        for cycleNumber in range(int(num_cycles)):
-            # dataStorage object to keep track of test data
-            dataStorage = DataStorage()  # one for each cycle
-            Cend_time = datetime.now() + Cduration  # set the time when to stop charging
-            ChargestartTime = datetime.now()
+        try:
+            for cycleNumber in range(int(num_cycles)):
+                dataStorage = DataStorage()
+                Cend_time = datetime.now() + Cduration
+                ChargestartTime = datetime.now()
+                try:
+                    # Charging loop
+                    self.startPSOutput()
+                    self.chargeCC(charge_current_max)
+                    self.setVoltage(charge_volt_start)
+                    print('Charging')
+                    while datetime.now() < Cend_time and not self.stop_event.is_set():
+                        time.sleep(self.timeInterval)
+                        tmp = datetime.now() - ChargestartTime
+                        if leadin_time > 0:
+                            ratio = min(tmp.total_seconds() / float(leadin_time), 1.0)
+                        else:
+                            ratio = 1.0
+                        currentVolt = charge_volt_start + DeltaV * ratio
+                        if currentVolt > charge_volt_end:
+                            currentVolt = charge_volt_end
+                        self.setVoltage(currentVolt)
+                        v_ps = self.getVoltagePSC()
+                        v = self.getVoltageELC()
+                        c = self.getCurrentPSC()
+                        print(f"{cycleNumber} of {num_cycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}")
+                        dataStorage.addTime(float(tmp.total_seconds()))
+                        dataStorage.addVoltage(v)
+                        dataStorage.addCurrent(c)
+                        if multimeter_mode == "voltage":
+                            dataStorage.addMMVoltage(self.getVoltageMM())
+                        elif multimeter_mode == "tcouple":
+                            dataStorage.addMMTemperature(self.getTemperatureMM())
+                    self.stopPSOutput()
 
-            # Charging loop
-            self.startPSOutput()
-            self.chargeCC(charge_current_max)
-            self.setVoltage(charge_volt_start)
-            print('Charging')
-            while (datetime.now() < Cend_time):
-                # while Charging do the following
-                time.sleep(self.timeInterval)  # Wait between measurements
-                tmp = datetime.now() - ChargestartTime
-                # gradually ramp voltage from charge_volt_start to
-                # charge_volt_end during the lead-in period
-                if leadin_time > 0:
-                    ratio = min(tmp.total_seconds() / float(leadin_time), 1.0)
-                else:
-                    ratio = 1.0
-                currentVolt = charge_volt_start + DeltaV * ratio
-                if currentVolt > charge_volt_end:
-                    currentVolt = charge_volt_end
-                self.setVoltage(currentVolt)
+                    Dend_time = datetime.now() + Dduration
+                    self.stopDischarge()
+                    self.setCCMmode()
+                    self.setCCcurrentL1(dcharge_current_max)
+                    self.startDischarge()
 
-                # print(tmp.total_seconds())
-                # read the voltage from Power Supply - this is the applied voltage
-                v_ps = self.getVoltagePSC()
-                # read voltage from electronic load - this is the voltage of the cell
-                v = self.getVoltageELC()
-                c = self.getCurrentPSC()  # read the current from Power Supply
-                print(f"{cycleNumber} of {num_cycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}")
-
-                dataStorage.addTime(float(tmp.total_seconds()))
-                dataStorage.addVoltage(v)
-                dataStorage.addCurrent(c)
-                if multimeter_mode == "voltage":
-                    dataStorage.addMMVoltage(self.getVoltageMM())
-                elif multimeter_mode == "tcouple":
-                    dataStorage.addMMTemperature(self.getTemperatureMM())
-            self.stopPSOutput()  # stop the output from the power supply
-            # Charging loop ends
-
-                # # for finding where charging ends and discharging starts
-                # dataStorage.addTime(9.9999)
-                # # for finding where charging ends and discharging starts
-                # dataStorage.addVoltage(9.9999)
-                # # for finding where charging ends and discharging starts
-                # dataStorage.addCurrent(9.9999)
-
-            # set the time when to stop Discharging
-            Dend_time = datetime.now() + Dduration
-            # Discharging loop
-
-            self.stopDischarge()
-            # self.setCCLmode()  # set the DC to CC low range mode
-            self.setCCMmode()
-
-            # if (dcharge_current_max>float(self.getCCcurrentL1MAX())):
-            #    self.setCCcurrentL1MAX(dcharge_current_max)
-            #    print(self.getCCcurrentL1MAX())
-
-            # Set the desired current of channel L1&L2
-            self.setCCcurrentL1(dcharge_current_max)
-            self.startDischarge()  # turn on DC load
-
-            # self.dischargeCC(dcharge_current_max)
-
-            DischargestartTime = datetime.now()
-            print('Discharging')
-            while (datetime.now() < Dend_time):
-                # while Discharging do the following
-                time.sleep(self.timeInterval)  # Wait between measurements
-                tmp = datetime.now()-DischargestartTime
-                # v = self.getVoltage()  # read the voltage from multimeter 12061
-                v = self.getVoltageELC()  # read voltage from electronic load
-                c = self.getCurrentELC()  # read the current from electronic load
-                print(f"{cycleNumber} of {num_cycles} -DISCHARGING- {tmp.total_seconds():03.2f} s of {Dduration.total_seconds():.1f} s - V:{v:.4f} C:{c:.4f}")
-                dataStorage.addTime(float(tmp.total_seconds()))
-                dataStorage.addVoltage(v)
-                dataStorage.addCurrent(c)
-                if multimeter_mode == "voltage":
-                    dataStorage.addMMVoltage(self.getVoltageMM())
-                elif multimeter_mode == "tcouple":
-                    dataStorage.addMMTemperature(self.getTemperatureMM())
-                if (v < dcharge_volt_min):  # Breaking out if minimum voltage has been reached
-                    print(f"below {dcharge_volt_min} volts")
+                    DischargestartTime = datetime.now()
+                    print('Discharging')
+                    while datetime.now() < Dend_time and not self.stop_event.is_set():
+                        time.sleep(self.timeInterval)
+                        tmp = datetime.now()-DischargestartTime
+                        v = self.getVoltageELC()
+                        c = self.getCurrentELC()
+                        print(f"{cycleNumber} of {num_cycles} -DISCHARGING- {tmp.total_seconds():03.2f} s of {Dduration.total_seconds():.1f} s - V:{v:.4f} C:{c:.4f}")
+                        dataStorage.addTime(float(tmp.total_seconds()))
+                        dataStorage.addVoltage(v)
+                        dataStorage.addCurrent(c)
+                        if multimeter_mode == "voltage":
+                            dataStorage.addMMVoltage(self.getVoltageMM())
+                        elif multimeter_mode == "tcouple":
+                            dataStorage.addMMTemperature(self.getTemperatureMM())
+                        if v < dcharge_volt_min:
+                            print(f"below {dcharge_volt_min} volts")
+                            break
+                    self.stopDischarge()
+                except KeyboardInterrupt:
+                    print("Keyboard interrupt - aborting test")
+                    self.abort()
+                    raise
+                finally:
+                    dataStorage.createTable(
+                        test_name,
+                        dcharge_current_max,
+                        cycleNumber,
+                        temperature,
+                        self.timeInterval,
+                        charge_time,
+                    )
+                    self.stopPSOutput()
+                    self.stopDischarge()
+                if self.stop_event.is_set():
                     break
-            self.stopDischarge()  # Inactivate the electronic load
-            # Discharging loop ends
-
-            # Use multimeter temperature in filename when available
-            dataStorage.createTable(
-                test_name,
-                dcharge_current_max,
-                cycleNumber,
-                temperature,
-                self.timeInterval,
-                charge_time,
-            )
+        except KeyboardInterrupt:
+            pass
+        finally:
+            self.stopPSOutput()
+            self.stopDischarge()
 
         # Set the event to indicate that testing is finished
         self.event.set()
