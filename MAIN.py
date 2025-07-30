@@ -15,7 +15,7 @@ DCHARGE_VOLT_MIN: float = 2.75    # V
 DCHARGE_CURRENT_MAX: float = 20    # A
 
 CHARGE_VOLT_PROT: int = 10    # V
-CHARGE_CURRENT_PROT: int = 10    # A
+CHARGE_CURRENT_PROT: int = 100    # A
 CHARGE_POWER_PROT: int = 2000    # Watts
 
 
