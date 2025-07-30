@@ -712,10 +712,12 @@ class TestController:
         """Perform an actual capacity test.
 
         The procedure charges the cell at ``charge_current_1c`` up to ``charge_voltage``
-        (unless ``skip_charge`` is ``True``), rests for ``rest_time`` seconds and then
-        discharges at ``discharge_current_1c`` down to ``min_voltage`` while logging the
-        cumulative capacity. The charging phase ends once the supply current stays below
-        ``finish_current`` for at least 10 seconds.
+        (unless ``skip_charge`` is ``True``). After charging it rests for ``rest_time``
+        seconds before discharging at ``discharge_current_1c`` down to ``min_voltage``
+        while logging the cumulative capacity. When ``skip_charge`` is enabled, both
+        the charging and resting phases are skipped. The charging phase normally ends
+        once the supply current stays below ``finish_current`` for at least 10 seconds.
+
         """
 
         dataStorage = DataStorage()
@@ -774,9 +776,11 @@ class TestController:
 
                     self.stopPSOutput()
 
-                # ----- Rest step -----
-                print(f"Resting for {rest_time} seconds")
-                time.sleep(rest_time)
+                    # ----- Rest step -----
+                    print(f"Resting for {rest_time} seconds")
+                    time.sleep(rest_time)
+                else:
+                    print("Skipping charge and rest steps")
 
                 # ----- Discharge step -----
                 self.stopDischarge()

@@ -51,8 +51,9 @@ python MAIN.py --actual-capacity-test \
 (or ``4.1``&nbsp;V). ``--capacity-rest-time`` and ``--capacity-min-voltage``
 fall back to the values in the file passed with ``--capacity-config`` or,
 if that option is omitted, to one hour and ``2.75``&nbsp;V respectively.
-Use the ``-skip`` flag to resume discharging without a charge step when
-continuing an interrupted capacity test.
+Use the ``-skip`` flag to resume discharging without running the charge or
+rest steps when continuing an interrupted capacity test.
+
 
 You can also supply defaults for the capacity test via a JSON file:
 
