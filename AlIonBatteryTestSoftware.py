@@ -722,6 +722,10 @@ class TestController:
                     dataStorage.addTime(elapsed)
                     dataStorage.addVoltage(v)
                     dataStorage.addCurrent(c)
+                    if self.multimeter_mode == "voltage":
+                        dataStorage.addMMVoltage(self.getVoltageMM())
+                    elif self.multimeter_mode == "tcouple":
+                        dataStorage.addMMTemperature(self.getTemperatureMM())
                     dataStorage.addCapacity(capacity)
                     if c <= 1.5:
                         break
@@ -751,6 +755,10 @@ class TestController:
                     dataStorage.addTime(elapsed)
                     dataStorage.addVoltage(v)
                     dataStorage.addCurrent(c)
+                    if self.multimeter_mode == "voltage":
+                        dataStorage.addMMVoltage(self.getVoltageMM())
+                    elif self.multimeter_mode == "tcouple":
+                        dataStorage.addMMTemperature(self.getTemperatureMM())
                     dataStorage.addCapacity(capacity)
                     if v <= min_voltage:
                         break
