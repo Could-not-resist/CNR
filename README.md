@@ -41,10 +41,13 @@ To perform a full capacity measurement instead of the default cycling test run:
 python MAIN.py --actual-capacity-test \
   --capacity-charge-current 1.0 \
   --capacity-discharge-current 1.0 \
-  [--charge-volt-end 4.1]
+  [--capacity-rest-time 3600] \
+  [--capacity-charge-voltage 4.1] \
+  [--capacity-min-voltage 2.75]
 ```
-
-``--charge-volt-end`` defaults to **4.1&nbsp;V** if not specified.
+``--capacity-charge-voltage`` defaults to the value of ``--charge-volt-end`` (or
+``4.1``&nbsp;V), ``--capacity-rest-time`` defaults to one hour and
+``--capacity-min-voltage`` defaults to ``2.75``&nbsp;V if not specified.
 
 Additional tests can be invoked with the following flags:
 
@@ -97,9 +100,11 @@ python MAIN.py --config-file cell_profiles.json --profile YUASA
 Command-line options still override the values loaded from the profile.
 
 This charges the cell at 1C up to the voltage specified by
-`--charge-volt-end` (default **4.1&nbsp;V**), rests for a configurable
-period (default one hour) at 20&nbsp;±&nbsp;2 °C and then discharges at 1C
-down to **2.75&nbsp;V** while recording the delivered ampere hours.
+`--capacity-charge-voltage` (default taken from `--charge-volt-end`),
+rests for the duration given by `--capacity-rest-time` (default one hour)
+at 20&nbsp;±&nbsp;2 °C and then discharges at 1C down to
+`--capacity-min-voltage` (default **2.75&nbsp;V**) while recording the
+delivered ampere hours.
 
 By default the parameters in `MAIN.py` define a single cycle with
 16.21&ndash;16.4&nbsp;V charging at 5&nbsp;A and a discharge down to 11&nbsp;V.
