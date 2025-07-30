@@ -247,7 +247,7 @@ def main():
             cap_min_volt = dcharge_volt_min
 
     if args.actual_capacity_test:
-        tc = TestController(args.multimeter_mode, args.debug)
+        tc = TestController(multimeter_mode, args.debug)
         tc.actual_capacity_test(
             cap_charge_current,
             cap_discharge_current,
@@ -257,7 +257,7 @@ def main():
             temperature,
         )
     elif args.efficiency_test:
-        tc = TestController(args.multimeter_mode, args.debug)
+        tc = TestController(multimeter_mode, args.debug)
         tc.efficiency_test(
             charge_current_max,
             dcharge_current_max,
@@ -267,7 +267,7 @@ def main():
         )
     elif args.rate_characteristic_test:
         rates = [float(r) for r in args.rates.split(',') if r]
-        tc = TestController(args.multimeter_mode, args.debug)
+        tc = TestController(multimeter_mode, args.debug)
         tc.rate_characteristic_test(
             rates,
             charge_current_max,
@@ -276,7 +276,7 @@ def main():
             temperature,
         )
     elif args.ocv_curve_test:
-        tc = TestController(args.multimeter_mode, args.debug)
+        tc = TestController(multimeter_mode, args.debug)
         tc.ocv_curve_test(
             args.step_current,
             args.steps,
@@ -284,7 +284,7 @@ def main():
             temperature,
         )
     elif args.internal_resistance_test:
-        tc = TestController(args.multimeter_mode, args.debug)
+        tc = TestController(multimeter_mode, args.debug)
         tc.internal_resistance_test(
             args.pulse_current,
             args.pulse_duration,
@@ -308,7 +308,7 @@ def main():
                 kwargs[field] = val
         settings = UPSSettings(**kwargs)
 
-        TObj = TestTypes(args.multimeter_mode, args.debug)
+        TObj = TestTypes(multimeter_mode, args.debug)
         thread = TObj.runUPSTest(settings)
         try:
             while thread.is_alive():
