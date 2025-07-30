@@ -65,6 +65,7 @@ class DataStorage:
         timeInterval: float,
         chargeTime=0,
         export_xlsx: bool = False,
+        verbose: bool = False,
     ):
         """Write collected results to disk.
 
@@ -85,6 +86,9 @@ class DataStorage:
         export_xlsx : bool, optional
             If ``True`` an Excel file with graphs is also generated.  By
             default only a CSV file is written.
+        verbose : bool, optional
+            If ``True`` print additional debug information such as the
+            absolute output path.
         """
         # Get the number of measurements
         length = len(self.volts)
@@ -135,15 +139,18 @@ class DataStorage:
                 f"{data_dir}/{testName}_{c_rate}C_#{cycleNr + 1}_@{file_temp}°C_"
                 + str(datetime.now().strftime("%d.%m.%y_%H;%M"))
             )
-            # Display the Path for debug purposes
-            print(abs_path)
+            # Display the Path for debug purposes if requested
+            if verbose:
+                print(abs_path)
             # Export to CSV file
             self.exportCSVFile(filePath, data, head)
             if export_xlsx:
                 # Optional Excel output with graphs
-                print(f"Saving results to {filePath}.xlsx")
+                if verbose:
+                    print(f"Saving results to {filePath}.xlsx")
                 self.exportXLSXFile(filePath, chargeTime, timeInterval)
-                print(f"Charge time configured: {chargeTime}")
+                if verbose:
+                    print(f"Charge time configured: {chargeTime}")
         except:
             print("Data storage failed, check file path")
         # Empty the result values
