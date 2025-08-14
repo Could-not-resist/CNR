@@ -65,11 +65,37 @@ class PowerSupplyController:
     #     self.powerSupply.write("SOUR:POW:PROT:HIGH MAX")  # Could not find MAX command in manual
 
     #### DC RISE/FALL #### DC RISE/FALL #### DC RISE/FALL ####
-    def setDC_Rise(self, *volts):
-        self.powerSupply.write("SOUR:POW:PROT:HIGH " + str(volts[0]))
+    def setDC_Rise(self, rate_v_per_ms: float) -> None:
+        """Set voltage rise rate.
 
-    def setDC_Fall(self, *volts):
-        self.powerSupply.write("SOUR:POW:PROT:HIGH " + str(volts[0]))
+        Args:
+            rate_v_per_ms: Slew rate in volts per millisecond.
+
+        Raises:
+            ValueError: If ``rate_v_per_ms`` is not positive.
+
+        See Chroma 62000P Programming Manual section on
+        ``SOUR:VOLT:RISE`` for parameter limits.
+        """
+        if rate_v_per_ms <= 0:
+            raise ValueError("Rise rate must be positive (V/ms).")
+        self.powerSupply.write(f"SOUR:VOLT:RISE {rate_v_per_ms}")
+
+    def setDC_Fall(self, rate_v_per_ms: float) -> None:
+        """Set voltage fall rate.
+
+        Args:
+            rate_v_per_ms: Slew rate in volts per millisecond.
+
+        Raises:
+            ValueError: If ``rate_v_per_ms`` is not positive.
+
+        See Chroma 62000P Programming Manual section on
+        ``SOUR:VOLT:FALL`` for parameter limits.
+        """
+        if rate_v_per_ms <= 0:
+            raise ValueError("Fall rate must be positive (V/ms).")
+        self.powerSupply.write(f"SOUR:VOLT:FALL {rate_v_per_ms}")
 
     # Functions to read realtime VOLTAGE, CURRENT and POWER from the power supply
     def getVoltage(self):
