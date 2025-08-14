@@ -197,10 +197,12 @@ The top of `MAIN.py` contains constants used to configure a test run:
 | `LEADIN_TIME` | `1` | s |
 | `CHARGE_TIME` | `5` | s |
 | `DCHARGE_TIME` | `5` | s |
+| `REST_TIME` | `0` | s |
 | `NUM_CYCLES` | `1` | &ndash; |
 
 `LEADIN_TIME` controls how long the power supply ramps from
 `CHARGE_VOLT_START` to `CHARGE_VOLT_END` at the beginning of each charge cycle.
+`REST_TIME` defines a pause inserted after each charge or discharge phase.
 
 Refer to the device programming manuals for the meaning of each setting.
 
@@ -227,6 +229,7 @@ common flags accepted by `MAIN.py` are listed below. Run
 | `--leadin-time` | Time in seconds used to ramp the supply from the starting to the ending charge voltage |
 | `--charge-time` | Allowed charging time |
 | `--dcharge-time` | Allowed discharging time |
+| `--rest-time` | Rest period in seconds between charge and discharge |
 | `--num-cycles` | Number of charge/discharge cycles |
 | `--multimeter-mode` | Log measurement using the multimeter (`voltage` or `tcouple`) |
 | `-d`, `--debug` | Print detailed progress information |

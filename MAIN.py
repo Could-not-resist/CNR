@@ -32,6 +32,7 @@ LEADIN_TIME: int = 1    # s
 
 CHARGE_TIME: int = 5    # s
 DCHARGE_TIME: int = 5   # s
+REST_TIME: int = 0      # s
 
 # Cycling
 NUM_CYCLES: int = 1   # n
@@ -60,6 +61,7 @@ class CustomTestSettings:
     leadin_time: int = LEADIN_TIME
     charge_time: int = CHARGE_TIME
     dcharge_time: int = DCHARGE_TIME
+    rest_time: int = REST_TIME
     num_cycles: int = NUM_CYCLES
     multimeter_mode: str | None = None
 
@@ -124,6 +126,7 @@ class TestTypes:
                 settings.leadin_time,
                 settings.charge_time,
                 settings.dcharge_time,
+                settings.rest_time,
                 settings.num_cycles,
                 settings.multimeter_mode,
             ),
@@ -161,6 +164,7 @@ def main():
     parser.add_argument("--leadin-time", type=int)
     parser.add_argument("--charge-time", type=int)
     parser.add_argument("--dcharge-time", type=int)
+    parser.add_argument("--rest-time", type=int)
     parser.add_argument("--num-cycles", type=int)
     parser.add_argument("--actual-capacity-test", action="store_true",
                         help="run actual capacity test")
