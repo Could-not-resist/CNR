@@ -63,6 +63,8 @@ class CustomTestSettings:
     dcharge_time: int = DCHARGE_TIME
     rest_time: int = REST_TIME
     num_cycles: int = NUM_CYCLES
+    charge_mode: str = "CC"
+    discharge_mode: str = "CC"
     multimeter_mode: str | None = None
 
 
@@ -107,6 +109,12 @@ class TestTypes:
     def run_custom_test(self, settings: CustomTestSettings):
         """Start a custom test using the provided settings."""
         import threading
+        valid_modes = {"CC", "CV", "CP"}
+        if settings.charge_mode not in valid_modes:
+            raise ValueError(f"Invalid charge_mode: {settings.charge_mode}")
+        if settings.discharge_mode not in valid_modes:
+            raise ValueError(f"Invalid discharge_mode: {settings.discharge_mode}")
+
         self.testController.event.clear()
         self.custom_thread = threading.Thread(
             target=self.testController.custom_test,
@@ -128,6 +136,8 @@ class TestTypes:
                 settings.dcharge_time,
                 settings.rest_time,
                 settings.num_cycles,
+                settings.charge_mode,
+                settings.discharge_mode,
                 settings.multimeter_mode,
             ),
         )
@@ -165,6 +175,16 @@ def main():
     parser.add_argument("--charge-time", type=int)
     parser.add_argument("--dcharge-time", type=int)
     parser.add_argument("--rest-time", type=int)
+    parser.add_argument(
+        "--charge-mode",
+        choices=["CC", "CV", "CP"],
+        help="charging mode: CC, CV or CP",
+    )
+    parser.add_argument(
+        "--discharge-mode",
+        choices=["CC", "CV", "CP"],
+        help="discharging mode: CC, CV or CP",
+    )
     parser.add_argument("--num-cycles", type=int)
     parser.add_argument("--actual-capacity-test", action="store_true",
                         help="run actual capacity test")
