@@ -341,8 +341,16 @@ class TestController:
         charge_time: int,
         dcharge_time: int,
         num_cycles: int,
+        charge_mode: str = "CC",
+        discharge_mode: str = "CC",
         multimeter_mode: str | None = None,
     ):
+        valid_modes = {"CC", "CV", "CP"}
+        if charge_mode not in valid_modes:
+            raise ValueError(f"Invalid charge_mode: {charge_mode}")
+        if discharge_mode not in valid_modes:
+            raise ValueError(f"Invalid discharge_mode: {discharge_mode}")
+
         TotstartTime = datetime.now()
         self.stop_event.clear()
         # Configure safety limits before running
@@ -386,20 +394,26 @@ class TestController:
                 try:
                     # Charging loop
                     self.startPSOutput()
-                    self.chargeCC(charge_current_max)
-                    self.setVoltage(charge_volt_start)
+                    if charge_mode == "CC":
+                        self.chargeCC(charge_current_max)
+                        self.setVoltage(charge_volt_start)
+                    elif charge_mode == "CV":
+                        self.chargeCV(charge_volt_end)
+                    elif charge_mode == "CP":
+                        self.chargeCP(charge_volt_end * charge_current_max)
                     print('Charging')
                     while datetime.now() < Cend_time and not self.stop_event.is_set():
                         time.sleep(self.timeInterval)
                         tmp = datetime.now() - ChargestartTime
-                        if leadin_time > 0:
-                            ratio = min(tmp.total_seconds() / float(leadin_time), 1.0)
-                        else:
-                            ratio = 1.0
-                        currentVolt = charge_volt_start + DeltaV * ratio
-                        if currentVolt > charge_volt_end:
-                            currentVolt = charge_volt_end
-                        self.setVoltage(currentVolt)
+                        if charge_mode == "CC":
+                            if leadin_time > 0:
+                                ratio = min(tmp.total_seconds() / float(leadin_time), 1.0)
+                            else:
+                                ratio = 1.0
+                            currentVolt = charge_volt_start + DeltaV * ratio
+                            if currentVolt > charge_volt_end:
+                                currentVolt = charge_volt_end
+                            self.setVoltage(currentVolt)
                         v_ps = self.getVoltagePSC()
                         v = self.getVoltageELC()
                         c = self.getCurrentPSC()
@@ -425,9 +439,12 @@ class TestController:
 
                     Dend_time = datetime.now() + Dduration
                     self.stopDischarge()
-                    self.setCCMmode()
-                    self.setCCcurrentL1(dcharge_current_max)
-                    self.startDischarge()
+                    if discharge_mode == "CC":
+                        self.dischargeCC(dcharge_current_max)
+                    elif discharge_mode == "CV":
+                        self.dischargeCV(dcharge_volt_min)
+                    elif discharge_mode == "CP":
+                        self.dischargeCP(dcharge_volt_min * dcharge_current_max)
 
                     DischargestartTime = datetime.now()
                     print('Discharging')
