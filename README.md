@@ -49,9 +49,17 @@ pip install pyvisa pandas openpyxl matplotlib tabulate
 python MAIN.py
 ```
    If no hardware connection is detected the program aborts unless mock
-   drivers are enabled. Set the environment variable `USE_MOCK_DRIVERS=1`
-   to force the built‑in mock drivers for development without hardware.
-   Use the `-d` flag to print detailed progress messages during a test.
+drivers are enabled. Set the environment variable `USE_MOCK_DRIVERS=1`
+to force the built‑in mock drivers for development without hardware.
+Use the `-d` flag to print detailed progress messages during a test.
+
+Charging and discharging default to constant current (`CC`). Select
+constant voltage (`CV`) or constant power (`CP`) with the
+`--charge-mode` and `--discharge-mode` options:
+
+```bash
+python MAIN.py --charge-mode CV --discharge-mode CP
+```
 
 ### Instrument resource names
 
