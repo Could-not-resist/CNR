@@ -3,18 +3,18 @@
 This project contains Python scripts for automated charging and discharging tests.
 It communicates with a **Chroma 63600 Modular DC Electronic Load**, a
 **Chroma 62000P Programmable DC Power Supply** and a **Chroma 12061 multimeter**
-to perform UPS battery cycling and log the resulting data.
+to perform custom battery cycling and log the resulting data.
 
 ## Project structure
 
 | File | Purpose |
 | --- | --- |
 | `MAIN.py` | Command-line interface and entry point. Parses arguments, loads configuration from `cell_profiles.json` and invokes tests in `TestController`. |
-| `AlIonBatteryTestSoftware.py` | Implements `TestController`, coordinating the power supply, electronic load and multimeter. Contains high level test routines such as UPS tests, efficiency tests and capacity measurements. |
+| `AlIonBatteryTestSoftware.py` | Implements `TestController`, coordinating the power supply, electronic load and multimeter. Contains high level test routines such as custom tests, efficiency tests and capacity measurements. |
 | `AlIonTestSoftwareDataManagement.py` | Provides the `DataStorage` class used to store and export measurement data to CSV/Excel and to create graphs. |
 | `AlIonTestSoftwareDeviceDrivers.py` | Low level device drivers using NI-VISA to control the power supply, electronic load and multimeter. |
 | `AlIonTestSoftwareDeviceDriversMock.py` | Mock versions of the device drivers for running the software without hardware attached. |
-| `build_test_config.py` | Interactive helper that writes JSON files with UPS and capacity-test settings. |
+| `build_test_config.py` | Interactive helper that writes JSON files with custom and capacity-test settings. |
 | `scpi_commands.py` | Quick reference of SCPI command strings used by the drivers. |
 | `cell_profiles.json` | Example configuration profiles containing default test parameters. |
 | `manuals/` | Manufacturer programming manuals (not tracked by version control). |
@@ -141,7 +141,7 @@ python MAIN.py --config-file cell_profiles.json --profile YUASA
 Command-line options still override the values loaded from the profile.
 
 An interactive helper `build_test_config.py` first asks for a test name and
-which type of test to configure (UPS, capacity or both).  It then prompts only
+which type of test to configure (custom, capacity or both).  It then prompts only
 for the relevant parameters and writes a JSON file containing the selected
 sections under a top-level `test_name`.  The script saves the file under
 `configs/` using a name you choose.

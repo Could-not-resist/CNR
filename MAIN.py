@@ -1,4 +1,4 @@
-"""Command line interface for running UPS battery tests."""
+"""Command line interface for running custom battery tests."""
 
 from dataclasses import dataclass
 import argparse
@@ -42,8 +42,8 @@ TEMPERATURE: float = 23.4    # °C
 
 
 @dataclass
-class UPSSettings:
-    """Configuration for a UPS test run."""
+class CustomTestSettings:
+    """Configuration for a custom test run."""
 
     test_name: str = TEST_NAME
     temperature: float = TEMPERATURE
@@ -93,14 +93,14 @@ class TestTypes:
         self.testController = TestController(
             multimeter_mode, debug, ps_resource, el_resource, mm_resource
         )
-        self.upsThread = None
+        self.custom_thread = None
 
-    def runUPSTest(self, settings: UPSSettings):
-        """Start a UPS test using the provided settings."""
+    def run_custom_test(self, settings: CustomTestSettings):
+        """Start a custom test using the provided settings."""
         import threading
         self.testController.event.clear()
-        self.upsThread = threading.Thread(
-            target=self.testController.NEWupsTest,
+        self.custom_thread = threading.Thread(
+            target=self.testController.custom_test,
             args=(
                 settings.test_name,
                 settings.temperature,
@@ -121,19 +121,19 @@ class TestTypes:
                 settings.multimeter_mode,
             ),
         )
-        self.upsThread.start()
-        return self.upsThread
+        self.custom_thread.start()
+        return self.custom_thread
 
     def stop(self):
         """Abort the running test and wait for it to finish."""
         if self.testController:
             self.testController.abort()
-        if self.upsThread is not None:
-            self.upsThread.join()
+        if self.custom_thread is not None:
+            self.custom_thread.join()
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run UPS test")
+    parser = argparse.ArgumentParser(description="Run custom test")
     parser.add_argument("--config-file", help="JSON file with cell settings")
     parser.add_argument("--profile", help="cell profile name in config file")
     parser.add_argument("--ps-resource", help="VISA resource name for power supply")
@@ -236,7 +236,7 @@ def main():
     )
 
 
-    for field in UPSSettings.__annotations__.keys():
+    for field in CustomTestSettings.__annotations__.keys():
         if getattr(args, field) is None:
             if field in config:
                 setattr(args, field, config[field])
@@ -343,14 +343,14 @@ def main():
 
     else:
         kwargs = {}
-        for field in UPSSettings.__annotations__.keys():
+        for field in CustomTestSettings.__annotations__.keys():
             val = getattr(args, field, None)
             if val is not None:
                 kwargs[field] = val
-        settings = UPSSettings(**kwargs)
+        settings = CustomTestSettings(**kwargs)
 
         TObj = TestTypes(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
-        thread = TObj.runUPSTest(settings)
+        thread = TObj.run_custom_test(settings)
         try:
             while thread.is_alive():
                 thread.join(0.5)
