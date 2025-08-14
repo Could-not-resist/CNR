@@ -61,6 +61,7 @@ class CustomTestSettings:
     charge_time: int = CHARGE_TIME
     dcharge_time: int = DCHARGE_TIME
     num_cycles: int = NUM_CYCLES
+    sample_interval: float = TestController.timeInterval
     multimeter_mode: str | None = None
 
 
@@ -125,6 +126,7 @@ class TestTypes:
                 settings.charge_time,
                 settings.dcharge_time,
                 settings.num_cycles,
+                settings.sample_interval,
                 settings.multimeter_mode,
             ),
         )
@@ -162,6 +164,7 @@ def main():
     parser.add_argument("--charge-time", type=int)
     parser.add_argument("--dcharge-time", type=int)
     parser.add_argument("--num-cycles", type=int)
+    parser.add_argument("--sample-interval", type=float)
     parser.add_argument("--actual-capacity-test", action="store_true",
                         help="run actual capacity test")
     parser.add_argument("--capacity-charge-current", type=float,

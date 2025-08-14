@@ -228,6 +228,7 @@ common flags accepted by `MAIN.py` are listed below. Run
 | `--charge-time` | Allowed charging time |
 | `--dcharge-time` | Allowed discharging time |
 | `--num-cycles` | Number of charge/discharge cycles |
+| `--sample-interval` | Time between measurements in seconds |
 | `--multimeter-mode` | Log measurement using the multimeter (`voltage` or `tcouple`) |
 | `-d`, `--debug` | Print detailed progress information |
 
