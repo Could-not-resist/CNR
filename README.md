@@ -32,8 +32,9 @@ pip install pyvisa pandas openpyxl matplotlib tabulate
 ```bash
 python MAIN.py
 ```
-   If no hardware connection is detected the program will ask whether to
-   continue using mock drivers.
+   If no hardware connection is detected the program aborts unless mock
+   drivers are enabled. Set the environment variable `USE_MOCK_DRIVERS=1`
+   to force the built‑in mock drivers for development without hardware.
    Use the `-d` flag to print detailed progress messages during a test.
 
 ### Instrument resource names
