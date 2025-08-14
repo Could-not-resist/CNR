@@ -94,11 +94,9 @@ class DataStorage:
             If ``True`` print additional debug information such as the
             absolute output path.
         """
-        # Get the number of measurements
-        length = len(self.volts)
         # Fill in power list with voltage and current values
-        for i in range(length):
-            self.power.append(self.volts[i] * self.current[i])
+        for v, c in zip(self.volts, self.current):
+            self.power.append(v * c)
         # Create a 2 dimensional list for the data
         # Start with an empty list.  The previous implementation initialised the
         # data list with an empty inner list which resulted in an extra row of
