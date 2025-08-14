@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 from datetime import timedelta
 import threading
+import os
 from AlIonTestSoftwareDeviceDrivers import PowerSupplyController, ElectronicLoadController, MultimeterController
 from AlIonTestSoftwareDeviceDriversMock import PowerSupplyControllerMock, ElectronicLoadControllerMock, MultimeterControllerMock
 from AlIonTestSoftwareDataManagement import DataStorage
@@ -35,39 +36,40 @@ class TestController:
         ps_resource: str | None = None,
         el_resource: str | None = None,
         mm_resource: str | None = None,
+        use_mock: bool | None = None,
     ) -> None:
         self.multimeter_mode = multimeter_mode
         self.debug = debug
-        try:
-            # Trying to connect to the real device controllers
-            self.powerSupplyController = PowerSupplyController(ps_resource)
-            print("Testcontroller succesfully connected to Power Supply")
-            self.electronicLoadController = ElectronicLoadController(el_resource)
-            print("Testcontroller succesfully connected to Electronic Load")
-            if multimeter_mode:
-                self.multimeterController = MultimeterController(mm_resource)
-                print("Testcontroller succesfully connected to Multimeter")
-                if multimeter_mode == "tcouple":
-                    self.multimeterController.configure_thermocouple()
+        if use_mock is None:
+            env = os.getenv("USE_MOCK_DRIVERS")
+            if env is not None:
+                use_mock = env.lower() in ("1", "true", "yes")
             else:
-                self.multimeterController = MultimeterControllerMock()
-        except Exception:
-            # Connecting to the mock device controllers when the real devices
-            # are not available.  The previous implementation exited before the
-            # mock controllers were created which made running the software
-            # without hardware impossible.
-            print("Connection not successful.")
-            answer = input(
-                "Devices not detected. Continue with mock drivers? [y/N]: "
-            ).strip().lower()
-            if answer not in ("y", "yes"):
-                raise SystemExit(
-                    "Aborting: no connection to hardware and user declined mock drivers"
-                )
+                use_mock = False
+
+        if use_mock:
             print("Using mock objects")
             self.powerSupplyController = PowerSupplyControllerMock()
             self.electronicLoadController = ElectronicLoadControllerMock()
             self.multimeterController = MultimeterControllerMock()
+        else:
+            try:
+                # Trying to connect to the real device controllers
+                self.powerSupplyController = PowerSupplyController(ps_resource)
+                print("Testcontroller succesfully connected to Power Supply")
+                self.electronicLoadController = ElectronicLoadController(el_resource)
+                print("Testcontroller succesfully connected to Electronic Load")
+                if multimeter_mode:
+                    self.multimeterController = MultimeterController(mm_resource)
+                    print("Testcontroller succesfully connected to Multimeter")
+                    if multimeter_mode == "tcouple":
+                        self.multimeterController.configure_thermocouple()
+                else:
+                    self.multimeterController = MultimeterControllerMock()
+            except Exception as exc:
+                raise SystemExit(
+                    "Aborting: no connection to hardware and mock drivers disabled"
+                ) from exc
 
         # Create an event to indicate if test is running
         self.event = threading.Event()
