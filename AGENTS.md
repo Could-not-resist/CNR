@@ -17,7 +17,7 @@ The project is organised as a set of Python modules used to run charging/dischar
 | File | Purpose |
 | --- | --- |
 | `MAIN.py` | Command line interface and entry point. Parses arguments, loads configuration from `cell_profiles.json` and invokes tests in `TestController`. |
-| `AlIonBatteryTestSoftware.py` | Implements `TestController` coordinating the power supply, electronic load and multimeter. Contains high level test routines such as UPS tests, efficiency tests and capacity measurements. |
+| `AlIonBatteryTestSoftware.py` | Implements `TestController` coordinating the power supply, electronic load and multimeter. Contains high level test routines such as custom tests, efficiency tests and capacity measurements. |
 | `AlIonTestSoftwareDataManagement.py` | Provides the `DataStorage` class used to store and export measurement data to CSV/Excel and to create graphs. |
 | `AlIonTestSoftwareDeviceDrivers.py` | Low level device drivers using NI-VISA to control the power supply, electronic load and multimeter. |
 | `AlIonTestSoftwareDeviceDriversMock.py` | Mock versions of the device drivers for running the software without hardware attached. |
@@ -28,7 +28,7 @@ The project is organised as a set of Python modules used to run charging/dischar
 ### Main modules
 
 **TestController** (`AlIonBatteryTestSoftware.py`)
-: Handles test execution. It exposes functions like `NEWupsTest`, `efficiency_test`, `rate_characteristic_test`, `internal_resistance_test` and `actual_capacity_test`. These routines send commands to the instrument drivers and log measurements via `DataStorage`.
+: Handles test execution. It exposes functions like `custom_test`, `efficiency_test`, `rate_characteristic_test`, `internal_resistance_test` and `actual_capacity_test`. These routines send commands to the instrument drivers and log measurements via `DataStorage`.
 
 **DataStorage** (`AlIonTestSoftwareDataManagement.py`)
 : Collects timestamps, voltage, current, power and optional capacity or multimeter readings. `createTable()` writes a CSV file and optionally an Excel workbook with graphs.

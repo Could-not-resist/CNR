@@ -345,4 +345,4 @@ class DataStorage:
 
 # Notað til að keyra sjálfvirk gröf á utanaðkomandi csv skrár
 # dataStorage = DataStorage()
-# dataStorage.exportXLSXFile("C:/Users/runson/Dropbox/Sharing/Alor test/UPS Test for 1C nr. 2 at 20° celsius     03_01_2023 15_21_10",chargeTime="180",timeInterval=0.2)
+# dataStorage.exportXLSXFile("C:/Users/runson/Dropbox/Sharing/Alor test/custom test for 1C nr. 2 at 20° celsius     03_01_2023 15_21_10",chargeTime="180",timeInterval=0.2)

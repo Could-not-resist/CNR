@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Interactive helper to create UPS and capacity test configuration files.
+"""Interactive helper to create custom and capacity test configuration files.
 
 The script first asks for a ``test_name`` and which type of test to
 configure.  Depending on the chosen type it prompts only for the
@@ -7,7 +7,7 @@ relevant parameters and writes a JSON file using this structure::
 
     {
       "test_name": "...",
-      "ups_settings": {...},    # optional
+      "custom_settings": {...},    # optional
       "capacity_test": {...}    # optional
     }
 """
@@ -16,9 +16,9 @@ import json
 from pathlib import Path
 from typing import Callable, Any
 
-# Default UPS settings matching MAIN.py constants
+# Default custom test settings matching MAIN.py constants
 DEFAULT_TEST_NAME = "YUASA"
-UPS_DEFAULTS = {
+CUSTOM_DEFAULTS = {
     "temperature": 23.4,
     "charge_volt_prot": 10,
     "charge_current_prot": 100,
@@ -38,7 +38,7 @@ UPS_DEFAULTS = {
 }
 
 # Ranges for validation
-UPS_RANGES = {
+CUSTOM_RANGES = {
     "temperature": (-50, 150),
     "charge_volt_prot": (0, 1000),
     "charge_current_prot": (0, 1000),
@@ -89,18 +89,18 @@ def _prompt_number(prompt: str, caster: Callable[[str], Any], *, default: Any, m
             print(f"Enter a value between {minimum} and {maximum}.")
 
 
-def build_ups_settings(test_name: str) -> dict:
-    """Collect UPS settings from the user with range validation."""
-    ups = {"test_name": test_name}
-    for field, default in UPS_DEFAULTS.items():
+def build_custom_settings(test_name: str) -> dict:
+    """Collect custom test settings from the user with range validation."""
+    custom = {"test_name": test_name}
+    for field, default in CUSTOM_DEFAULTS.items():
         if isinstance(default, (int, float)):
-            minimum, maximum = UPS_RANGES.get(field, (0, 1e9))
+            minimum, maximum = CUSTOM_RANGES.get(field, (0, 1e9))
             caster = int if isinstance(default, int) and not isinstance(default, bool) else float
-            ups[field] = _prompt_number(field, caster, default=default, minimum=minimum, maximum=maximum)
+            custom[field] = _prompt_number(field, caster, default=default, minimum=minimum, maximum=maximum)
         else:
             val = input(f"{field} [{default if default is not None else 'none'}]: ")
-            ups[field] = val if val else default
-    return ups
+            custom[field] = val if val else default
+    return custom
 
 
 def build_capacity_settings() -> dict:
@@ -118,12 +118,12 @@ def build_capacity_settings() -> dict:
 
 def main() -> None:
     test_name = input(f"test_name [{DEFAULT_TEST_NAME}]: ").strip() or DEFAULT_TEST_NAME
-    test_type = input("Test type (ups, capacity, both) [ups]: ").strip().lower() or "ups"
+    test_type = input("Test type (custom, capacity, both) [custom]: ").strip().lower() or "custom"
     config = {"test_name": test_name}
-    if test_type in ("ups", "both"):
-        print("Enter UPS settings:")
-        ups_settings = build_ups_settings(test_name)
-        config["ups_settings"] = ups_settings
+    if test_type in ("custom", "both"):
+        print("Enter custom test settings:")
+        custom_settings = build_custom_settings(test_name)
+        config["custom_settings"] = custom_settings
     if test_type in ("capacity", "both"):
         print("\nEnter capacity test parameters:")
         capacity_settings = build_capacity_settings()

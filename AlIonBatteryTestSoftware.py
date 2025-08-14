@@ -1,4 +1,4 @@
-"""Core routines for controlling UPS battery test sequences."""
+"""Core routines for controlling custom battery test sequences."""
 
 import time
 from datetime import datetime
@@ -322,8 +322,8 @@ class TestController:
 
     # Test protocal for testing the capacity of a battery
 
-# This function is called from the TestTypes class to run a UPS test
-    def NEWupsTest(
+# This function is called from the TestTypes class to run a custom test
+    def custom_test(
         self,
         test_name: str,
         temperature: float,
