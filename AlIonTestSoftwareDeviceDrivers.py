@@ -14,7 +14,11 @@ class PowerSupplyController:
         self.resourceManager = pyvisa.ResourceManager()
         name = resource_name or self.powerSupplyName
         self.powerSupply = self.resourceManager.open_resource(name)
-        
+        self.powerSupply.read_termination = '\n'
+        self.powerSupply.write_termination = '\n'
+        self.powerSupply.timeout = 8000
+        self.powerSupply.chunk_size = 102_400
+
 
     # Function that returns the name of connected device
     def checkDeviceConnection(self):
@@ -109,15 +113,24 @@ class PowerSupplyController:
             raise ValueError("Fall rate must be positive (V/ms).")
         self.powerSupply.write(f"SOUR:VOLT:FALL {rate_v_per_ms}")
 
+    def _query_with_retry(self, command: str, attempts: int = 3) -> str:
+        """Query the power supply with simple retry logic."""
+        for _ in range(attempts):
+            response = self.powerSupply.query(command).strip()
+            if response:
+                return response
+            self.powerSupply.clear()
+        return response
+
     # Functions to read realtime VOLTAGE, CURRENT and POWER from the power supply
     def getVoltage(self):
-        return self.powerSupply.query("FETCH:VOLT?")
+        return self._query_with_retry("MEAS:VOLT?")
 
     def getCurrent(self):
-        return self.powerSupply.query("FETCH:CURR?")
+        return self._query_with_retry("MEAS:CURR?")
 
     def getPower(self):
-        return self.powerSupply.query("FETCH:POW?")
+        return self._query_with_retry("MEAS:POW?")
         
 
     # Function for constant CURRENT charging, taking in current in amps
