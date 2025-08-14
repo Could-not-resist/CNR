@@ -209,8 +209,9 @@ def main():
 
     profile = args.profile or args.test_name or TEST_NAME
     config = {}
+    capacity_defaults = {}
     if args.config_file:
-        config = load_config(args.config_file, profile)
+        config, capacity_defaults = load_config(args.config_file, profile)
 
     ps_resource = (
         args.ps_resource
