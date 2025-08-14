@@ -63,13 +63,15 @@ class UPSSettings:
     multimeter_mode: str | None = None
 
 
-def load_config(config_path: str, profile: str) -> dict:
-    """Load settings for a given cell profile from a JSON configuration file."""
+def load_config(config_path: str, profile: str) -> tuple[dict, dict]:
+    """Load profile settings and capacity defaults from a JSON file."""
     try:
         data = json.loads(Path(config_path).read_text())
-        return data.get(profile, {}) if isinstance(data, dict) else {}
+        if not isinstance(data, dict):
+            return {}, {}
+        return data.get(profile, {}), data.get("capacity_defaults", {})
     except Exception:
-        return {}
+        return {}, {}
 
 
 class TestTypes:
@@ -127,7 +129,6 @@ def main():
     parser = argparse.ArgumentParser(description="Run UPS test")
     parser.add_argument("--config-file", help="JSON file with cell settings")
     parser.add_argument("--profile", help="cell profile name in config file")
-    parser.add_argument("--capacity-config", help="JSON defaults for capacity test")
     parser.add_argument("--ps-resource", help="VISA resource name for power supply")
     parser.add_argument("--el-resource", help="VISA resource name for electronic load")
     parser.add_argument("--mm-resource", help="VISA resource name for multimeter")
@@ -214,8 +215,9 @@ def main():
 
     profile = args.profile or args.test_name or TEST_NAME
     config = {}
+    capacity_defaults = {}
     if args.config_file:
-        config = load_config(args.config_file, profile)
+        config, capacity_defaults = load_config(args.config_file, profile)
 
     ps_resource = (
         args.ps_resource
@@ -233,13 +235,6 @@ def main():
         or config.get("mm_resource")
     )
 
-    capacity_defaults = {}
-    if args.capacity_config:
-        try:
-            capacity_defaults = json.loads(Path(args.capacity_config).read_text())
-        except Exception as exc:
-            print(f"Failed to load capacity config: {exc}")
-            capacity_defaults = {}
 
     for field in UPSSettings.__annotations__.keys():
         if getattr(args, field) is None:
@@ -372,4 +367,4 @@ if __name__ == "__main__":
 # This allows running the script directly from the command line
 # Example usage:
 # python MAIN.py --actual-capacity-test --capacity-charge-current 4.6 --capacity-discharge-current 46 --multimeter-mode tcouple
-# python MAIN.py --actual-capacity-test --capacity-config tests/capacity_defaults.json -d
+# python MAIN.py --actual-capacity-test --config-file cell_profiles.json -d

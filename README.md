@@ -26,7 +26,7 @@ pip install pyvisa pandas openpyxl matplotlib tabulate
 1. Connect the Chroma 63600 electronic load and Chroma 62000P power supply to
    your PC and ensure the NI-VISA drivers are installed.
 2. Adjust the charge/discharge parameters using command-line options, or
-   provide a JSON configuration file with cell profiles.
+   provide a JSON configuration file with cell profiles and capacity defaults.
 3. Run the test script:
 
 ```bash
@@ -62,20 +62,15 @@ python MAIN.py --actual-capacity-test \
 ```
 ``--capacity-charge-voltage`` defaults to the value of ``--charge-volt-end``
 (or ``4.1``&nbsp;V). ``--capacity-rest-time`` and ``--capacity-min-voltage``
-fall back to the values in the file passed with ``--capacity-config`` or,
-if that option is omitted, to one hour and ``2.75``&nbsp;V respectively.
+fall back to the values in the ``capacity_defaults`` section of the JSON
+file passed with ``--config-file`` or, if that section is absent, to one
+hour and ``2.75``&nbsp;V respectively.
 
-You can also supply defaults for the capacity test via a JSON file:
-
-```bash
-python MAIN.py --actual-capacity-test --capacity-config tests/capacity_defaults.json
-```
-
-The file may define ``rest_time``, ``charge_voltage``, ``min_voltage``,
-``charge_current``, ``discharge_current``, ``finish_current`` and
-``multimeter_mode`` keys.
-These values override the built‑in defaults in ``MAIN.py`` but any
-command-line options still take precedence.
+The configuration file may define ``rest_time``, ``charge_voltage``,
+``min_voltage``, ``charge_current``, ``discharge_current``,
+``finish_current`` and ``multimeter_mode`` keys inside
+``capacity_defaults``. These values override the built‑in defaults in
+``MAIN.py`` but any command-line options still take precedence.
 
 Additional tests can be invoked with the following flags:
 
@@ -120,7 +115,8 @@ Additional tests can be invoked with the following flags:
 
 Instead of specifying every parameter on the command line you can store
 cell profiles in a JSON file. A sample `cell_profiles.json` is included in
-the repository. Select a profile like this:
+the repository. It also contains a ``capacity_defaults`` section used for
+standalone capacity tests. Select a profile like this:
 
 ```bash
 python MAIN.py --config-file cell_profiles.json --profile YUASA
