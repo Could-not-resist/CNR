@@ -64,20 +64,27 @@ class CustomTestSettings:
     multimeter_mode: str | None = None
 
 
-def load_config(config_path: str, profile: str) -> tuple[dict, dict]:
-    """Load profile settings and capacity defaults from a JSON file."""
+def load_config(config_path: str, profile: str) -> tuple[dict, dict, str | None]:
+    """Load profile parameters, capacity defaults and test type from a JSON file."""
     try:
         data = json.loads(Path(config_path).read_text())
     except FileNotFoundError:
         print(f"Configuration file not found: {config_path}")
-        return {}, {}
+        return {}, {}, None
     except json.JSONDecodeError as exc:
         print(f"Error decoding JSON from {config_path}: {exc}")
-        return {}, {}
+        return {}, {}, None
 
     if not isinstance(data, dict):
-        return {}, {}
-    return data.get(profile, {}), data.get("capacity_defaults", {})
+        return {}, {}, None
+
+    profile_data = data.get(profile, {})
+    if not isinstance(profile_data, dict):
+        return {}, data.get("capacity_defaults", {}), None
+
+    test_type = profile_data.get("test_type")
+    params = profile_data.get("parameters", {})
+    return params, data.get("capacity_defaults", {}), test_type
 
 
 
@@ -216,8 +223,9 @@ def main():
     profile = args.profile or args.test_name or TEST_NAME
     config = {}
     capacity_defaults = {}
+    test_type = None
     if args.config_file:
-        config, capacity_defaults = load_config(args.config_file, profile)
+        config, capacity_defaults, test_type = load_config(args.config_file, profile)
 
     ps_resource = (
         args.ps_resource
@@ -340,6 +348,84 @@ def main():
             finish_current,
         )
         print(f"Measured capacity: {capacity:.3f} Ah")
+    elif args.config_file and test_type:
+        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
+        if test_type == "actual_capacity_test":
+            tc.actual_capacity_test(
+                cap_charge_current,
+                cap_discharge_current,
+                rest_time,
+                cap_charge_volt,
+                cap_min_volt,
+                temperature,
+                finish_current,
+            )
+        elif test_type == "efficiency_test":
+            tc.efficiency_test(
+                charge_current_max,
+                dcharge_current_max,
+                charge_volt_end,
+                dcharge_volt_min,
+                temperature,
+            )
+        elif test_type == "rate_characteristic_test":
+            rates_cfg = config.get("rates", args.rates)
+            if isinstance(rates_cfg, str):
+                rates = [float(r) for r in rates_cfg.split(',') if r]
+            else:
+                rates = [float(r) for r in rates_cfg]
+            tc.rate_characteristic_test(
+                rates,
+                charge_current_max,
+                charge_volt_end,
+                dcharge_volt_min,
+                temperature,
+            )
+        elif test_type == "ocv_curve_test":
+            step_current = config.get("step_current", args.step_current)
+            steps = config.get("steps", args.steps)
+            tc.ocv_curve_test(
+                step_current,
+                steps,
+                1800.0,
+                temperature,
+            )
+        elif test_type == "internal_resistance_test":
+            pulse_current = config.get("pulse_current", args.pulse_current)
+            pulse_duration = config.get("pulse_duration", args.pulse_duration)
+            tc.internal_resistance_test(
+                pulse_current,
+                pulse_duration,
+                temperature,
+            )
+            capacity = tc.actual_capacity_test(
+                cap_charge_current,
+                cap_discharge_current,
+                rest_time,
+                cap_charge_volt,
+                cap_min_volt,
+                temperature,
+                finish_current,
+            )
+            print(f"Measured capacity: {capacity:.3f} Ah")
+        elif test_type == "custom":
+            kwargs = {}
+            for field in CustomTestSettings.__annotations__.keys():
+                val = getattr(args, field, None)
+                if val is not None:
+                    kwargs[field] = val
+            settings = CustomTestSettings(**kwargs)
+            TObj = TestTypes(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
+            thread = TObj.run_custom_test(settings)
+            try:
+                while thread.is_alive():
+                    thread.join(0.5)
+            except KeyboardInterrupt:
+                print("Keyboard interrupt received, stopping test")
+                TObj.stop()
+        else:
+            print(f"Unsupported test_type: {test_type}")
+            return
 
     else:
         kwargs = {}

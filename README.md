@@ -16,7 +16,7 @@ to perform custom battery cycling and log the resulting data.
 | `AlIonTestSoftwareDeviceDriversMock.py` | Mock versions of the device drivers for running the software without hardware attached. |
 | `build_test_config.py` | Interactive helper that writes JSON files with custom and capacity-test settings. |
 | `scpi_commands.py` | Quick reference of SCPI command strings used by the drivers. |
-| `cell_profiles.json` | Example configuration profiles containing default test parameters. |
+| `cell_profiles.json` | Example configuration profiles containing test parameters and their `test_type`. |
 | `manuals/` | Manufacturer programming manuals (not tracked by version control). |
 
 ## Requirements
@@ -139,6 +139,11 @@ python MAIN.py --config-file cell_profiles.json --profile YUASA
 ```
 
 Command-line options still override the values loaded from the profile.
+
+Each profile defines a `test_type` such as `custom`, `efficiency_test` or
+`rate_characteristic_test` alongside its parameter block. When a configuration
+file and profile are supplied without explicit test flags, `MAIN.py` dispatches
+to the corresponding `TestController` method based on `test_type`.
 
 An interactive helper `build_test_config.py` first asks for a test name and
 which type of test to configure (custom, capacity or both).  It then prompts only
