@@ -115,11 +115,18 @@ class PowerSupplyController:
 
     def _query_with_retry(self, command: str, attempts: int = 3) -> str:
         """Query the power supply with simple retry logic."""
+        if attempts < 1:
+            raise ValueError("attempts must be at least 1")
+        response = ""
         for _ in range(attempts):
             response = self.powerSupply.query(command).strip()
             if response:
-                return response
+                break
             self.powerSupply.clear()
+        if not response:
+            raise RuntimeError(
+                f"No response received for {command!r} after {attempts} attempts"
+            )
         return response
 
     # Functions to read realtime VOLTAGE, CURRENT and POWER from the power supply
