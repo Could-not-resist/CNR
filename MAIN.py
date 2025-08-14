@@ -67,11 +67,16 @@ def load_config(config_path: str, profile: str) -> tuple[dict, dict]:
     """Load profile settings and capacity defaults from a JSON file."""
     try:
         data = json.loads(Path(config_path).read_text())
-        if not isinstance(data, dict):
-            return {}, {}
-        return data.get(profile, {}), data.get("capacity_defaults", {})
-    except Exception:
+    except FileNotFoundError:
+        print(f"Configuration file not found: {config_path}")
         return {}, {}
+    except json.JSONDecodeError as exc:
+        print(f"Error decoding JSON from {config_path}: {exc}")
+        return {}, {}
+
+    if not isinstance(data, dict):
+        return {}, {}
+    return data.get(profile, {}), data.get("capacity_defaults", {})
 
 
 
