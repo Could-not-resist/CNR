@@ -783,9 +783,11 @@ class TestController:
                 capacity = 0.0
                 print(f"Charging to {charge_voltage} V at {charge_current_1c} A")
                 low_current_time = 0.0
-                while True:
+                while not self.stop_event.is_set():
                     time.sleep(self.timeInterval)
                     elapsed += self.timeInterval
+                    if self.stop_event.is_set():
+                        break
                     v = self.getVoltageELC()
                     c = self.getCurrentPSC()
                     mm = None
@@ -807,6 +809,8 @@ class TestController:
                         assert mm is not None
                         dataStorage.addMMTemperature(mm)
                     dataStorage.addCapacity(capacity)
+                    if self.stop_event.is_set():
+                        break
                     if c <= finish_current:
                         low_current_time += self.timeInterval
                         if low_current_time >= 10.0:
@@ -827,9 +831,11 @@ class TestController:
                 self.startDischarge()
 
                 print(f"Discharging to {min_voltage} V at {discharge_current_1c} A")
-                while True:
+                while not self.stop_event.is_set():
                     time.sleep(self.timeInterval)
                     elapsed += self.timeInterval
+                    if self.stop_event.is_set():
+                        break
                     v = self.getVoltageELC()
                     c = self.getCurrentELC()
                     capacity += c * self.timeInterval / 3600.0
@@ -852,7 +858,7 @@ class TestController:
                         assert mm is not None
                         dataStorage.addMMTemperature(mm)
                     dataStorage.addCapacity(capacity)
-                    if v <= min_voltage:
+                    if v <= min_voltage or self.stop_event.is_set():
                         break
 
                 self.stopDischarge()
