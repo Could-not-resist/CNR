@@ -280,7 +280,7 @@ class TestController:
         """Disable outputs and configure protection limits.
 
         If parameters are omitted, values are loaded from ``MAIN`` or fall back
-        to the defaults in ``cell_profiles.json``.
+        to the defaults in ``profiles.json``.
         """
 
         try:

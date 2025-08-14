@@ -16,13 +16,13 @@ The project is organised as a set of Python modules used to run charging/dischar
 
 | File | Purpose |
 | --- | --- |
-| `MAIN.py` | Command line interface and entry point. Parses arguments, loads configuration from `cell_profiles.json` and invokes tests in `TestController`. |
+| `MAIN.py` | Command line interface and entry point. Parses arguments, loads configuration from `profiles.json` and invokes tests in `TestController`. |
 | `AlIonBatteryTestSoftware.py` | Implements `TestController` coordinating the power supply, electronic load and multimeter. Contains high level test routines such as custom tests, efficiency tests and capacity measurements. |
 | `AlIonTestSoftwareDataManagement.py` | Provides the `DataStorage` class used to store and export measurement data to CSV/Excel and to create graphs. |
 | `AlIonTestSoftwareDeviceDrivers.py` | Low level device drivers using NI-VISA to control the power supply, electronic load and multimeter. |
 | `AlIonTestSoftwareDeviceDriversMock.py` | Mock versions of the device drivers for running the software without hardware attached. |
 | `scpi_commands.py` | Quick reference of SCPI command strings used by the drivers. |
-| `cell_profiles.json` | Example configuration profiles containing default test parameters. |
+| `profiles.json` | Example configuration profiles containing default test parameters. |
 | `manuals/` | Folder for manufacturer manuals (ignored by version control). |
 
 ### Main modules

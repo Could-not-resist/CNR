@@ -157,7 +157,9 @@ class TestTypes:
 
 def main():
     parser = argparse.ArgumentParser(description="Run custom test")
-    parser.add_argument("--config-file", help="JSON file with cell settings")
+    parser.add_argument(
+        "--config-file", default="profiles.json", help="JSON file with cell settings"
+    )
     parser.add_argument("--profile", help="cell profile name in config file")
     parser.add_argument("--ps-resource", help="VISA resource name for power supply")
     parser.add_argument("--el-resource", help="VISA resource name for electronic load")
@@ -480,4 +482,4 @@ if __name__ == "__main__":
 
 # Example usage:
 # python MAIN.py --actual-capacity-test --capacity-charge-current 4.6 --capacity-discharge-current 46 --multimeter-mode tcouple
-# python MAIN.py --actual-capacity-test --config-file cell_profiles.json -d
+# python MAIN.py --actual-capacity-test --config-file profiles.json -d

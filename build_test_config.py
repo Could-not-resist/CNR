@@ -3,8 +3,8 @@
 
 The tool asks for a ``test_name`` and a ``test_type`` such as
 ``custom``, ``actual_capacity_test`` or ``efficiency_test``.  It then
-prompts only for the parameters relevant to that test and writes a JSON
-snippet compatible with ``cell_profiles.json`` using the format::
+    prompts only for the parameters relevant to that test and writes a JSON
+    snippet compatible with ``profiles.json`` using the format::
 
     {
       "test_type": "custom",
@@ -271,11 +271,14 @@ def main() -> None:
 
     print("\nGenerated configuration:")
     print(json.dumps(config, indent=2))
-    filename = input("\nSave under configs/ as (without extension): ").strip() or "test_config"
-    path = Path("configs") / f"{filename}.json"
-    path.parent.mkdir(exist_ok=True)
-    path.write_text(json.dumps(config, indent=2))
-    print(f"Configuration saved to {path}")
+    profiles = Path("profiles.json")
+    if profiles.exists():
+        data = json.loads(profiles.read_text())
+    else:
+        data = {}
+    data[test_name] = config
+    profiles.write_text(json.dumps(data, indent=2))
+    print(f"Configuration saved to {profiles}")
 
 
 if __name__ == "__main__":

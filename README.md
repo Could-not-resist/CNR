@@ -10,14 +10,14 @@ measurements while logging the resulting data.
 
 | File | Purpose |
 | --- | --- |
-| `MAIN.py` | Command-line interface and entry point. Parses arguments, loads configuration from `cell_profiles.json` and invokes tests in `TestController`. |
+| `MAIN.py` | Command-line interface and entry point. Parses arguments, loads configuration from `profiles.json` and invokes tests in `TestController`. |
 | `AlIonBatteryTestSoftware.py` | Implements `TestController`, coordinating the power supply, electronic load and multimeter. Contains high level test routines such as custom tests, efficiency tests and capacity measurements. |
 | `AlIonTestSoftwareDataManagement.py` | Provides the `DataStorage` class used to store and export measurement data to CSV/Excel and to create graphs. |
 | `AlIonTestSoftwareDeviceDrivers.py` | Low level device drivers using NI-VISA to control the power supply, electronic load and multimeter. |
 | `AlIonTestSoftwareDeviceDriversMock.py` | Mock versions of the device drivers for running the software without hardware attached. |
 | `build_test_config.py` | Interactive helper that writes profile entries for any test type. |
 | `scpi_commands.py` | Quick reference of SCPI command strings used by the drivers. |
-| `cell_profiles.json` | Example configuration profiles containing test parameters and their `test_type`. |
+| `profiles.json` | Example configuration profiles containing test parameters and their `test_type`. |
 | `manuals/` | Manufacturer programming manuals (not tracked by version control). |
 
 ## Requirements
@@ -139,7 +139,7 @@ Additional tests can be invoked with the following flags:
 ### Using configuration files
 
 Instead of specifying every parameter on the command line you can store
-cell profiles in a JSON file. A sample `cell_profiles.json` is included in
+cell profiles in a JSON file. A sample `profiles.json` is included in
 the repository. It also contains a ``capacity_defaults`` section used for
 standalone capacity tests.
 
@@ -165,14 +165,14 @@ Run the profile without additional flags and `MAIN.py` selects the
 appropriate test based on `test_type`:
 
 ```bash
-python MAIN.py --config-file cell_profiles.json --profile YUASA
+python MAIN.py --config-file profiles.json --profile YUASA
 ```
 
 Command-line options still override the values loaded from the profile.
 
 The helper `build_test_config.py` prompts for a test name and `test_type`
-and then gathers the relevant parameters before writing a profile snippet
-under `configs/`.
+and then gathers the relevant parameters before adding the profile to
+`profiles.json`.
 
 This charges the cell at 1C up to the voltage specified by
 `--capacity-charge-voltage` (default taken from `--charge-volt-end`),
