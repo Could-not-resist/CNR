@@ -5,6 +5,7 @@ from openpyxl.chart import ScatterChart, Reference, Series  # type: ignore
 # from openpyxl.chart.series import Series
 from datetime import datetime
 import os
+import pandas
 import pandas as pd
 import math
 import statistics
@@ -154,8 +155,8 @@ class DataStorage:
                 self.exportXLSXFile(filePath, chargeTime, timeInterval)
                 if verbose:
                     print(f"Charge time configured: {chargeTime}")
-        except:
-            print("Data storage failed, check file path")
+        except (OSError, pandas.errors.PandasError) as err:
+            print(f"Data storage failed: {err}")
         # Empty the result values
         self.time = []
         self.timestamp = []
