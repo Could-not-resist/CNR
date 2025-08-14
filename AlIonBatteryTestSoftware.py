@@ -323,7 +323,7 @@ class TestController:
     # Test protocal for testing the capacity of a battery
 
 # This function is called from the TestTypes class to run a custom test
-    def custom_test(
+    def _custom_test_impl(
         self,
         test_name: str,
         temperature: float,
@@ -505,6 +505,52 @@ class TestController:
 
         # Set the event to indicate that testing is finished
         self.event.set()
+
+    def custom_test(
+        self,
+        test_name: str,
+        temperature: float,
+        charge_volt_prot: int,
+        charge_current_prot: int,
+        charge_power_prot: int,
+        charge_volt_start: float,
+        charge_volt_end: float,
+        charge_current_max: float,
+        dcharge_volt_min: float,
+        dcharge_current_max: float,
+        slew_volt: float,
+        slew_current: float,
+        leadin_time: int,
+        charge_time: int,
+        dcharge_time: int,
+        num_cycles: int,
+        sample_interval: float,
+        multimeter_mode: str | None = None,
+    ):
+        prev_interval = self.timeInterval
+        self.timeInterval = sample_interval
+        try:
+            self._custom_test_impl(
+                test_name,
+                temperature,
+                charge_volt_prot,
+                charge_current_prot,
+                charge_power_prot,
+                charge_volt_start,
+                charge_volt_end,
+                charge_current_max,
+                dcharge_volt_min,
+                dcharge_current_max,
+                slew_volt,
+                slew_current,
+                leadin_time,
+                charge_time,
+                dcharge_time,
+                num_cycles,
+                multimeter_mode,
+            )
+        finally:
+            self.timeInterval = prev_interval
 
     def efficiency_test(
         self,

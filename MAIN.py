@@ -65,7 +65,9 @@ class CustomTestSettings:
     num_cycles: int = NUM_CYCLES
     charge_mode: str = "CC"
     discharge_mode: str = "CC"
+    sample_interval: float = TestController.timeInterval
     multimeter_mode: str | None = None
+
 
 
 def load_config(config_path: str, profile: str) -> tuple[dict, dict, str | None]:
@@ -138,6 +140,7 @@ class TestTypes:
                 settings.num_cycles,
                 settings.charge_mode,
                 settings.discharge_mode,
+                settings.sample_interval,
                 settings.multimeter_mode,
             ),
         )
@@ -175,6 +178,7 @@ def main():
     parser.add_argument("--charge-time", type=int)
     parser.add_argument("--dcharge-time", type=int)
     parser.add_argument("--rest-time", type=int)
+    parser.add_argument("--sample-interval", type=float)
     parser.add_argument(
         "--charge-mode",
         choices=["CC", "CV", "CP"],
