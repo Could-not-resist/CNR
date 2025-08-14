@@ -228,6 +228,11 @@ python -m py_compile *.py
 
 at the repository root. This ensures all Python files compile cleanly.
 
+## Breaking Changes
+
+- The `--use-multimeter` flag has been removed. Use `--multimeter-mode` to enable
+  multimeter logging.
+
 ## Stopping a running test
 
 Press `Ctrl+C` while a test is active to abort safely. The program turns off
