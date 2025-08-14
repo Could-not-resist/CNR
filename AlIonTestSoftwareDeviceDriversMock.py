@@ -18,36 +18,46 @@ class PowerSupplyControllerMock:
 
     #### VOLTAGE #### VOLTAGE #### VOLTAGE #### VOLTAGE ####
     # Functions that allow user to set the maximum voltage, current and power for safety
-    def setVoltage(self, volts : float):
+    def setVoltage(self, volts: float) -> None:
+        """Set output voltage in volts."""
         self.current_voltage = volts
 
-    def setVoltageLimMax(self, volts : float):
+    def setVoltageLimMax(self, volts: float) -> None:
+        """Set upper voltage limit in volts."""
         self.Voltage_limmax = volts
 
-    def setVoltageLimMin(self, volts : float):
+    def setVoltageLimMin(self, volts: float) -> None:
+        """Set lower voltage limit in volts."""
         self.Voltage_limmin = volts
 
-    def setVoltageProt(self, volts : float):
+    def setVoltageProt(self, volts: float) -> None:
+        """Set over-voltage protection threshold in volts."""
         self.Voltage_prot = volts
 
-    def setVoltageSlew(self, volts : float):
+    def setVoltageSlew(self, volts: float) -> None:
+        """Set voltage slew rate in volts per second."""
         self.Voltage_slew = volts
 
 
     #### CURRENT #### CURRENT #### CURRENT #### CURRENT ####
-    def setCurrent(self, amps : float):
+    def setCurrent(self, amps: float) -> None:
+        """Set output current in amps."""
         self.current_current = amps
 
-    def setCurrentLimMax(self, amps : float):
+    def setCurrentLimMax(self, amps: float) -> None:
+        """Set upper current limit in amps."""
         self.Current_limmax = amps
 
-    def setCurrentLimMin(self, amps : float):
+    def setCurrentLimMin(self, amps: float) -> None:
+        """Set lower current limit in amps."""
         self.Current_limmin = amps
 
-    def setCurrentProt(self, amps : float):
+    def setCurrentProt(self, amps: float) -> None:
+        """Set over-current protection threshold in amps."""
         self.Current_prot = amps
 
-    def setCurrentSlew(self, amps : float):
+    def setCurrentSlew(self, amps: float) -> None:
+        """Set current slew rate in amps per second."""
         self.Current_slew = amps
 
     #### POWER #### POWER #### POWER #### POWER #### POWER ####

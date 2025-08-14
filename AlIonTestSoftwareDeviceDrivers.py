@@ -20,38 +20,48 @@ class PowerSupplyController:
 
     # Functions that allow user to set the maximum voltage, current and power for safety
     #### VOLTAGE #### VOLTAGE #### VOLTAGE #### VOLTAGE ####
-    def setVoltage(self, *volts):
-        self.powerSupply.write("SOUR:VOLT " + str((volts[0])))
+    def setVoltage(self, volts: float) -> None:
+        """Set output voltage in volts."""
+        self.powerSupply.write("SOUR:VOLT " + str(volts))
 
-    def setVoltageLimMax(self, *volts):
-        self.powerSupply.write("SOUR:VOLT:LIMIT:HIGH " + str((volts[0])))
+    def setVoltageLimMax(self, volts: float) -> None:
+        """Set upper voltage limit in volts."""
+        self.powerSupply.write("SOUR:VOLT:LIMIT:HIGH " + str(volts))
 
-    def setVoltageLimMin(self, *volts):
-        self.powerSupply.write("SOUR:VOLT:LIMIT:LOW " + str((volts[0])))
+    def setVoltageLimMin(self, volts: float) -> None:
+        """Set lower voltage limit in volts."""
+        self.powerSupply.write("SOUR:VOLT:LIMIT:LOW " + str(volts))
 
-    def setVoltageProt(self, *volts):
-        self.powerSupply.write("SOUR:VOLT:PROT:HIGH " + str((volts[0])))
+    def setVoltageProt(self, volts: float) -> None:
+        """Set over-voltage protection threshold in volts."""
+        self.powerSupply.write("SOUR:VOLT:PROT:HIGH " + str(volts))
 
-    def setVoltageSlew(self, *volts):
-        self.powerSupply.write("SOUR:VOLT:SLEW " + str((volts[0])))
+    def setVoltageSlew(self, volts: float) -> None:
+        """Set voltage slew rate in volts per second."""
+        self.powerSupply.write("SOUR:VOLT:SLEW " + str(volts))
 
     # def setVoltageMax(self):
     #     self.powerSupply.write("SOUR:VOLT:LIMIT:HIGH MAX")  # Could not find MAX command in manual
 
     #### CURRENT #### CURRENT #### CURRENT #### CURRENT ####
-    def setCurrent(self, amps):
+    def setCurrent(self, amps: float) -> None:
+        """Set output current in amps."""
         self.powerSupply.write("SOUR:CURR " + str(amps))
 
-    def setCurrentLimMax(self, amps):
+    def setCurrentLimMax(self, amps: float) -> None:
+        """Set upper current limit in amps."""
         self.powerSupply.write("SOUR:CURR:LIMIT:HIGH " + str(amps))
 
-    def setCurrentLimMin(self, *amps):
-        self.powerSupply.write("SOUR:CURR:LIMIT:LOW " + str(amps[0]))
+    def setCurrentLimMin(self, amps: float) -> None:
+        """Set lower current limit in amps."""
+        self.powerSupply.write("SOUR:CURR:LIMIT:LOW " + str(amps))
 
-    def setCurrentProt(self, *amps):
-        self.powerSupply.write("SOUR:CURR:PROT:HIGH " + str(amps[0]))
+    def setCurrentProt(self, amps: float) -> None:
+        """Set over-current protection threshold in amps."""
+        self.powerSupply.write("SOUR:CURR:PROT:HIGH " + str(amps))
 
-    def setCurrentSlew(self, amps):
+    def setCurrentSlew(self, amps: float) -> None:
+        """Set current slew rate in amps per second."""
         self.powerSupply.write("SOUR:CURR:SLEW " + str(amps))
 
     # def setCurrentMax(self):
