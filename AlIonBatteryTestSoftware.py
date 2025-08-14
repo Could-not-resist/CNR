@@ -8,6 +8,15 @@ from AlIonTestSoftwareDeviceDrivers import PowerSupplyController, ElectronicLoad
 from AlIonTestSoftwareDeviceDriversMock import PowerSupplyControllerMock, ElectronicLoadControllerMock, MultimeterControllerMock
 from AlIonTestSoftwareDataManagement import DataStorage
 
+import struct
+try:
+    import pyvisa
+    VisaIOError = pyvisa.errors.VisaIOError
+except Exception:  # pyvisa may not be installed when using mock drivers
+    class VisaIOError(Exception):
+        """Fallback VisaIOError when pyvisa is unavailable."""
+        pass
+
 
 # Class used to control test procedures
 class TestController:
@@ -180,7 +189,11 @@ class TestController:
 
     def getCCcurrentL1MAX(self):
         # Read the maximum amp setting of Channel 1
-        return self.electronicLoadController.getCCcurrentL1MAX()
+        try:
+            return float(self.electronicLoadController.getCCcurrentL1MAX())
+        except (VisaIOError, struct.error) as err:
+            print(f"Electronic-load read timeout: {err}")
+            return float('nan')
 
     # Helper methods for discharging and reading instrument values
 
@@ -194,26 +207,50 @@ class TestController:
         self.electronicLoadController.dischargeCP(watts)
 
     def getVoltageELC(self):
-        x = self.electronicLoadController.getVoltage()
+        try:
+            x = self.electronicLoadController.getVoltage()
+        except (VisaIOError, struct.error) as err:
+            print(f"Electronic-load read timeout: {err}")
+            return float('nan')
         return float(x)
 
     def getCurrentELC(self):
-        x = self.electronicLoadController.getCurrent()
+        try:
+            x = self.electronicLoadController.getCurrent()
+        except (VisaIOError, struct.error) as err:
+            print(f"Electronic-load read timeout: {err}")
+            return float('nan')
         return float(x)
 
     def getVoltagePSC(self):
-        x = self.powerSupplyController.getVoltage()
+        try:
+            x = self.powerSupplyController.getVoltage()
+        except (VisaIOError, struct.error) as err:
+            print(f"Power-supply read timeout: {err}")
+            return float('nan')
         return float(x)
 
     def getCurrentPSC(self):
-        x = self.powerSupplyController.getCurrent()
+        try:
+            x = self.powerSupplyController.getCurrent()
+        except (VisaIOError, struct.error) as err:
+            print(f"Power-supply read timeout: {err}")
+            return float('nan')
         return float(x)
 
     def getVoltageMM(self):
-        return float(self.multimeterController.getVolts())
+        try:
+            return float(self.multimeterController.getVolts())
+        except (VisaIOError, struct.error) as err:
+            print(f"Multimeter read timeout: {err}")
+            return float('nan')
 
     def getTemperatureMM(self):
-        return float(self.multimeterController.getThermocoupleTemp())
+        try:
+            return float(self.multimeterController.getThermocoupleTemp())
+        except (VisaIOError, struct.error) as err:
+            print(f"Multimeter read timeout: {err}")
+            return float('nan')
 
     # def stopDischarge(self):
     #     self.electronicLoadController.stopDischarge()
