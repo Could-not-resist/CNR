@@ -1,7 +1,6 @@
 """Mock implementations of the device drivers for testing without hardware."""
 
 from random import randrange
-import tkinter
 
 # Class for communication with the NI-VISA driver to control the power supply
 class PowerSupplyControllerMock:
