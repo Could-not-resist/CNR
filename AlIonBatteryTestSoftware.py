@@ -340,6 +340,7 @@ class TestController:
         leadin_time: int,
         charge_time: int,
         dcharge_time: int,
+        rest_time: int,
         num_cycles: int,
         charge_mode: str = "CC",
         discharge_mode: str = "CC",
@@ -436,6 +437,8 @@ class TestController:
                             assert mm is not None
                             dataStorage.addMMTemperature(mm)
                     self.stopPSOutput()
+                    if rest_time > 0:
+                        time.sleep(rest_time)
 
                     Dend_time = datetime.now() + Dduration
                     self.stopDischarge()
@@ -475,6 +478,8 @@ class TestController:
                             print(f"below {dcharge_volt_min} volts")
                             break
                     self.stopDischarge()
+                    if rest_time > 0:
+                        time.sleep(rest_time)
                 except KeyboardInterrupt:
                     print("Keyboard interrupt - aborting test")
                     self.abort()
