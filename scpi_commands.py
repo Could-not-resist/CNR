@@ -18,6 +18,8 @@ POWER_SUPPLY_COMMANDS = {
     "setCurrentProt": "SOUR:CURR:PROT:HIGH {amps}",
     "setCurrentSlew": "SOUR:CURR:SLEW {amps}",
     "setPowerProt": "SOUR:POW:PROT:HIGH {watts}",
+    "setDC_Rise": "SOUR:VOLT:RISE {rate}",
+    "setDC_Fall": "SOUR:VOLT:FALL {rate}",
     "getVoltage": "FETCH:VOLT?",
     "getCurrent": "FETCH:CURR?",
     "getPower": "FETCH:POW?",

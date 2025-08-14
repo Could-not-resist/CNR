@@ -36,6 +36,19 @@ python MAIN.py
    continue using mock drivers.
    Use the `-d` flag to print detailed progress messages during a test.
 
+### Instrument resource names
+
+The scripts use preset NI-VISA resource names for the power supply,
+electronic load and multimeter.  These can be overridden:
+
+* Command line options `--ps-resource`, `--el-resource` and `--mm-resource`
+* Environment variables `POWER_SUPPLY_RESOURCE`,
+  `ELECTRONIC_LOAD_RESOURCE` and `MULTIMETER_RESOURCE`
+* Keys `ps_resource`, `el_resource` and `mm_resource` in the selected
+  JSON configuration profile
+
+If none of these are provided the built-in defaults are used.
+
 To perform a full capacity measurement instead of the default cycling test run:
 
 ```bash

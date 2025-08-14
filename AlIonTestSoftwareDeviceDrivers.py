@@ -5,13 +5,15 @@ import pyvisa
 # Class for communication with the NI-VISA driver to control the power supply
 class PowerSupplyController:
     """Control a Chroma 62000P power supply via SCPI commands."""
-    # Variable to keep the resource name of the power supply
+    # Default NI-VISA resource name
     powerSupplyName = "USB0::0x1698::0x0837::011000000136::INSTR"
 
     # Constructor that establishes connection to the power supply
-    def __init__(self) -> None:
+    # ``resource_name`` may override the default VISA resource string.
+    def __init__(self, resource_name: str | None = None) -> None:
         self.resourceManager = pyvisa.ResourceManager()
-        self.powerSupply = self.resourceManager.open_resource(self.powerSupplyName)
+        name = resource_name or self.powerSupplyName
+        self.powerSupply = self.resourceManager.open_resource(name)
         
 
     # Function that returns the name of connected device
@@ -20,38 +22,48 @@ class PowerSupplyController:
 
     # Functions that allow user to set the maximum voltage, current and power for safety
     #### VOLTAGE #### VOLTAGE #### VOLTAGE #### VOLTAGE ####
-    def setVoltage(self, *volts):
-        self.powerSupply.write("SOUR:VOLT " + str((volts[0])))
+    def setVoltage(self, volts: float) -> None:
+        """Set output voltage in volts."""
+        self.powerSupply.write("SOUR:VOLT " + str(volts))
 
-    def setVoltageLimMax(self, *volts):
-        self.powerSupply.write("SOUR:VOLT:LIMIT:HIGH " + str((volts[0])))
+    def setVoltageLimMax(self, volts: float) -> None:
+        """Set upper voltage limit in volts."""
+        self.powerSupply.write("SOUR:VOLT:LIMIT:HIGH " + str(volts))
 
-    def setVoltageLimMin(self, *volts):
-        self.powerSupply.write("SOUR:VOLT:LIMIT:LOW " + str((volts[0])))
+    def setVoltageLimMin(self, volts: float) -> None:
+        """Set lower voltage limit in volts."""
+        self.powerSupply.write("SOUR:VOLT:LIMIT:LOW " + str(volts))
 
-    def setVoltageProt(self, *volts):
-        self.powerSupply.write("SOUR:VOLT:PROT:HIGH " + str((volts[0])))
+    def setVoltageProt(self, volts: float) -> None:
+        """Set over-voltage protection threshold in volts."""
+        self.powerSupply.write("SOUR:VOLT:PROT:HIGH " + str(volts))
 
-    def setVoltageSlew(self, *volts):
-        self.powerSupply.write("SOUR:VOLT:SLEW " + str((volts[0])))
+    def setVoltageSlew(self, volts: float) -> None:
+        """Set voltage slew rate in volts per second."""
+        self.powerSupply.write("SOUR:VOLT:SLEW " + str(volts))
 
     # def setVoltageMax(self):
     #     self.powerSupply.write("SOUR:VOLT:LIMIT:HIGH MAX")  # Could not find MAX command in manual
 
     #### CURRENT #### CURRENT #### CURRENT #### CURRENT ####
-    def setCurrent(self, amps):
+    def setCurrent(self, amps: float) -> None:
+        """Set output current in amps."""
         self.powerSupply.write("SOUR:CURR " + str(amps))
 
-    def setCurrentLimMax(self, amps):
+    def setCurrentLimMax(self, amps: float) -> None:
+        """Set upper current limit in amps."""
         self.powerSupply.write("SOUR:CURR:LIMIT:HIGH " + str(amps))
 
-    def setCurrentLimMin(self, *amps):
-        self.powerSupply.write("SOUR:CURR:LIMIT:LOW " + str(amps[0]))
+    def setCurrentLimMin(self, amps: float) -> None:
+        """Set lower current limit in amps."""
+        self.powerSupply.write("SOUR:CURR:LIMIT:LOW " + str(amps))
 
-    def setCurrentProt(self, *amps):
-        self.powerSupply.write("SOUR:CURR:PROT:HIGH " + str(amps[0]))
+    def setCurrentProt(self, amps: float) -> None:
+        """Set over-current protection threshold in amps."""
+        self.powerSupply.write("SOUR:CURR:PROT:HIGH " + str(amps))
 
-    def setCurrentSlew(self, amps):
+    def setCurrentSlew(self, amps: float) -> None:
+        """Set current slew rate in amps per second."""
         self.powerSupply.write("SOUR:CURR:SLEW " + str(amps))
 
     # def setCurrentMax(self):
@@ -65,11 +77,37 @@ class PowerSupplyController:
     #     self.powerSupply.write("SOUR:POW:PROT:HIGH MAX")  # Could not find MAX command in manual
 
     #### DC RISE/FALL #### DC RISE/FALL #### DC RISE/FALL ####
-    def setDC_Rise(self, *volts):
-        self.powerSupply.write("SOUR:POW:PROT:HIGH " + str(volts[0]))
+    def setDC_Rise(self, rate_v_per_ms: float) -> None:
+        """Set voltage rise rate.
 
-    def setDC_Fall(self, *volts):
-        self.powerSupply.write("SOUR:POW:PROT:HIGH " + str(volts[0]))
+        Args:
+            rate_v_per_ms: Slew rate in volts per millisecond.
+
+        Raises:
+            ValueError: If ``rate_v_per_ms`` is not positive.
+
+        See Chroma 62000P Programming Manual section on
+        ``SOUR:VOLT:RISE`` for parameter limits.
+        """
+        if rate_v_per_ms <= 0:
+            raise ValueError("Rise rate must be positive (V/ms).")
+        self.powerSupply.write(f"SOUR:VOLT:RISE {rate_v_per_ms}")
+
+    def setDC_Fall(self, rate_v_per_ms: float) -> None:
+        """Set voltage fall rate.
+
+        Args:
+            rate_v_per_ms: Slew rate in volts per millisecond.
+
+        Raises:
+            ValueError: If ``rate_v_per_ms`` is not positive.
+
+        See Chroma 62000P Programming Manual section on
+        ``SOUR:VOLT:FALL`` for parameter limits.
+        """
+        if rate_v_per_ms <= 0:
+            raise ValueError("Fall rate must be positive (V/ms).")
+        self.powerSupply.write(f"SOUR:VOLT:FALL {rate_v_per_ms}")
 
     # Functions to read realtime VOLTAGE, CURRENT and POWER from the power supply
     def getVoltage(self):
@@ -122,13 +160,14 @@ class PowerSupplyController:
 # Class for communication with the NI-VISA driver to control the electronic load
 class ElectronicLoadController:
     """Interface to a Chroma 63600 electronic load for discharging cells."""
-    # Variable to keep the resource name of the electronic load
+    # Default NI-VISA resource name
     electronicLoadName = "USB0::0x0A69::0x083E::000000000001::INSTR"
 
     # Constructor that establishes connection to the electronic load
-    def __init__(self) -> None:
+    def __init__(self, resource_name: str | None = None) -> None:
         self.resourceManager = pyvisa.ResourceManager()
-        self.electronicLoad = self.resourceManager.open_resource(self.electronicLoadName)
+        name = resource_name or self.electronicLoadName
+        self.electronicLoad = self.resourceManager.open_resource(name)
 
         # Set and activate the channel that will be used for testing
         self.electronicLoad.write("CHAN 1")
@@ -214,14 +253,14 @@ class ElectronicLoadController:
 # Class for communication with the NI-VISA driver to control the multimeter
 class MultimeterController:
     """Read measurements from a Chroma 51101 multimeter."""
-    
-    # Variable to keep the resource name of the mutimeter
+    # Default NI-VISA resource name
     multimeterName = "USB0::0x1698::0x083F::TW00014586::INSTR"
 
     # Constructor that establishes connection to the multimeter
-    def __init__(self) -> None:
+    def __init__(self, resource_name: str | None = None) -> None:
         self.resourceManager = pyvisa.ResourceManager()
-        self.multimeter = self.resourceManager.open_resource(self.multimeterName)
+        name = resource_name or self.multimeterName
+        self.multimeter = self.resourceManager.open_resource(name)
 
     # Function that returns the name of the connected device
     def checkDeviceConnection(self):
