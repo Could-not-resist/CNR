@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Interactive helper to create UPS and capacity test configuration files.
 
-The generated JSON file uses the following structure:
-{
-  "ups_settings": {...},
-  "capacity_test": {...}
-}
+The script first asks for a ``test_name`` and which type of test to
+configure.  Depending on the chosen type it prompts only for the
+relevant parameters and writes a JSON file using this structure::
+
+    {
+      "test_name": "...",
+      "ups_settings": {...},    # optional
+      "capacity_test": {...}    # optional
+    }
 """
 
 import json
@@ -13,8 +17,8 @@ from pathlib import Path
 from typing import Callable, Any
 
 # Default UPS settings matching MAIN.py constants
+DEFAULT_TEST_NAME = "YUASA"
 UPS_DEFAULTS = {
-    "test_name": "YUASA",
     "temperature": 23.4,
     "charge_volt_prot": 10,
     "charge_current_prot": 100,
@@ -85,9 +89,9 @@ def _prompt_number(prompt: str, caster: Callable[[str], Any], *, default: Any, m
             print(f"Enter a value between {minimum} and {maximum}.")
 
 
-def build_ups_settings() -> dict:
+def build_ups_settings(test_name: str) -> dict:
     """Collect UPS settings from the user with range validation."""
-    ups = {}
+    ups = {"test_name": test_name}
     for field, default in UPS_DEFAULTS.items():
         if isinstance(default, (int, float)):
             minimum, maximum = UPS_RANGES.get(field, (0, 1e9))
@@ -113,11 +117,17 @@ def build_capacity_settings() -> dict:
 
 
 def main() -> None:
-    print("Enter UPS settings:")
-    ups_settings = build_ups_settings()
-    print("\nEnter capacity test parameters:")
-    capacity_settings = build_capacity_settings()
-    config = {"ups_settings": ups_settings, "capacity_test": capacity_settings}
+    test_name = input(f"test_name [{DEFAULT_TEST_NAME}]: ").strip() or DEFAULT_TEST_NAME
+    test_type = input("Test type (ups, capacity, both) [ups]: ").strip().lower() or "ups"
+    config = {"test_name": test_name}
+    if test_type in ("ups", "both"):
+        print("Enter UPS settings:")
+        ups_settings = build_ups_settings(test_name)
+        config["ups_settings"] = ups_settings
+    if test_type in ("capacity", "both"):
+        print("\nEnter capacity test parameters:")
+        capacity_settings = build_capacity_settings()
+        config["capacity_test"] = capacity_settings
     print("\nGenerated configuration:")
     print(json.dumps(config, indent=2))
     filename = input("\nSave under configs/ as (without extension): ").strip() or "test_config"

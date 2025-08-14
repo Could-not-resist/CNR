@@ -140,9 +140,10 @@ python MAIN.py --config-file cell_profiles.json --profile YUASA
 
 Command-line options still override the values loaded from the profile.
 
-An interactive helper `build_test_config.py` prompts for UPS settings and
-capacity‑test parameters and writes a JSON file with a top-level
-`ups_settings` and `capacity_test` section.  The script saves the file under
+An interactive helper `build_test_config.py` first asks for a test name and
+which type of test to configure (UPS, capacity or both).  It then prompts only
+for the relevant parameters and writes a JSON file containing the selected
+sections under a top-level `test_name`.  The script saves the file under
 `configs/` using a name you choose.
 
 This charges the cell at 1C up to the voltage specified by
