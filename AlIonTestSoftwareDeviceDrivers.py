@@ -74,8 +74,8 @@ class PowerSupplyController:
     #     self.powerSupply.write("SOUR:CURR:LIMIT:HIGH MAX")  # Could not find MAX command in manual
 
     #### POWER #### POWER #### POWER #### POWER #### POWER ####
-    def setPowerProt(self, *watt):
-        self.powerSupply.write("SOUR:POW:PROT:HIGH " + str(watt[0]))
+    def setPowerProt(self, watts: float) -> None:
+        self.powerSupply.write("SOUR:POW:PROT:HIGH " + str(watts))
 
     # def setPowerMax(self):
     #     self.powerSupply.write("SOUR:POW:PROT:HIGH MAX")  # Could not find MAX command in manual
