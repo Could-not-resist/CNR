@@ -34,29 +34,29 @@ class DataStorage:
         """Record the measurement timestamp and elapsed time."""
         timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
         self.timestamp.append(timestamp)
-        self.time.append(float('{:.4f}'.format(Mtime_sec)))
+        self.time.append(round(Mtime_sec, 4))
 
     # Function to add voltage value
     def addVoltage(self, volts: float):
         """Append a voltage measurement in volts."""
-        self.volts.append(float('{:.4f}'.format(volts)))
+        self.volts.append(round(volts, 4))
 
     # Function to add current value
     def addCurrent(self, amps: float):
         """Append a current reading in amperes."""
-        self.current.append(float('{:.4f}'.format(amps)))
+        self.current.append(round(amps, 4))
 
     def addMMVoltage(self, volts: float):
         """Append a multimeter voltage reading."""
-        self.mm_volts.append(float('{:.4f}'.format(volts)))
+        self.mm_volts.append(round(volts, 4))
 
     def addMMTemperature(self, temp_c: float):
         """Append a temperature measurement from the multimeter."""
-        self.mm_temp.append(float('{:.4f}'.format(temp_c)))
+        self.mm_temp.append(round(temp_c, 4))
 
     def addCapacity(self, ah: float):
         """Store capacity value in ampere-hours."""
-        self.capacity.append(float('{:.4f}'.format(ah)))
+        self.capacity.append(round(ah, 4))
 
     # Function for creating a table
     def createTable(
@@ -169,7 +169,7 @@ class DataStorage:
     def exportCSVFile(self, filePath, data, head):
         """Write the collected data to a CSV file."""
         df = pd.DataFrame(data, columns=head)
-        df.to_csv(filePath + ".csv", index=False)
+        df.to_csv(filePath + ".csv", index=False, float_format="%.4f")
 
     def exportXLSXFile(self, filePath, chargeTime, timeInterval):
         """Create an Excel workbook with optional graphs."""
@@ -178,7 +178,7 @@ class DataStorage:
         # Create our excel file
         xlsxDataframe = pd.ExcelWriter(filePath + ".xlsx", engine='openpyxl')
         # Write from csv to excel
-        csvDataframe.to_excel(xlsxDataframe, index=False)
+        csvDataframe.to_excel(xlsxDataframe, index=False, float_format="%.4f")
         # Save our excel file
         xlsxDataframe.close()
 
