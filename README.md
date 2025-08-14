@@ -128,6 +128,11 @@ python MAIN.py --config-file cell_profiles.json --profile YUASA
 
 Command-line options still override the values loaded from the profile.
 
+An interactive helper `build_test_config.py` prompts for UPS settings and
+capacity‑test parameters and writes a JSON file with a top-level
+`ups_settings` and `capacity_test` section.  The script saves the file under
+`configs/` using a name you choose.
+
 This charges the cell at 1C up to the voltage specified by
 `--capacity-charge-voltage` (default taken from `--charge-volt-end`),
 rests for the duration given by `--capacity-rest-time` (default one hour)
