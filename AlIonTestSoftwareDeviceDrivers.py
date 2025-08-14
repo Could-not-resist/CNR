@@ -272,7 +272,7 @@ class ElectronicLoadController:
 
 # Class for communication with the NI-VISA driver to control the multimeter
 class MultimeterController:
-    """Read measurements from a Chroma 51101 multimeter."""
+    """Read measurements from a Chroma 12061 multimeter."""
     # Default NI-VISA resource name
     multimeterName = "USB0::0x1698::0x083F::TW00014586::INSTR"
 
