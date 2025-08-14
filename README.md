@@ -2,7 +2,7 @@
 
 This project contains Python scripts for automated charging and discharging tests.
 It communicates with a **Chroma 63600 Modular DC Electronic Load**, a
-**Chroma 62000P Programmable DC Power Supply** and a **Chroma 51101 multimeter**
+**Chroma 62000P Programmable DC Power Supply** and a **Chroma 12061 multimeter**
 to perform UPS battery cycling and log the resulting data.
 
 ## Project structure
@@ -38,7 +38,7 @@ pip install pyvisa pandas openpyxl matplotlib tabulate
 ## Usage
 
 1. Connect the Chroma 63600 electronic load, Chroma 62000P power supply and
-   Chroma 51101 multimeter to your PC and ensure the NI-VISA drivers are
+   Chroma 12061 multimeter to your PC and ensure the NI-VISA drivers are
    installed.
 2. Adjust the charge/discharge parameters using command-line options, or
    provide a JSON configuration file with cell profiles and capacity defaults.
