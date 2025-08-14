@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
-"""Interactive helper to create custom and capacity test configuration files.
+"""Interactive helper to build test configuration profiles.
 
-The script first asks for a ``test_name`` and which type of test to
-configure.  Depending on the chosen type it prompts only for the
-relevant parameters and writes a JSON file using this structure::
+The tool asks for a ``test_name`` and a ``test_type`` such as
+``custom``, ``actual_capacity_test`` or ``efficiency_test``.  It then
+prompts only for the parameters relevant to that test and writes a JSON
+snippet compatible with ``cell_profiles.json`` using the format::
 
     {
-      "test_name": "...",
-      "custom_settings": {...},    # optional
-      "capacity_test": {...}    # optional
+      "test_type": "custom",
+      "parameters": {
+        "test_name": "...",
+        ...
+      }
     }
 """
 
@@ -63,7 +66,6 @@ CAPACITY_DEFAULTS = {
     "charge_current": 1.0,
     "finish_current": 1.5,
     "discharge_current": 1.0,
-    "multimeter_mode": None,
 }
 
 CAPACITY_RANGES = {
@@ -73,6 +75,63 @@ CAPACITY_RANGES = {
     "charge_current": (0, 1000),
     "finish_current": (0, 1000),
     "discharge_current": (0, 1000),
+}
+
+EFFICIENCY_DEFAULTS = {
+    "charge_current": 1.0,
+    "discharge_current": 1.0,
+    "charge_voltage": 4.1,
+    "discharge_voltage": 2.75,
+    "temperature": 20.0,
+}
+
+EFFICIENCY_RANGES = {
+    "charge_current": (0, 1000),
+    "discharge_current": (0, 1000),
+    "charge_voltage": (0, 1000),
+    "discharge_voltage": (0, 1000),
+    "temperature": (-50, 150),
+}
+
+RATE_DEFAULTS = {
+    "discharge_currents": [1.0, 0.5, 0.2],
+    "charge_current": 1.0,
+    "charge_voltage": 4.1,
+    "discharge_voltage": 2.75,
+    "temperature": 20.0,
+}
+
+RATE_RANGES = {
+    "charge_current": (0, 1000),
+    "charge_voltage": (0, 1000),
+    "discharge_voltage": (0, 1000),
+    "temperature": (-50, 150),
+}
+
+OCV_DEFAULTS = {
+    "step_current": 1.0,
+    "steps": 10,
+    "rest_time": 1800.0,
+    "temperature": 20.0,
+}
+
+OCV_RANGES = {
+    "step_current": (0, 1000),
+    "steps": (1, 1000),
+    "rest_time": (0, 86400),
+    "temperature": (-50, 150),
+}
+
+RESISTANCE_DEFAULTS = {
+    "pulse_current": 1.0,
+    "pulse_duration": 1.0,
+    "temperature": 20.0,
+}
+
+RESISTANCE_RANGES = {
+    "pulse_current": (0, 1000),
+    "pulse_duration": (0, 86400),
+    "temperature": (-50, 150),
 }
 
 
@@ -103,31 +162,113 @@ def build_custom_settings(test_name: str) -> dict:
     return custom
 
 
-def build_capacity_settings() -> dict:
-    """Collect capacity test parameters from the user."""
-    cap = {}
+def build_capacity_settings(test_name: str) -> dict:
+    """Collect parameters for ``actual_capacity_test``."""
+    cap = {"test_name": test_name}
     for field, default in CAPACITY_DEFAULTS.items():
-        if field == "multimeter_mode":
-            val = input(f"{field} [{default if default else 'none'}]: ")
-            cap[field] = val if val else default
-            continue
         minimum, maximum = CAPACITY_RANGES[field]
         cap[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
     return cap
 
 
+def build_efficiency_settings(test_name: str) -> dict:
+    """Collect parameters for ``efficiency_test``."""
+    eff = {"test_name": test_name}
+    for field, default in EFFICIENCY_DEFAULTS.items():
+        minimum, maximum = EFFICIENCY_RANGES[field]
+        eff[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
+    return eff
+
+
+def build_rate_settings(test_name: str) -> dict:
+    """Collect parameters for ``rate_characteristic_test``."""
+    rate = {"test_name": test_name}
+    default_rates = ",".join(str(r) for r in RATE_DEFAULTS["discharge_currents"])
+    raw = input(f"discharge_currents comma separated [{default_rates}]: ") or default_rates
+    try:
+        currents = [float(x) for x in raw.split(",") if x.strip()]
+    except ValueError:
+        print("Invalid input, using defaults")
+        currents = RATE_DEFAULTS["discharge_currents"]
+    rate["discharge_currents"] = currents
+    for field in ("charge_current", "charge_voltage", "discharge_voltage", "temperature"):
+        default = RATE_DEFAULTS[field]
+        minimum, maximum = RATE_RANGES[field]
+        rate[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
+    return rate
+
+
+def build_ocv_settings(test_name: str) -> dict:
+    """Collect parameters for ``ocv_curve_test``."""
+    ocv = {"test_name": test_name}
+    ocv["step_current"] = _prompt_number(
+        "step_current",
+        float,
+        default=OCV_DEFAULTS["step_current"],
+        minimum=OCV_RANGES["step_current"][0],
+        maximum=OCV_RANGES["step_current"][1],
+    )
+    ocv["steps"] = _prompt_number(
+        "steps",
+        int,
+        default=OCV_DEFAULTS["steps"],
+        minimum=OCV_RANGES["steps"][0],
+        maximum=OCV_RANGES["steps"][1],
+    )
+    ocv["rest_time"] = _prompt_number(
+        "rest_time",
+        float,
+        default=OCV_DEFAULTS["rest_time"],
+        minimum=OCV_RANGES["rest_time"][0],
+        maximum=OCV_RANGES["rest_time"][1],
+    )
+    ocv["temperature"] = _prompt_number(
+        "temperature",
+        float,
+        default=OCV_DEFAULTS["temperature"],
+        minimum=OCV_RANGES["temperature"][0],
+        maximum=OCV_RANGES["temperature"][1],
+    )
+    return ocv
+
+
+def build_resistance_settings(test_name: str) -> dict:
+    """Collect parameters for ``internal_resistance_test``."""
+    res = {"test_name": test_name}
+    for field, default in RESISTANCE_DEFAULTS.items():
+        minimum, maximum = RESISTANCE_RANGES[field]
+        res[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
+    return res
+
+
 def main() -> None:
     test_name = input(f"test_name [{DEFAULT_TEST_NAME}]: ").strip() or DEFAULT_TEST_NAME
-    test_type = input("Test type (custom, capacity, both) [custom]: ").strip().lower() or "custom"
-    config = {"test_name": test_name}
-    if test_type in ("custom", "both"):
-        print("Enter custom test settings:")
-        custom_settings = build_custom_settings(test_name)
-        config["custom_settings"] = custom_settings
-    if test_type in ("capacity", "both"):
-        print("\nEnter capacity test parameters:")
-        capacity_settings = build_capacity_settings()
-        config["capacity_test"] = capacity_settings
+    test_type = (
+        input(
+            "Test type (custom, actual_capacity_test, efficiency_test, rate_characteristic_test, ocv_curve_test, internal_resistance_test) [custom]: "
+        )
+        .strip()
+        .lower()
+        or "custom"
+    )
+
+    builders = {
+        "custom": build_custom_settings,
+        "actual_capacity_test": build_capacity_settings,
+        "efficiency_test": build_efficiency_settings,
+        "rate_characteristic_test": build_rate_settings,
+        "ocv_curve_test": build_ocv_settings,
+        "internal_resistance_test": build_resistance_settings,
+    }
+    builder = builders.get(test_type)
+    if builder is None:
+        print(f"Unsupported test type: {test_type}")
+        return
+
+    print(f"Enter {test_type} parameters:")
+    params = builder(test_name)
+    config = {"test_type": test_type, "parameters": params}
+
     print("\nGenerated configuration:")
     print(json.dumps(config, indent=2))
     filename = input("\nSave under configs/ as (without extension): ").strip() or "test_config"
