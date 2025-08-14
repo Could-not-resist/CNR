@@ -197,11 +197,6 @@ def main():
         help="log measurement with multimeter (voltage or thermocouple)"
     )
     parser.add_argument(
-        "--use-multimeter",
-        action="store_true",
-        help="DEPRECATED: same as --multimeter-mode voltage"
-    )
-    parser.add_argument(
         "-d",
         "--debug",
         action="store_true",
@@ -210,14 +205,10 @@ def main():
 
     args = parser.parse_args()
 
-    if args.multimeter_mode is None and args.use_multimeter:
-        args.multimeter_mode = "tcouple"
-
     profile = args.profile or args.test_name or TEST_NAME
     config = {}
-    capacity_defaults = {}
     if args.config_file:
-        config, capacity_defaults = load_config(args.config_file, profile)
+        config = load_config(args.config_file, profile)
 
     ps_resource = (
         args.ps_resource
@@ -266,8 +257,6 @@ def main():
     multimeter_mode = args.multimeter_mode
     if multimeter_mode is None:
         multimeter_mode = capacity_defaults.get("multimeter_mode")
-        if multimeter_mode is None and args.use_multimeter:
-            multimeter_mode = "voltage"
 
     cap_charge_volt = args.capacity_charge_voltage
     if cap_charge_volt is None:
