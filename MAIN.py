@@ -167,18 +167,29 @@ def main():
                         help="run rate characteristic test")
     parser.add_argument("--ocv-curve-test", action="store_true",
                         help="run OCV curve test")
-    parser.add_argument("--internal-resistance-test", action="store_true",
-                        help="run internal resistance test")
+    parser.add_argument(
+        "--internal-resistance-test",
+        action="store_true",
+        help="run internal resistance test (no capacity measurement)",
+    )
     parser.add_argument("--rates", default="1.0,0.5,0.2",
                         help="comma separated discharge rates in A")
     parser.add_argument("--step-current", type=float, default=1.0,
                         help="step current for OCV curve")
     parser.add_argument("--steps", type=int, default=10,
                         help="number of steps for OCV curve")
-    parser.add_argument("--pulse-current", type=float, default=1.0,
-                        help="pulse current for resistance test")
-    parser.add_argument("--pulse-duration", type=float, default=1.0,
-                        help="pulse duration in seconds")
+    parser.add_argument(
+        "--pulse-current",
+        type=float,
+        default=1.0,
+        help="pulse current for internal resistance test",
+    )
+    parser.add_argument(
+        "--pulse-duration",
+        type=float,
+        default=1.0,
+        help="pulse duration for internal resistance test in seconds",
+    )
     parser.add_argument(
         "--multimeter-mode",
         choices=["voltage", "tcouple"],
@@ -320,7 +331,7 @@ def main():
             temperature,
         )
     elif args.internal_resistance_test:
-        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
+
         tc.internal_resistance_test(
             args.pulse_current,
             args.pulse_duration,

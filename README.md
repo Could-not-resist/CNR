@@ -113,7 +113,8 @@ Additional tests can be invoked with the following flags:
   ```
 
   Applies a short current pulse to determine the DC and AC resistance of the
-  cell.
+  cell. This command only measures resistance; run `--actual-capacity-test`
+  separately to measure capacity.
 
 ### Using configuration files
 
