@@ -5,13 +5,15 @@ import pyvisa
 # Class for communication with the NI-VISA driver to control the power supply
 class PowerSupplyController:
     """Control a Chroma 62000P power supply via SCPI commands."""
-    # Variable to keep the resource name of the power supply
+    # Default NI-VISA resource name
     powerSupplyName = "USB0::0x1698::0x0837::011000000136::INSTR"
 
     # Constructor that establishes connection to the power supply
-    def __init__(self) -> None:
+    # ``resource_name`` may override the default VISA resource string.
+    def __init__(self, resource_name: str | None = None) -> None:
         self.resourceManager = pyvisa.ResourceManager()
-        self.powerSupply = self.resourceManager.open_resource(self.powerSupplyName)
+        name = resource_name or self.powerSupplyName
+        self.powerSupply = self.resourceManager.open_resource(name)
         
 
     # Function that returns the name of connected device
@@ -122,13 +124,14 @@ class PowerSupplyController:
 # Class for communication with the NI-VISA driver to control the electronic load
 class ElectronicLoadController:
     """Interface to a Chroma 63600 electronic load for discharging cells."""
-    # Variable to keep the resource name of the electronic load
+    # Default NI-VISA resource name
     electronicLoadName = "USB0::0x0A69::0x083E::000000000001::INSTR"
 
     # Constructor that establishes connection to the electronic load
-    def __init__(self) -> None:
+    def __init__(self, resource_name: str | None = None) -> None:
         self.resourceManager = pyvisa.ResourceManager()
-        self.electronicLoad = self.resourceManager.open_resource(self.electronicLoadName)
+        name = resource_name or self.electronicLoadName
+        self.electronicLoad = self.resourceManager.open_resource(name)
 
         # Set and activate the channel that will be used for testing
         self.electronicLoad.write("CHAN 1")
@@ -214,14 +217,14 @@ class ElectronicLoadController:
 # Class for communication with the NI-VISA driver to control the multimeter
 class MultimeterController:
     """Read measurements from a Chroma 51101 multimeter."""
-    
-    # Variable to keep the resource name of the mutimeter
+    # Default NI-VISA resource name
     multimeterName = "USB0::0x1698::0x083F::TW00014586::INSTR"
 
     # Constructor that establishes connection to the multimeter
-    def __init__(self) -> None:
+    def __init__(self, resource_name: str | None = None) -> None:
         self.resourceManager = pyvisa.ResourceManager()
-        self.multimeter = self.resourceManager.open_resource(self.multimeterName)
+        name = resource_name or self.multimeterName
+        self.multimeter = self.resourceManager.open_resource(name)
 
     # Function that returns the name of the connected device
     def checkDeviceConnection(self):
