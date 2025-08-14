@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 import argparse
 import json
+import os
 from pathlib import Path
 from AlIonBatteryTestSoftware import TestController
 
@@ -72,8 +73,17 @@ def load_config(config_path: str, profile: str) -> dict:
 
 
 class TestTypes:
-    def __init__(self, multimeter_mode: str | None = None, debug: bool = False):
-        self.testController = TestController(multimeter_mode, debug)
+    def __init__(
+        self,
+        multimeter_mode: str | None = None,
+        debug: bool = False,
+        ps_resource: str | None = None,
+        el_resource: str | None = None,
+        mm_resource: str | None = None,
+    ):
+        self.testController = TestController(
+            multimeter_mode, debug, ps_resource, el_resource, mm_resource
+        )
         self.upsThread = None
 
     def runUPSTest(self, settings: UPSSettings):
@@ -118,6 +128,9 @@ def main():
     parser.add_argument("--config-file", help="JSON file with cell settings")
     parser.add_argument("--profile", help="cell profile name in config file")
     parser.add_argument("--capacity-config", help="JSON defaults for capacity test")
+    parser.add_argument("--ps-resource", help="VISA resource name for power supply")
+    parser.add_argument("--el-resource", help="VISA resource name for electronic load")
+    parser.add_argument("--mm-resource", help="VISA resource name for multimeter")
     parser.add_argument("--test-name")
     parser.add_argument("--temperature", type=float)
     parser.add_argument("--charge-volt-prot", type=int)
@@ -193,6 +206,22 @@ def main():
     if args.config_file:
         config = load_config(args.config_file, profile)
 
+    ps_resource = (
+        args.ps_resource
+        or os.getenv("POWER_SUPPLY_RESOURCE")
+        or config.get("ps_resource")
+    )
+    el_resource = (
+        args.el_resource
+        or os.getenv("ELECTRONIC_LOAD_RESOURCE")
+        or config.get("el_resource")
+    )
+    mm_resource = (
+        args.mm_resource
+        or os.getenv("MULTIMETER_RESOURCE")
+        or config.get("mm_resource")
+    )
+
     capacity_defaults = {}
     if args.capacity_config:
         try:
@@ -253,7 +282,7 @@ def main():
         finish_current = capacity_defaults.get("finish_current", 1.5)
 
     if args.actual_capacity_test:
-        tc = TestController(multimeter_mode, args.debug)
+        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
         tc.actual_capacity_test(
             cap_charge_current,
             cap_discharge_current,
@@ -264,7 +293,7 @@ def main():
             finish_current,
         )
     elif args.efficiency_test:
-        tc = TestController(multimeter_mode, args.debug)
+        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
         tc.efficiency_test(
             charge_current_max,
             dcharge_current_max,
@@ -274,7 +303,7 @@ def main():
         )
     elif args.rate_characteristic_test:
         rates = [float(r) for r in args.rates.split(',') if r]
-        tc = TestController(multimeter_mode, args.debug)
+        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
         tc.rate_characteristic_test(
             rates,
             charge_current_max,
@@ -283,7 +312,7 @@ def main():
             temperature,
         )
     elif args.ocv_curve_test:
-        tc = TestController(multimeter_mode, args.debug)
+        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
         tc.ocv_curve_test(
             args.step_current,
             args.steps,
@@ -291,7 +320,7 @@ def main():
             temperature,
         )
     elif args.internal_resistance_test:
-        tc = TestController(multimeter_mode, args.debug)
+        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
         tc.internal_resistance_test(
             args.pulse_current,
             args.pulse_duration,
@@ -316,7 +345,7 @@ def main():
                 kwargs[field] = val
         settings = UPSSettings(**kwargs)
 
-        TObj = TestTypes(multimeter_mode, args.debug)
+        TObj = TestTypes(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
         thread = TObj.runUPSTest(settings)
         try:
             while thread.is_alive():

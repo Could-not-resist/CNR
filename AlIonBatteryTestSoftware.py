@@ -19,17 +19,24 @@ class TestController:
     # Variable for keeping track of the C-rate of the battery
 
     # Initiating function
-    def __init__(self, multimeter_mode: str | None = None, debug: bool = False) -> None:
+    def __init__(
+        self,
+        multimeter_mode: str | None = None,
+        debug: bool = False,
+        ps_resource: str | None = None,
+        el_resource: str | None = None,
+        mm_resource: str | None = None,
+    ) -> None:
         self.multimeter_mode = multimeter_mode
         self.debug = debug
         try:
             # Trying to connect to the real device controllers
-            self.powerSupplyController = PowerSupplyController()
+            self.powerSupplyController = PowerSupplyController(ps_resource)
             print("Testcontroller succesfully connected to Power Supply")
-            self.electronicLoadController = ElectronicLoadController()
+            self.electronicLoadController = ElectronicLoadController(el_resource)
             print("Testcontroller succesfully connected to Electronic Load")
             if multimeter_mode:
-                self.multimeterController = MultimeterController()
+                self.multimeterController = MultimeterController(mm_resource)
                 print("Testcontroller succesfully connected to Multimeter")
                 if multimeter_mode == "tcouple":
                     self.multimeterController.configure_thermocouple()
