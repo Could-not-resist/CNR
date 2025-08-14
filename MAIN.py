@@ -6,23 +6,24 @@ import json
 import os
 from pathlib import Path
 from AlIonBatteryTestSoftware import TestController
+from defaults import DEFAULT_LIMITS
 
 # Charge/discharge voltage and current limits
 CHARGE_VOLT_START: float = 4.1    # V
-CHARGE_VOLT_END: float = 4.1    # V
-CHARGE_CURRENT_MAX: float = 5.0    # A
+CHARGE_VOLT_END: float = DEFAULT_LIMITS["CHARGE_VOLT_END"]
+CHARGE_CURRENT_MAX: float = DEFAULT_LIMITS["CHARGE_CURRENT_MAX"]
 
 DCHARGE_VOLT_MIN: float = 2.75    # V
 DCHARGE_CURRENT_MAX: float = 20    # A
 
-CHARGE_VOLT_PROT: int = 10    # V
-CHARGE_CURRENT_PROT: int = 100    # A
-CHARGE_POWER_PROT: int = 2000    # Watts
+CHARGE_VOLT_PROT: int = DEFAULT_LIMITS["CHARGE_VOLT_PROT"]
+CHARGE_CURRENT_PROT: int = DEFAULT_LIMITS["CHARGE_CURRENT_PROT"]
+CHARGE_POWER_PROT: int = DEFAULT_LIMITS["CHARGE_POWER_PROT"]
 
 
 # Slew (ramp) settings
-SLEW_VOLT: float = 0.1    # V/ms
-SLEW_CURRENT: float = 0.1    # A/ms
+SLEW_VOLT: float = DEFAULT_LIMITS["SLEW_VOLT"]
+SLEW_CURRENT: float = DEFAULT_LIMITS["SLEW_CURRENT"]
 
 # Timing (in seconds)
 # Ramp duration for increasing the charge voltage from CHARGE_VOLT_START

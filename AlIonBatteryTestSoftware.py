@@ -8,6 +8,7 @@ import os
 from AlIonTestSoftwareDeviceDrivers import PowerSupplyController, ElectronicLoadController, MultimeterController
 from AlIonTestSoftwareDeviceDriversMock import PowerSupplyControllerMock, ElectronicLoadControllerMock, MultimeterControllerMock
 from AlIonTestSoftwareDataManagement import DataStorage
+from defaults import DEFAULT_LIMITS
 
 import struct
 try:
@@ -293,13 +294,13 @@ class TestController:
                 SLEW_CURRENT,
             )
         except Exception:
-            CHARGE_VOLT_PROT = 10
-            CHARGE_CURRENT_PROT = 10
-            CHARGE_POWER_PROT = 2000
-            CHARGE_VOLT_END = 4.1
-            CHARGE_CURRENT_MAX = 5.0
-            SLEW_VOLT = 0.1
-            SLEW_CURRENT = 0.1
+            CHARGE_VOLT_PROT = DEFAULT_LIMITS["CHARGE_VOLT_PROT"]
+            CHARGE_CURRENT_PROT = DEFAULT_LIMITS["CHARGE_CURRENT_PROT"]
+            CHARGE_POWER_PROT = DEFAULT_LIMITS["CHARGE_POWER_PROT"]
+            CHARGE_VOLT_END = DEFAULT_LIMITS["CHARGE_VOLT_END"]
+            CHARGE_CURRENT_MAX = DEFAULT_LIMITS["CHARGE_CURRENT_MAX"]
+            SLEW_VOLT = DEFAULT_LIMITS["SLEW_VOLT"]
+            SLEW_CURRENT = DEFAULT_LIMITS["SLEW_CURRENT"]
 
         charge_volt_prot = CHARGE_VOLT_PROT if charge_volt_prot is None else charge_volt_prot
         charge_current_prot = CHARGE_CURRENT_PROT if charge_current_prot is None else charge_current_prot
