@@ -5,9 +5,9 @@ from datetime import datetime
 from datetime import timedelta
 import threading
 import os
-from AlIonTestSoftwareDeviceDrivers import PowerSupplyController, ElectronicLoadController, MultimeterController
-from AlIonTestSoftwareDeviceDriversMock import PowerSupplyControllerMock, ElectronicLoadControllerMock, MultimeterControllerMock
-from AlIonTestSoftwareDataManagement import DataStorage
+from al_ion_test_software_device_drivers import PowerSupplyController, ElectronicLoadController, MultimeterController
+from al_ion_test_software_device_drivers_mock import PowerSupplyControllerMock, ElectronicLoadControllerMock, MultimeterControllerMock
+from al_ion_test_software_data_management import DataStorage
 from defaults import DEFAULT_LIMITS, DEFAULT_SAMPLE_INTERVAL
 
 import struct

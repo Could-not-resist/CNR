@@ -526,9 +526,9 @@ def main():
     if args.dry_run:
         return
 
-    from AlIonBatteryTestSoftware import TestController
+    from al_ion_battery_test_software import TestController
     try:
-        from AlIonBatteryTestSoftware import VisaIOError
+        from al_ion_battery_test_software import VisaIOError
     except ImportError:  # pragma: no cover - falls back when mock is used
         VisaIOError = Exception
     try:
@@ -555,5 +555,5 @@ if __name__ == "__main__":
 # This allows running the script directly from the command line
 
 # Example usage:
-# python MAIN.py --profile YUASA
-# python MAIN.py --profile YUASA_ACT1 -d
+# python main.py --profile YUASA
+# python main.py --profile YUASA_ACT1 -d

@@ -10,7 +10,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-MAIN = importlib.import_module("MAIN")
+MAIN = importlib.import_module("main")
 
 
 def test_num_cycles_cli_overrides_profile(monkeypatch):
@@ -19,13 +19,13 @@ def test_num_cycles_cli_overrides_profile(monkeypatch):
     tc_instance = MagicMock()
     tc_cls = MagicMock(return_value=tc_instance)
     dummy_module = types.SimpleNamespace(TestController=tc_cls)
-    monkeypatch.setitem(sys.modules, "AlIonBatteryTestSoftware", dummy_module)
+    monkeypatch.setitem(sys.modules, "al_ion_battery_test_software", dummy_module)
 
     monkeypatch.setattr(
         sys,
         "argv",
         [
-            "MAIN.py",
+            "main.py",
             "--profile",
             "YUASA_CUSTOM1",
             "--num-cycles",
@@ -54,13 +54,13 @@ def test_multimeter_mode_cli_overrides_profile(monkeypatch):
     tc_instance = MagicMock()
     tc_cls = MagicMock(return_value=tc_instance)
     dummy_module = types.SimpleNamespace(TestController=tc_cls)
-    monkeypatch.setitem(sys.modules, "AlIonBatteryTestSoftware", dummy_module)
+    monkeypatch.setitem(sys.modules, "al_ion_battery_test_software", dummy_module)
 
     monkeypatch.setattr(
         sys,
         "argv",
         [
-            "MAIN.py",
+            "main.py",
             "--profile",
             "YUASA_CUSTOM1",
             "--multimeter-mode",
