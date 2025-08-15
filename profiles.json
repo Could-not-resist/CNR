@@ -1,50 +1,14 @@
 {
-  "YUASA": {
-    "test_type": "custom",
+  "YUASA_ACT1": {
+    "test_type": "actual_capacity_test",
     "parameters": {
-      "charge_volt_start": 4.1,
-      "charge_volt_end": 4.1,
-      "charge_current_max": 10.0,
-      "dcharge_volt_min": 2.75,
-      "dcharge_current_max": 10,
-      "charge_volt_prot": 5,
-      "charge_current_prot": 50,
-      "charge_power_prot": 2000,
-      "slew_volt": 0.1,
-      "slew_current": 0.1,
-      "leadin_time": 1,
-      "charge_time": 5,
-      "dcharge_time": 5,
-      "num_cycles": 1,
-      "temperature": 27.0,
-      "test_name": "YUASA"
-    }
-  },
-  "SAMSUNG": {
-    "test_type": "efficiency_test",
-    "parameters": {
-      "charge_volt_start": 16.21,
-      "charge_volt_end": 16.4,
-      "charge_current_max": 5.0,
-      "dcharge_volt_min": 11.0,
-      "dcharge_current_max": 1,
-      "charge_volt_prot": 20,
-      "charge_current_prot": 10,
-      "charge_power_prot": 2000,
-      "slew_volt": 0.1,
-      "slew_current": 0.1,
-      "leadin_time": 1,
-      "charge_time": 5,
-      "dcharge_time": 5,
-      "num_cycles": 1,
-      "temperature": 27.0,
-      "test_name": "SAMSUNG"
-    }
-  },
-  "LG": {
-    "test_type": "custom",
-    "parameters": {
-      "test_name": "LG"
+      "test_name": "YUASA_ACT1",
+      "rest_time": 60.0,
+      "charge_voltage": 4.1,
+      "min_voltage": 2.75,
+      "charge_current": 20.0,
+      "finish_current": 1.5,
+      "discharge_current": 20.0
     }
   }
 }
