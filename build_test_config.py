@@ -22,6 +22,11 @@ from defaults import DEFAULT_LIMITS, DEFAULT_TEST_PARAMS
 
 # Default custom test settings matching MAIN.py constants
 DEFAULT_TEST_NAME = DEFAULT_TEST_PARAMS["TEST_NAME"]
+
+# Multimeter mode options
+MULTIMETER_CHOICES = ("voltage", "tcouple")
+MULTIMETER_DEFAULT = "tcouple"
+
 CUSTOM_DEFAULTS = {
     "temperature": DEFAULT_TEST_PARAMS["TEMPERATURE"],
     "charge_volt_prot": DEFAULT_LIMITS["CHARGE_VOLT_PROT"],
@@ -38,7 +43,6 @@ CUSTOM_DEFAULTS = {
     "charge_time": DEFAULT_TEST_PARAMS["CHARGE_TIME"],
     "dcharge_time": DEFAULT_TEST_PARAMS["DCHARGE_TIME"],
     "num_cycles": DEFAULT_TEST_PARAMS["NUM_CYCLES"],
-    "multimeter_mode": None,
 }
 
 # Ranges for validation
@@ -149,6 +153,17 @@ def _prompt_number(prompt: str, caster: Callable[[str], Any], *, default: Any, m
             print(f"Enter a value between {minimum} and {maximum}.")
 
 
+def _prompt_multimeter_mode() -> str:
+    """Prompt for a multimeter mode from ``MULTIMETER_CHOICES``."""
+    choices = ", ".join(MULTIMETER_CHOICES)
+    prompt = f"multimeter_mode ({choices}) [{MULTIMETER_DEFAULT}]: "
+    while True:
+        mode = input(prompt).strip().lower() or MULTIMETER_DEFAULT
+        if mode in MULTIMETER_CHOICES:
+            return mode
+        print(f"Enter one of: {choices}.")
+
+
 def build_custom_settings(test_name: str) -> dict:
     """Collect custom test settings from the user with range validation."""
     custom = {"test_name": test_name}
@@ -160,6 +175,7 @@ def build_custom_settings(test_name: str) -> dict:
         else:
             val = input(f"{field} [{default if default is not None else 'none'}]: ")
             custom[field] = val if val else default
+    custom["multimeter_mode"] = _prompt_multimeter_mode()
     return custom
 
 
@@ -169,6 +185,7 @@ def build_capacity_settings(test_name: str) -> dict:
     for field, default in CAPACITY_DEFAULTS.items():
         minimum, maximum = CAPACITY_RANGES[field]
         cap[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
+    cap["multimeter_mode"] = _prompt_multimeter_mode()
     return cap
 
 
@@ -178,6 +195,7 @@ def build_efficiency_settings(test_name: str) -> dict:
     for field, default in EFFICIENCY_DEFAULTS.items():
         minimum, maximum = EFFICIENCY_RANGES[field]
         eff[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
+    eff["multimeter_mode"] = _prompt_multimeter_mode()
     return eff
 
 
@@ -196,6 +214,7 @@ def build_rate_settings(test_name: str) -> dict:
         default = RATE_DEFAULTS[field]
         minimum, maximum = RATE_RANGES[field]
         rate[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
+    rate["multimeter_mode"] = _prompt_multimeter_mode()
     return rate
 
 
@@ -230,6 +249,7 @@ def build_ocv_settings(test_name: str) -> dict:
         minimum=OCV_RANGES["temperature"][0],
         maximum=OCV_RANGES["temperature"][1],
     )
+    ocv["multimeter_mode"] = _prompt_multimeter_mode()
     return ocv
 
 
@@ -239,6 +259,7 @@ def build_resistance_settings(test_name: str) -> dict:
     for field, default in RESISTANCE_DEFAULTS.items():
         minimum, maximum = RESISTANCE_RANGES[field]
         res[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
+    res["multimeter_mode"] = _prompt_multimeter_mode()
     return res
 
 
