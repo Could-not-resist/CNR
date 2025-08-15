@@ -71,6 +71,9 @@ Common commands:
   The profile name must exist in the configuration file; otherwise an error
   is reported.
 
+  The `--test-name` option does not select profiles. It only sets the
+  name used in output files when running without `--profile`.
+
   When the profile supplies a `test_type` and all required parameters, tests
   can be launched without any additional command‑line options. Passing a
   command-line test type flag (for example, `--efficiency-test`) overrides the
@@ -284,7 +287,7 @@ common flags accepted by `MAIN.py` are listed below. Run
 
 | Option | Description |
 | --- | --- |
-| `--test-name` | Name used for log and output files |
+| `--test-name` | Name used for log and output files when no profile is selected |
 | `--temperature` | Ambient temperature in °C |
 | `--charge-volt-prot` | Overvoltage protection limit |
 | `--charge-current-prot` | Overcurrent protection limit |
