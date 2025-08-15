@@ -10,7 +10,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-MAIN = importlib.import_module("MAIN")
+main_module = importlib.import_module("main")
 
 
 def test_num_cycles_cli_overrides_profile(monkeypatch):
@@ -19,13 +19,13 @@ def test_num_cycles_cli_overrides_profile(monkeypatch):
     tc_instance = MagicMock()
     tc_cls = MagicMock(return_value=tc_instance)
     dummy_module = types.SimpleNamespace(TestController=tc_cls)
-    monkeypatch.setitem(sys.modules, "AlIonBatteryTestSoftware", dummy_module)
+    monkeypatch.setitem(sys.modules, "al_ion_battery_test_software", dummy_module)
 
     monkeypatch.setattr(
         sys,
         "argv",
         [
-            "MAIN.py",
+            "main.py",
             "--profile",
             "YUASA_CUSTOM1",
             "--num-cycles",
@@ -33,7 +33,7 @@ def test_num_cycles_cli_overrides_profile(monkeypatch):
         ],
     )
 
-    MAIN.main()
+    main_module.main()
 
     tc_cls.assert_called_once()
     tc_instance.custom_test.assert_called_once()
@@ -45,7 +45,7 @@ def test_validate_required_keys_missing_parameters():
     profile = {"parameters": {"temperature": 25.0}}
     required = {"custom": ["temperature", "dcharge_current_max"]}
     with pytest.raises(KeyError) as excinfo:
-        MAIN.validate_required_keys(profile, required, "custom")
+        main_module.validate_required_keys(profile, required, "custom")
     assert "dcharge_current_max" in str(excinfo.value)
 
 
@@ -54,13 +54,13 @@ def test_multimeter_mode_cli_overrides_profile(monkeypatch):
     tc_instance = MagicMock()
     tc_cls = MagicMock(return_value=tc_instance)
     dummy_module = types.SimpleNamespace(TestController=tc_cls)
-    monkeypatch.setitem(sys.modules, "AlIonBatteryTestSoftware", dummy_module)
+    monkeypatch.setitem(sys.modules, "al_ion_battery_test_software", dummy_module)
 
     monkeypatch.setattr(
         sys,
         "argv",
         [
-            "MAIN.py",
+            "main.py",
             "--profile",
             "YUASA_CUSTOM1",
             "--multimeter-mode",
@@ -68,7 +68,7 @@ def test_multimeter_mode_cli_overrides_profile(monkeypatch):
         ],
     )
 
-    MAIN.main()
+    main_module.main()
 
     tc_cls.assert_called_once()
     tc_instance.custom_test.assert_called_once()
