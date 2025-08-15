@@ -68,6 +68,29 @@ Common commands:
   python MAIN.py --profile <name>
   ```
 
+  When the profile supplies a `test_type` and all required parameters, tests
+  can be launched without any additional command‑line options. Examples:
+
+  ```bash
+  # Custom cycle test
+  python MAIN.py --profile MY_CUSTOM_PROFILE
+
+  # Actual capacity test
+  python MAIN.py --profile YUASA_ACT1
+
+  # Efficiency test
+  python MAIN.py --profile MY_EFFICIENCY_PROFILE
+
+  # Rate characteristic test
+  python MAIN.py --profile MY_RATE_PROFILE
+
+  # OCV curve test
+  python MAIN.py --profile MY_OCV_PROFILE
+
+  # Internal resistance test
+  python MAIN.py --profile MY_IR_PROFILE
+  ```
+
 - List the available profiles in `profiles.json`:
 
   ```bash

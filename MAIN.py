@@ -71,7 +71,7 @@ class CustomTestSettings:
 
 
 def load_config(config_path: str, profile: str) -> tuple[dict, dict, str | None]:
-    """Load profile parameters, capacity defaults and test type from a JSON file."""
+    """Load profile configuration, capacity defaults and test type from a JSON file."""
     try:
         data = json.loads(Path(config_path).read_text())
     except FileNotFoundError:
@@ -89,8 +89,7 @@ def load_config(config_path: str, profile: str) -> tuple[dict, dict, str | None]
         return {}, data.get("capacity_defaults", {}), None
 
     test_type = profile_data.get("test_type")
-    params = profile_data.get("parameters", {})
-    return params, data.get("capacity_defaults", {}), test_type
+    return profile_data, data.get("capacity_defaults", {}), test_type
 
 
 
@@ -275,6 +274,8 @@ def main():
     if config_file:
         config, _, test_type = load_config(config_file, profile)
 
+    params_section = config.get("parameters", {})
+
     ps_resource = (
         args.ps_resource
         or os.getenv("POWER_SUPPLY_RESOURCE")
@@ -293,6 +294,8 @@ def main():
 
     multimeter_mode = config.get("multimeter_mode")
     if multimeter_mode is None:
+        multimeter_mode = params_section.get("multimeter_mode")
+    if multimeter_mode is None:
         multimeter_mode = args.multimeter_mode
 
     cli_flags = {
@@ -307,7 +310,9 @@ def main():
         resolved_test_type = test_type or "custom"
 
     def resolve_param(key: str, cli_attr: str, default):
-        val = config.get(key)
+        val = params_section.get(key)
+        if val is None:
+            val = config.get(key)
         if val is None:
             val = getattr(args, cli_attr, None)
         if val is None:
@@ -392,7 +397,9 @@ def main():
     def build_custom_params():
         kwargs = {}
         for field in CustomTestSettings.__annotations__.keys():
-            val = config.get(field)
+            val = params_section.get(field)
+            if val is None:
+                val = config.get(field)
             if val is None:
                 val = getattr(args, field, None)
             if val is not None:
