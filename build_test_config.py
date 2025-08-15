@@ -140,7 +140,14 @@ RESISTANCE_RANGES = {
 }
 
 
-def _prompt_number(prompt: str, caster: Callable[[str], Any], *, default: Any, minimum: float, maximum: float) -> Any:
+def _prompt_number(
+    prompt: str,
+    caster: Callable[[str], Any],
+    *,
+    default: Any,
+    minimum: float,
+    maximum: float,
+) -> Any:
     """Prompt for a numeric value within ``minimum``..``maximum``."""
     while True:
         raw = input(f"{prompt} [{default}]: ") or str(default)
@@ -170,8 +177,18 @@ def build_custom_settings(test_name: str) -> dict[str, Any]:
     for field, default in CUSTOM_DEFAULTS.items():
         if isinstance(default, (int, float)):
             minimum, maximum = CUSTOM_RANGES.get(field, (0, 1e9))
-            caster = int if isinstance(default, int) and not isinstance(default, bool) else float
-            custom[field] = _prompt_number(field, caster, default=default, minimum=minimum, maximum=maximum)
+            caster = (
+                int
+                if isinstance(default, int) and not isinstance(default, bool)
+                else float
+            )
+            custom[field] = _prompt_number(
+                field,
+                caster,
+                default=default,
+                minimum=minimum,
+                maximum=maximum,
+            )
         else:
             val = input(f"{field} [{default if default is not None else 'none'}]: ")
             custom[field] = val if val else default
@@ -184,7 +201,13 @@ def build_capacity_settings(test_name: str) -> dict[str, Any]:
     cap = {"test_name": test_name}
     for field, default in CAPACITY_DEFAULTS.items():
         minimum, maximum = CAPACITY_RANGES[field]
-        cap[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
+        cap[field] = _prompt_number(
+            field,
+            float,
+            default=default,
+            minimum=minimum,
+            maximum=maximum,
+        )
     cap["multimeter_mode"] = _prompt_multimeter_mode()
     return cap
 
@@ -194,7 +217,13 @@ def build_efficiency_settings(test_name: str) -> dict[str, Any]:
     eff = {"test_name": test_name}
     for field, default in EFFICIENCY_DEFAULTS.items():
         minimum, maximum = EFFICIENCY_RANGES[field]
-        eff[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
+        eff[field] = _prompt_number(
+            field,
+            float,
+            default=default,
+            minimum=minimum,
+            maximum=maximum,
+        )
     eff["multimeter_mode"] = _prompt_multimeter_mode()
     return eff
 
@@ -210,10 +239,21 @@ def build_rate_settings(test_name: str) -> dict[str, Any]:
         print("Invalid input, using defaults")
         currents = RATE_DEFAULTS["discharge_currents"]
     rate["discharge_currents"] = currents
-    for field in ("charge_current", "charge_voltage", "discharge_voltage", "temperature"):
+    for field in (
+        "charge_current",
+        "charge_voltage",
+        "discharge_voltage",
+        "temperature",
+    ):
         default = RATE_DEFAULTS[field]
         minimum, maximum = RATE_RANGES[field]
-        rate[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
+        rate[field] = _prompt_number(
+            field,
+            float,
+            default=default,
+            minimum=minimum,
+            maximum=maximum,
+        )
     rate["multimeter_mode"] = _prompt_multimeter_mode()
     return rate
 
@@ -258,7 +298,13 @@ def build_resistance_settings(test_name: str) -> dict[str, Any]:
     res = {"test_name": test_name}
     for field, default in RESISTANCE_DEFAULTS.items():
         minimum, maximum = RESISTANCE_RANGES[field]
-        res[field] = _prompt_number(field, float, default=default, minimum=minimum, maximum=maximum)
+        res[field] = _prompt_number(
+            field,
+            float,
+            default=default,
+            minimum=minimum,
+            maximum=maximum,
+        )
     res["multimeter_mode"] = _prompt_multimeter_mode()
     return res
 

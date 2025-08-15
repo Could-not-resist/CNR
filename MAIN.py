@@ -84,7 +84,12 @@ def load_config(
 
     profile_data = data[profile]
     if not isinstance(profile_data, dict):
-        return {}, data.get("capacity_defaults", {}), None, data.get("required_keys", {})
+        return (
+            {},
+            data.get("capacity_defaults", {}),
+            None,
+            data.get("required_keys", {}),
+        )
 
     test_type = profile_data.get("test_type")
     return (
@@ -94,8 +99,9 @@ def load_config(
         data.get("required_keys", {}),
     )
 
-
-def validate_required_keys(profile: dict, required: dict, test_type: str) -> None:
+def validate_required_keys(
+    profile: dict, required: dict, test_type: str
+) -> None:
     """Raise if profile is missing parameters required by ``test_type``."""
     params = {k: v for k, v in profile.items() if k != "parameters"}
     params.update(profile.get("parameters", {}))
@@ -124,7 +130,8 @@ def main():
 
     parser = argparse.ArgumentParser(description="Run custom test")
     parser.add_argument(
-        "--config-file", help="JSON file with cell settings (defaults to profiles.json)"
+        "--config-file",
+        help="JSON file with cell settings (defaults to profiles.json)",
     )
     parser.add_argument(
         "--list-profiles",
@@ -132,9 +139,18 @@ def main():
         help="List available profiles and exit",
     )
     parser.add_argument("--profile", help="cell profile name in config file")
-    parser.add_argument("--ps-resource", help="VISA resource name for power supply")
-    parser.add_argument("--el-resource", help="VISA resource name for electronic load")
-    parser.add_argument("--mm-resource", help="VISA resource name for multimeter")
+    parser.add_argument(
+        "--ps-resource",
+        help="VISA resource name for power supply",
+    )
+    parser.add_argument(
+        "--el-resource",
+        help="VISA resource name for electronic load",
+    )
+    parser.add_argument(
+        "--mm-resource",
+        help="VISA resource name for multimeter",
+    )
     parser.add_argument("--test-name")
     parser.add_argument("--temperature", type=float)
     parser.add_argument("--charge-volt-prot", type=int)
@@ -169,18 +185,36 @@ def main():
         action="store_true",
         help="run actual capacity test (overrides profile test_type)",
     )
-    parser.add_argument("--capacity-charge-current", type=float,
-                        help="charge current for capacity test in amperes")
-    parser.add_argument("--capacity-discharge-current", type=float,
-                        help="discharge current for capacity test in amperes")
-    parser.add_argument("--capacity-rest-time", type=float,
-                        help="rest time before discharge in seconds")
-    parser.add_argument("--capacity-charge-voltage", type=float,
-                        help="charge voltage for capacity test")
-    parser.add_argument("--capacity-min-voltage", type=float,
-                        help="minimum discharge voltage for capacity test")
-    parser.add_argument("--capacity-finish-current", type=float,
-                        help="current threshold to end charging during capacity test")
+    parser.add_argument(
+        "--capacity-charge-current",
+        type=float,
+        help="charge current for capacity test in amperes",
+    )
+    parser.add_argument(
+        "--capacity-discharge-current",
+        type=float,
+        help="discharge current for capacity test in amperes",
+    )
+    parser.add_argument(
+        "--capacity-rest-time",
+        type=float,
+        help="rest time before discharge in seconds",
+    )
+    parser.add_argument(
+        "--capacity-charge-voltage",
+        type=float,
+        help="charge voltage for capacity test",
+    )
+    parser.add_argument(
+        "--capacity-min-voltage",
+        type=float,
+        help="minimum discharge voltage for capacity test",
+    )
+    parser.add_argument(
+        "--capacity-finish-current",
+        type=float,
+        help="current threshold to end charging during capacity test",
+    )
     test_group.add_argument(
         "--efficiency-test",
         action="store_true",
@@ -204,12 +238,23 @@ def main():
             "and override profile test_type"
         ),
     )
-    parser.add_argument("--rates", default="1.0,0.5,0.2",
-                        help="comma separated discharge rates in A")
-    parser.add_argument("--step-current", type=float, default=1.0,
-                        help="step current for OCV curve")
-    parser.add_argument("--steps", type=int, default=10,
-                        help="number of steps for OCV curve")
+    parser.add_argument(
+        "--rates",
+        default="1.0,0.5,0.2",
+        help="comma separated discharge rates in A",
+    )
+    parser.add_argument(
+        "--step-current",
+        type=float,
+        default=1.0,
+        help="step current for OCV curve",
+    )
+    parser.add_argument(
+        "--steps",
+        type=int,
+        default=10,
+        help="number of steps for OCV curve",
+    )
     parser.add_argument(
         "--pulse-current",
         type=float,
@@ -225,7 +270,10 @@ def main():
     parser.add_argument(
         "--multimeter-mode",
         choices=["voltage", "tcouple"],
-        help="log measurement with multimeter (voltage or thermocouple, default: tcouple)"
+        help=(
+            "log measurement with multimeter (voltage or thermocouple, "
+            "default: tcouple)"
+        ),
     )
     parser.add_argument(
         "-d",
@@ -349,7 +397,10 @@ def main():
     # Argparse's mutually exclusive group ensures only one of these flags can be
     # provided. Command-line flags override the ``test_type`` loaded from a
     # profile.
-    resolved_test_type = next((t for t, flag in cli_flags.items() if flag), None)
+    resolved_test_type = next(
+        (t for t, flag in cli_flags.items() if flag),
+        None,
+    )
     if resolved_test_type is None:
         resolved_test_type = test_type or "custom"
 
@@ -390,20 +441,25 @@ def main():
             "charge_voltage": resolve_param(
                 "capacity_charge_voltage",
                 "capacity_charge_voltage",
-                capacity_defaults.get("charge_voltage", DEFAULT_LIMITS["CHARGE_VOLT_END"]),
+                capacity_defaults.get(
+                    "charge_voltage",
+                    DEFAULT_LIMITS["CHARGE_VOLT_END"],
+                ),
             ),
             "min_voltage": resolve_param(
                 "capacity_min_voltage",
                 "capacity_min_voltage",
                 capacity_defaults.get(
-                    "min_voltage", DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"]
+                    "min_voltage",
+                    DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"],
                 ),
             ),
             "temperature": resolve_param(
                 "temperature",
                 "temperature",
                 capacity_defaults.get(
-                    "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+                    "temperature",
+                    DEFAULT_TEST_PARAMS["TEMPERATURE"],
                 ),
             ),
             "finish_current": resolve_param(
@@ -436,7 +492,9 @@ def main():
                 DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"],
             ),
             "temperature": resolve_param(
-                "temperature", "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+                "temperature",
+                "temperature",
+                DEFAULT_TEST_PARAMS["TEMPERATURE"],
             ),
         }
 
@@ -464,28 +522,52 @@ def main():
                 DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"],
             ),
             "temperature": resolve_param(
-                "temperature", "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+                "temperature",
+                "temperature",
+                DEFAULT_TEST_PARAMS["TEMPERATURE"],
             ),
         }
 
     def build_ocv_params() -> dict[str, Any]:
         return {
-            "step_current": resolve_param("step_current", "step_current", 1.0),
-            "steps": resolve_param("steps", "steps", 10),
-            "rest_time": resolve_param("rest_time", "rest_time", 1800.0),
+            "step_current": resolve_param(
+                "step_current",
+                "step_current",
+                1.0,
+            ),
+            "steps": resolve_param(
+                "steps",
+                "steps",
+                10,
+            ),
+            "rest_time": resolve_param(
+                "rest_time",
+                "rest_time",
+                1800.0,
+            ),
             "temperature": resolve_param(
-                "temperature", "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+                "temperature",
+                "temperature",
+                DEFAULT_TEST_PARAMS["TEMPERATURE"],
             ),
         }
 
     def build_ir_params() -> dict[str, Any]:
         return {
-            "pulse_current": resolve_param("pulse_current", "pulse_current", 1.0),
+            "pulse_current": resolve_param(
+                "pulse_current",
+                "pulse_current",
+                1.0,
+            ),
             "pulse_duration": resolve_param(
-                "pulse_duration", "pulse_duration", 1.0
+                "pulse_duration",
+                "pulse_duration",
+                1.0,
             ),
             "temperature": resolve_param(
-                "temperature", "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+                "temperature",
+                "temperature",
+                DEFAULT_TEST_PARAMS["TEMPERATURE"],
             ),
         }
 
@@ -512,12 +594,30 @@ def main():
         return vars(CustomTestSettings(**kwargs))
 
     dispatch = {
-        "actual_capacity_test": ("actual_capacity_test", build_actual_capacity_params),
-        "efficiency_test": ("efficiency_test", build_efficiency_params),
-        "rate_characteristic_test": ("rate_characteristic_test", build_rate_params),
-        "ocv_curve_test": ("ocv_curve_test", build_ocv_params),
-        "internal_resistance_test": ("internal_resistance_test", build_ir_params),
-        "custom": ("custom_test", build_custom_params),
+        "actual_capacity_test": (
+            "actual_capacity_test",
+            build_actual_capacity_params,
+        ),
+        "efficiency_test": (
+            "efficiency_test",
+            build_efficiency_params,
+        ),
+        "rate_characteristic_test": (
+            "rate_characteristic_test",
+            build_rate_params,
+        ),
+        "ocv_curve_test": (
+            "ocv_curve_test",
+            build_ocv_params,
+        ),
+        "internal_resistance_test": (
+            "internal_resistance_test",
+            build_ir_params,
+        ),
+        "custom": (
+            "custom_test",
+            build_custom_params,
+        ),
     }
 
     method_name, builder = dispatch.get(resolved_test_type, dispatch["custom"])
@@ -533,7 +633,11 @@ def main():
         VisaIOError = Exception
     try:
         tc = TestController(
-            multimeter_mode, args.debug, ps_resource, el_resource, mm_resource
+            multimeter_mode,
+            args.debug,
+            ps_resource,
+            el_resource,
+            mm_resource,
         )
     except (SystemExit, ConnectionError, OSError, VisaIOError) as exc:
         print(f"Failed to initialize TestController: {exc}")
