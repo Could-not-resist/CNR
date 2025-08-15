@@ -259,9 +259,12 @@ def main():
     config_file = args.config_file
     if args.profile and not config_file:
         config_file = "profiles.json"
+    capacity_defaults: dict[str, Any] = {}
     if config_file:
         try:
-            config, _, test_type, required_keys = load_config(config_file, profile)
+            config, capacity_defaults, test_type, required_keys = load_config(
+                config_file, profile
+            )
         except KeyError as exc:
             print(exc)
             return
@@ -297,13 +300,16 @@ def main():
         1. Command line argument
         2. Profile's "parameters" section
         3. Top level of the profile
-        4. Default "tcouple"
+        4. ``capacity_defaults`` mapping
+        5. Default "tcouple"
         """
         mode = args.multimeter_mode
         if mode is None:
             mode = params_section.get("multimeter_mode")
         if mode is None:
             mode = config.get("multimeter_mode")
+        if mode is None:
+            mode = capacity_defaults.get("multimeter_mode")
         if mode is None:
             mode = "tcouple"
         if mode not in {"voltage", "tcouple"}:
@@ -346,27 +352,43 @@ def main():
     def build_actual_capacity_params() -> dict[str, Any]:
         return {
             "charge_current_1c": resolve_param(
-                "capacity_charge_current", "capacity_charge_current", 1.0
+                "capacity_charge_current",
+                "capacity_charge_current",
+                capacity_defaults.get("charge_current", 1.0),
             ),
             "discharge_current_1c": resolve_param(
-                "capacity_discharge_current", "capacity_discharge_current", 1.0
+                "capacity_discharge_current",
+                "capacity_discharge_current",
+                capacity_defaults.get("discharge_current", 1.0),
             ),
-            "rest_time": resolve_param("capacity_rest_time", "capacity_rest_time", 3600.0),
+            "rest_time": resolve_param(
+                "capacity_rest_time",
+                "capacity_rest_time",
+                capacity_defaults.get("rest_time", 3600.0),
+            ),
             "charge_voltage": resolve_param(
                 "capacity_charge_voltage",
                 "capacity_charge_voltage",
-                DEFAULT_LIMITS["CHARGE_VOLT_END"],
+                capacity_defaults.get("charge_voltage", DEFAULT_LIMITS["CHARGE_VOLT_END"]),
             ),
             "min_voltage": resolve_param(
                 "capacity_min_voltage",
                 "capacity_min_voltage",
-                DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"],
+                capacity_defaults.get(
+                    "min_voltage", DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"]
+                ),
             ),
             "temperature": resolve_param(
-                "temperature", "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+                "temperature",
+                "temperature",
+                capacity_defaults.get(
+                    "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+                ),
             ),
             "finish_current": resolve_param(
-                "capacity_finish_current", "capacity_finish_current", 1.5
+                "capacity_finish_current",
+                "capacity_finish_current",
+                capacity_defaults.get("finish_current", 1.5),
             ),
         }
 

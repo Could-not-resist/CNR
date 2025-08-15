@@ -36,6 +36,16 @@
     ],
     "custom": []
   },
+  "capacity_defaults": {
+    "rest_time": 3600.0,
+    "charge_voltage": 4.1,
+    "min_voltage": 2.75,
+    "charge_current": 1.0,
+    "discharge_current": 1.0,
+    "finish_current": 1.5,
+    "temperature": 23.4,
+    "multimeter_mode": "tcouple"
+  },
   "YUASA_ACT1": {
     "test_type": "actual_capacity_test",
     "parameters": {
