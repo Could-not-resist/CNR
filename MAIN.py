@@ -357,11 +357,18 @@ def main():
         or config.get("mm_resource")
     )
 
-    multimeter_mode = config.get("multimeter_mode")
-    if multimeter_mode is None:
-        multimeter_mode = params_section.get("multimeter_mode")
-    if multimeter_mode is None:
-        multimeter_mode = args.multimeter_mode
+    def resolve_multimeter_mode() -> str | None:
+        """Return validated multimeter mode from CLI, params or config."""
+        mode = config.get("multimeter_mode")
+        if mode is None:
+            mode = params_section.get("multimeter_mode")
+        if mode is None:
+            mode = args.multimeter_mode
+        if mode not in {None, "voltage", "tcouple"}:
+            raise ValueError(f"Invalid multimeter_mode: {mode}")
+        return mode
+
+    multimeter_mode = resolve_multimeter_mode()
 
     cli_flags = {
         "actual_capacity_test": args.actual_capacity_test,
@@ -474,6 +481,8 @@ def main():
         # to take precedence over top level entries.
         kwargs = {}
         for field in CustomTestSettings.__annotations__.keys():
+            if field == "multimeter_mode":
+                continue
             val = getattr(args, field, None)
             if val is None:
                 val = params_section.get(field)
@@ -481,6 +490,7 @@ def main():
                 val = config.get(field)
             if val is not None:
                 kwargs[field] = val
+        kwargs["multimeter_mode"] = multimeter_mode
         return vars(CustomTestSettings(**kwargs))
 
     dispatch = {
