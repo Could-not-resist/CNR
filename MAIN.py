@@ -73,26 +73,44 @@ class CustomTestSettings:
 
 
 
-def load_config(config_path: str, profile: str) -> tuple[dict, dict, str | None]:
-    """Load profile configuration, capacity defaults and test type from a JSON file."""
+def load_config(
+    config_path: str, profile: str
+) -> tuple[dict, dict, str | None, dict]:
+    """Load profile configuration, defaults, test type and required keys."""
     try:
         data = json.loads(Path(config_path).read_text())
     except FileNotFoundError:
         print(f"Configuration file not found: {config_path}")
-        return {}, {}, None
+        return {}, {}, None, {}
     except json.JSONDecodeError as exc:
         print(f"Error decoding JSON from {config_path}: {exc}")
-        return {}, {}, None
+        return {}, {}, None, {}
 
     if not isinstance(data, dict):
-        return {}, {}, None
+        return {}, {}, None, {}
 
     profile_data = data.get(profile, {})
     if not isinstance(profile_data, dict):
-        return {}, data.get("capacity_defaults", {}), None
+        return {}, data.get("capacity_defaults", {}), None, data.get("required_keys", {})
 
     test_type = profile_data.get("test_type")
-    return profile_data, data.get("capacity_defaults", {}), test_type
+    return (
+        profile_data,
+        data.get("capacity_defaults", {}),
+        test_type,
+        data.get("required_keys", {}),
+    )
+
+
+def validate_required_keys(profile: dict, required: dict, test_type: str) -> None:
+    """Raise if profile is missing parameters required by ``test_type``."""
+    params = {k: v for k, v in profile.items() if k != "parameters"}
+    params.update(profile.get("parameters", {}))
+    missing = [k for k in required.get(test_type, []) if k not in params]
+    if missing:
+        raise KeyError(
+            f"Missing required keys for {test_type}: {', '.join(missing)}"
+        )
 
 
 
@@ -272,11 +290,18 @@ def main():
     profile = args.profile or args.test_name or TEST_NAME
     config: dict = {}
     test_type = None
+    required_keys: dict = {}
     config_file = args.config_file
     if args.profile and not config_file:
         config_file = "profiles.json"
     if config_file:
-        config, _, test_type = load_config(config_file, profile)
+        config, _, test_type, required_keys = load_config(config_file, profile)
+        if test_type and required_keys:
+            try:
+                validate_required_keys(config, required_keys, test_type)
+            except KeyError as exc:
+                print(exc)
+                return
 
     params_section = config.get("parameters", {})
 

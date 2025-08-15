@@ -17,7 +17,7 @@ measurements while logging the resulting data.
 | `AlIonTestSoftwareDeviceDriversMock.py` | Mock versions of the device drivers for running the software without hardware attached. |
 | `build_test_config.py` | Interactive helper that writes profile entries for any test type. |
 | `scpi_commands.py` | Quick reference of SCPI command strings used by the drivers. |
-| `profiles.json` | Example configuration profiles containing test parameters and their `test_type`. |
+| `profiles.json` | Example configuration profiles containing test parameters, their `test_type`, and a `required_keys` map. |
 | `manuals/` | Manufacturer programming manuals (not tracked by version control). |
 
 ## Requirements
@@ -69,7 +69,10 @@ Common commands:
   ```
 
   When the profile supplies a `test_type` and all required parameters, tests
-  can be launched without any additional command‑line options. Examples:
+  can be launched without any additional command‑line options. The
+  `required_keys` section in `profiles.json` lists the parameters that must
+  be present for each test type; missing entries trigger an error when a
+  profile is loaded. Examples:
 
   ```bash
   # Custom cycle test
