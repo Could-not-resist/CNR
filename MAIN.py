@@ -310,15 +310,21 @@ def main():
 
     rest_time = args.capacity_rest_time
     if rest_time is None:
-        rest_time = capacity_defaults.get("rest_time", 3600.0)
+        rest_time = config.get(
+            "rest_time", capacity_defaults.get("rest_time", 3600.0)
+        )
 
     cap_charge_current = args.capacity_charge_current
     if cap_charge_current is None:
-        cap_charge_current = capacity_defaults.get("charge_current", 1.0)
+        cap_charge_current = config.get(
+            "charge_current", capacity_defaults.get("charge_current", 1.0)
+        )
 
     cap_discharge_current = args.capacity_discharge_current
     if cap_discharge_current is None:
-        cap_discharge_current = capacity_defaults.get("discharge_current", 1.0)
+        cap_discharge_current = config.get(
+            "discharge_current", capacity_defaults.get("discharge_current", 1.0)
+        )
 
     multimeter_mode = args.multimeter_mode
     if multimeter_mode is None:
@@ -326,21 +332,21 @@ def main():
 
     cap_charge_volt = args.capacity_charge_voltage
     if cap_charge_volt is None:
-        if args.charge_volt_end is None and "charge_voltage" in capacity_defaults:
-            cap_charge_volt = capacity_defaults["charge_voltage"]
-        else:
-            cap_charge_volt = charge_volt_end
+        cap_charge_volt = config.get(
+            "charge_voltage", capacity_defaults.get("charge_voltage", charge_volt_end)
+        )
 
     cap_min_volt = args.capacity_min_voltage
     if cap_min_volt is None:
-        if args.dcharge_volt_min is None and "min_voltage" in capacity_defaults:
-            cap_min_volt = capacity_defaults["min_voltage"]
-        else:
-            cap_min_volt = dcharge_volt_min
+        cap_min_volt = config.get(
+            "min_voltage", capacity_defaults.get("min_voltage", dcharge_volt_min)
+        )
 
     finish_current = args.capacity_finish_current
     if finish_current is None:
-        finish_current = capacity_defaults.get("finish_current", 1.5)
+        finish_current = config.get(
+            "finish_current", capacity_defaults.get("finish_current", 1.5)
+        )
 
     if args.actual_capacity_test:
         tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
