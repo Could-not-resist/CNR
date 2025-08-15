@@ -314,11 +314,11 @@ def main():
         resolved_test_type = test_type or "custom"
 
     def resolve_param(key: str, cli_attr: str, default):
-        val = params_section.get(key)
+        val = getattr(args, cli_attr, None)
+        if val is None:
+            val = params_section.get(key)
         if val is None:
             val = config.get(key)
-        if val is None:
-            val = getattr(args, cli_attr, None)
         if val is None:
             val = default
         return val
@@ -401,11 +401,11 @@ def main():
     def build_custom_params():
         kwargs = {}
         for field in CustomTestSettings.__annotations__.keys():
-            val = params_section.get(field)
+            val = getattr(args, field, None)
+            if val is None:
+                val = params_section.get(field)
             if val is None:
                 val = config.get(field)
-            if val is None:
-                val = getattr(args, field, None)
             if val is not None:
                 kwargs[field] = val
         return vars(CustomTestSettings(**kwargs))
