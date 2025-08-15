@@ -1,4 +1,8 @@
-"""Command line interface for running custom battery tests."""
+"""Command line interface for running battery tests.
+
+Command-line test type flags (e.g., ``--efficiency-test``) take priority
+over the ``test_type`` defined in a profile.
+"""
 
 from dataclasses import dataclass
 import argparse
@@ -218,8 +222,11 @@ def main():
         help="discharging mode: CC, CV or CP",
     )
     parser.add_argument("--num-cycles", type=int)
-    parser.add_argument("--actual-capacity-test", action="store_true",
-                        help="run actual capacity test")
+    parser.add_argument(
+        "--actual-capacity-test",
+        action="store_true",
+        help="run actual capacity test (overrides profile test_type)",
+    )
     parser.add_argument("--capacity-charge-current", type=float,
                         help="charge current for capacity test in amperes")
     parser.add_argument("--capacity-discharge-current", type=float,
@@ -232,16 +239,28 @@ def main():
                         help="minimum discharge voltage for capacity test")
     parser.add_argument("--capacity-finish-current", type=float,
                         help="current threshold to end charging during capacity test")
-    parser.add_argument("--efficiency-test", action="store_true",
-                        help="run efficiency test")
-    parser.add_argument("--rate-characteristic-test", action="store_true",
-                        help="run rate characteristic test")
-    parser.add_argument("--ocv-curve-test", action="store_true",
-                        help="run OCV curve test")
+    parser.add_argument(
+        "--efficiency-test",
+        action="store_true",
+        help="run efficiency test (overrides profile test_type)",
+    )
+    parser.add_argument(
+        "--rate-characteristic-test",
+        action="store_true",
+        help="run rate characteristic test (overrides profile test_type)",
+    )
+    parser.add_argument(
+        "--ocv-curve-test",
+        action="store_true",
+        help="run OCV curve test (overrides profile test_type)",
+    )
     parser.add_argument(
         "--internal-resistance-test",
         action="store_true",
-        help="run internal resistance test (no capacity measurement)",
+        help=(
+            "run internal resistance test (no capacity measurement) "
+            "and override profile test_type"
+        ),
     )
     parser.add_argument("--rates", default="1.0,0.5,0.2",
                         help="comma separated discharge rates in A")
@@ -334,6 +353,7 @@ def main():
         "ocv_curve_test": args.ocv_curve_test,
         "internal_resistance_test": args.internal_resistance_test,
     }
+    # Command-line flags override the ``test_type`` loaded from a profile
     resolved_test_type = next((t for t, flag in cli_flags.items() if flag), None)
     if resolved_test_type is None:
         resolved_test_type = test_type or "custom"
