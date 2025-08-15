@@ -51,7 +51,8 @@ python MAIN.py
    If no hardware connection is detected the program aborts unless mock
 drivers are enabled. Set the environment variable `USE_MOCK_DRIVERS=1`
 to force the built‑in mock drivers for development without hardware.
- Use the `-d` flag to print detailed progress messages during a test.
+ Use the `--log-level` option to control output verbosity, for example
+ `--log-level DEBUG` prints detailed progress messages during a test.
 
 Common commands:
 
@@ -303,7 +304,8 @@ common flags accepted by `MAIN.py` are listed below. Run
 | `--num-cycles` | Number of charge/discharge cycles |
 | `--sample-interval` | Time between measurements in seconds |
 | `--multimeter-mode` | Log measurement using the multimeter (`voltage` or `tcouple`, default `tcouple`) |
-| `-d`, `--debug` | Print detailed progress information |
+| `--log-level` | Set logging verbosity (`CRITICAL`, `ERROR`, `WARNING`, `INFO`, `DEBUG`; default `INFO`) |
+| `-d`, `--debug` | Enable additional debug mode for device communication |
 | `--dry-run` | Display resolved parameters and exit without running a test |
 
 

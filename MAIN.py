@@ -7,15 +7,18 @@ over the ``test_type`` defined in a profile.
 from dataclasses import dataclass
 import argparse
 import json
+import logging
 import os
 from pathlib import Path
-from pprint import pprint
 from typing import Any
 from defaults import (
     DEFAULT_LIMITS,
     DEFAULT_TEST_PARAMS,
     DEFAULT_SAMPLE_INTERVAL,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -57,12 +60,16 @@ def load_config(
     try:
         data = json.loads(Path(config_path).read_text())
     except FileNotFoundError:
-        print(f"Configuration file not found: {config_path}")
+        logger.error("Configuration file not found: %s", config_path)
         return {}, {}, None, {}
     except json.JSONDecodeError as exc:
-        print(
-            f"Error decoding JSON from {config_path}: {exc.msg} "
-            f"(line {exc.lineno} column {exc.colno} char {exc.pos})"
+        logger.error(
+            "Error decoding JSON from %s: %s (line %s column %s char %s)",
+            config_path,
+            exc.msg,
+            exc.lineno,
+            exc.colno,
+            exc.pos,
         )
         return {}, {}, None, {}
 
@@ -231,25 +238,39 @@ def main():
         action="store_true",
         help="show resolved parameters and exit",
     )
+    parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"],
+        help="set logging verbosity (default: INFO)",
+    )
 
     args = parser.parse_args()
+
+    logging.basicConfig(
+        level=getattr(logging, args.log_level.upper()), format="%(message)s"
+    )
 
     if args.list_profiles:
         config_path = args.config_file or "profiles.json"
         try:
             data = json.loads(Path(config_path).read_text())
         except FileNotFoundError as exc:
-            print(f"Error reading {config_path}: {exc}")
+            logger.error("Error reading %s: %s", config_path, exc)
             return
         except json.JSONDecodeError as exc:
-            print(
-                f"Error decoding JSON from {config_path}: {exc.msg} "
-                f"(line {exc.lineno} column {exc.colno} char {exc.pos})"
+            logger.error(
+                "Error decoding JSON from %s: %s (line %s column %s char %s)",
+                config_path,
+                exc.msg,
+                exc.lineno,
+                exc.colno,
+                exc.pos,
             )
             return
         for name in data:
             if name not in {"capacity_defaults", "required_keys"}:
-                print(name)
+                logger.info(name)
         return
 
     profile = args.profile or args.test_name or DEFAULT_TEST_PARAMS["TEST_NAME"]
@@ -266,13 +287,13 @@ def main():
                 config_file, profile
             )
         except KeyError as exc:
-            print(exc)
+            logger.error(exc)
             return
         if test_type and required_keys:
             try:
                 validate_required_keys(config, required_keys, test_type)
             except KeyError as exc:
-                print(exc)
+                logger.error(exc)
                 return
 
     params_section = config.get("parameters", {})
@@ -498,7 +519,7 @@ def main():
 
     method_name, builder = dispatch.get(resolved_test_type, dispatch["custom"])
     params = builder()
-    pprint(params)
+    logger.info("Resolved parameters: %s", params)
     if args.dry_run:
         return
 
@@ -519,9 +540,9 @@ def main():
     try:
         result = method(**params)
         if resolved_test_type == "actual_capacity_test" and result is not None:
-            print(f"Measured capacity: {result:.3f} Ah")
+            logger.info("Measured capacity: %.3f Ah", result)
     except KeyboardInterrupt:
-        print("Keyboard interrupt received, stopping test")
+        logger.warning("Keyboard interrupt received, stopping test")
         tc.abort()
 
 
