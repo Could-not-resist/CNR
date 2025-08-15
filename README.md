@@ -217,6 +217,7 @@ Command-line options still override the values loaded from the profile.
 The helper `build_test_config.py` prompts for a test name and `test_type`
 and then gathers the relevant parameters before adding the profile to
 `profiles.json`.
+It also asks for a multimeter mode (`voltage` or `tcouple`) and defaults to `tcouple`.
 
 This charges the cell at 1C up to the voltage specified by
 `--capacity-charge-voltage` (default taken from `--charge-volt-end`),
