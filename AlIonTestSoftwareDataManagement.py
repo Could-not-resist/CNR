@@ -1,7 +1,11 @@
 """Utilities for storing measurement data and exporting results."""
 
 import openpyxl
-from openpyxl.chart import ScatterChart, Reference, Series  # type: ignore
+from openpyxl.chart import (  # type: ignore
+    ScatterChart,
+    Reference,
+    Series,
+)
 # from openpyxl.chart.series import Series
 from datetime import datetime
 import os
@@ -171,7 +175,12 @@ class DataStorage:
         df = pd.DataFrame(data, columns=head)
         df.to_csv(filePath + ".csv", index=False, float_format="%.4f")
 
-    def exportXLSXFile(self, filePath, chargeTime, timeInterval=DEFAULT_SAMPLE_INTERVAL):
+    def exportXLSXFile(
+        self,
+        filePath,
+        chargeTime,
+        timeInterval=DEFAULT_SAMPLE_INTERVAL,
+    ):
         """Create an Excel workbook with optional graphs."""
         # Read in the CSV file that was just created
         csvDataframe = pd.read_csv(filePath + ".csv")
@@ -238,21 +247,62 @@ class DataStorage:
 
         else:  # This is used normally
             # Create a list of Values to graph
-            seconds = Reference(sheet, min_col=2, min_row=3,
-                                max_col=2, max_row=len(csvDataframe))
-            voltageCharging = Reference(sheet, min_col=3, min_row=3, max_col=3, max_row=int(
-                (float(chargeTime) * 60) / float(timeInterval)))
-            currentCharging = Reference(sheet, min_col=4, min_row=3, max_col=4, max_row=int(
-                (float(chargeTime) * 60) / float(timeInterval)))
-            powerCharging = Reference(sheet, min_col=5, min_row=3, max_col=5, max_row=int(
-                (float(chargeTime) * 60) / float(timeInterval)))
+            seconds = Reference(
+                sheet,
+                min_col=2,
+                min_row=3,
+                max_col=2,
+                max_row=len(csvDataframe),
+            )
+            voltageCharging = Reference(
+                sheet,
+                min_col=3,
+                min_row=3,
+                max_col=3,
+                max_row=int((float(chargeTime) * 60) / float(timeInterval)),
+            )
+            currentCharging = Reference(
+                sheet,
+                min_col=4,
+                min_row=3,
+                max_col=4,
+                max_row=int((float(chargeTime) * 60) / float(timeInterval)),
+            )
+            powerCharging = Reference(
+                sheet,
+                min_col=5,
+                min_row=3,
+                max_col=5,
+                max_row=int((float(chargeTime) * 60) / float(timeInterval)),
+            )
 
-            voltageDischarging = Reference(sheet, min_col=3, min_row=int((float(
-                chargeTime) * 60) / float(timeInterval) + 1), max_col=3, max_row=len(csvDataframe))
-            currentDischarging = Reference(sheet, min_col=4, min_row=int((float(
-                chargeTime) * 60) / float(timeInterval) + 1), max_col=4, max_row=len(csvDataframe))
-            powerDischarging = Reference(sheet, min_col=5, min_row=int((float(
-                chargeTime) * 60) / float(timeInterval) + 1), max_col=5, max_row=len(csvDataframe))
+            voltageDischarging = Reference(
+                sheet,
+                min_col=3,
+                min_row=int(
+                    (float(chargeTime) * 60) / float(timeInterval) + 1
+                ),
+                max_col=3,
+                max_row=len(csvDataframe),
+            )
+            currentDischarging = Reference(
+                sheet,
+                min_col=4,
+                min_row=int(
+                    (float(chargeTime) * 60) / float(timeInterval) + 1
+                ),
+                max_col=4,
+                max_row=len(csvDataframe),
+            )
+            powerDischarging = Reference(
+                sheet,
+                min_col=5,
+                min_row=int(
+                    (float(chargeTime) * 60) / float(timeInterval) + 1
+                ),
+                max_col=5,
+                max_row=len(csvDataframe),
+            )
             ## CHARGING GRAPHS ##
             # Create a graph for the Voltage during Charging
             voltageChartCharging = ScatterChart()
