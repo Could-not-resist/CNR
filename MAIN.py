@@ -158,7 +158,12 @@ class TestTypes:
 def main():
     parser = argparse.ArgumentParser(description="Run custom test")
     parser.add_argument(
-        "--config-file", default="profiles.json", help="JSON file with cell settings"
+        "--config-file", help="JSON file with cell settings (defaults to profiles.json)"
+    )
+    parser.add_argument(
+        "--list-profiles",
+        action="store_true",
+        help="List available profiles and exit",
     )
     parser.add_argument("--profile", help="cell profile name in config file")
     parser.add_argument("--ps-resource", help="VISA resource name for power supply")
@@ -249,13 +254,27 @@ def main():
 
     args = parser.parse_args()
 
+    if args.list_profiles:
+        config_path = args.config_file or "profiles.json"
+        try:
+            data = json.loads(Path(config_path).read_text())
+        except (FileNotFoundError, json.JSONDecodeError) as exc:
+            print(f"Error reading {config_path}: {exc}")
+            return
+        for name in data:
+            if name != "capacity_defaults":
+                print(name)
+        return
 
     profile = args.profile or args.test_name or TEST_NAME
     config = {}
     capacity_defaults = {}
     test_type = None
-    if args.config_file:
-        config, capacity_defaults, test_type = load_config(args.config_file, profile)
+    config_file = args.config_file
+    if args.profile and not config_file:
+        config_file = "profiles.json"
+    if config_file:
+        config, capacity_defaults, test_type = load_config(config_file, profile)
 
     ps_resource = (
         args.ps_resource
@@ -378,7 +397,7 @@ def main():
             finish_current,
         )
         print(f"Measured capacity: {capacity:.3f} Ah")
-    elif args.config_file and test_type:
+    elif config_file and test_type:
         tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
         if test_type == "actual_capacity_test":
             tc.actual_capacity_test(
