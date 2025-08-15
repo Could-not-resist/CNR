@@ -92,14 +92,20 @@ def load_config(
         print(f"Configuration file not found: {config_path}")
         return {}, {}, None, {}
     except json.JSONDecodeError as exc:
-        print(f"Error decoding JSON from {config_path}: {exc}")
+        print(
+            f"Error decoding JSON from {config_path}: {exc.msg} "
+            f"(line {exc.lineno} column {exc.colno} char {exc.pos})"
+        )
         return {}, {}, None, {}
 
     if not isinstance(data, dict):
         return {}, {}, None, {}
 
     if profile not in data:
-        raise KeyError(f"Profile '{profile}' not found in {config_path}")
+        raise KeyError(
+            f"Profile '{profile}' not found in {config_path}. "
+            "Run --list-profiles to see available profiles."
+        )
 
     profile_data = data[profile]
     if not isinstance(profile_data, dict):
@@ -326,8 +332,14 @@ def main():
         config_path = args.config_file or "profiles.json"
         try:
             data = json.loads(Path(config_path).read_text())
-        except (FileNotFoundError, json.JSONDecodeError) as exc:
+        except FileNotFoundError as exc:
             print(f"Error reading {config_path}: {exc}")
+            return
+        except json.JSONDecodeError as exc:
+            print(
+                f"Error decoding JSON from {config_path}: {exc.msg} "
+                f"(line {exc.lineno} column {exc.colno} char {exc.pos})"
+            )
             return
         for name in data:
             if name not in {"capacity_defaults", "required_keys"}:
