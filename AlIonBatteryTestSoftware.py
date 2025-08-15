@@ -349,7 +349,7 @@ class TestController:
 
     # Test protocal for testing the capacity of a battery
 
-# This function is called from the TestTypes class to run a custom test
+# Runs a custom test using the provided parameters
     def _custom_test_impl(
         self,
         test_name: str,
