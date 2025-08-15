@@ -31,7 +31,7 @@ The project is organised as a set of Python modules used to run charging/dischar
 : Handles test execution. It exposes functions like `custom_test`, `efficiency_test`, `rate_characteristic_test`, `internal_resistance_test` and `actual_capacity_test`. These routines send commands to the instrument drivers and log measurements via `DataStorage`.
 
 **DataStorage** (`AlIonTestSoftwareDataManagement.py`)
-: Collects timestamps, voltage, current, power and optional capacity or multimeter readings. `createTable()` writes a CSV file and optionally an Excel workbook with graphs.
+: Collects timestamps, voltage, current, power and optional capacity or multimeter readings. `create_table()` writes a CSV file and optionally an Excel workbook with graphs.
 
 **Device drivers** (`AlIonTestSoftwareDeviceDrivers.py` and `AlIonTestSoftwareDeviceDriversMock.py`)
 : Provide methods such as `setVoltage`, `startDischarge`, `getVoltage`, etc. The mock drivers emulate these interfaces for development without instruments.

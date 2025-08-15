@@ -112,78 +112,78 @@ class TestController:
         """Stop all outputs and signal running loops to exit."""
         self.stop_event.set()
         try:
-            self.stopPSOutput()
+            self.stop_ps_output()
         except Exception:
             pass
         try:
-            self.stopDischarge()
+            self.stop_discharge()
         except Exception:
             pass
 
     # Defining basic functionality of all remote devices through the device controller
     #####  62000P Power supply #####
     # Function for constant CURRENT charging, taking in current in amps
-    def chargeCC(self, amps):
+    def charge_cc(self, amps):
         self.powerSupplyController.chargeCC(amps)
 
     # Function for constant VOLTAGE charging, taking in voltage in volts
-    def chargeCV(self, volts):
+    def charge_cv(self, volts):
         self.powerSupplyController.chargeCV(volts)
 
     # Function for constant POWER charging, taking in power in watts
-    def chargeCP(self, watts):
+    def charge_cp(self, watts):
         self.powerSupplyController.chargeCP(watts)
 
     # def startCharge(self):
     #     self.powerSupplyController.st
     # Functions to START/STOP the powersupply from charging
-    def startPSOutput(self):
+    def start_ps_output(self):
         self.powerSupplyController.startOutput()
 
-    def stopPSOutput(self):
+    def stop_ps_output(self):
         self.powerSupplyController.stopOutput()
 
     # Functions that allow user to set the maximum voltage, current and power for safety
     #### VOLTAGE #### VOLTAGE #### VOLTAGE #### VOLTAGE ####
-    def setVoltage(self, volts: float):
+    def set_voltage(self, volts: float):
         self.powerSupplyController.setVoltage(volts)
 
-    def setVoltageLimMax(self, volts: float):
+    def set_voltage_lim_max(self, volts: float):
         self.powerSupplyController.setVoltageLimMax(volts)
 
-    def setVoltageLimMin(self, volts: float):
+    def set_voltage_lim_min(self, volts: float):
         self.powerSupplyController.setVoltageLimMin(volts)
 
-    def setVoltageProt(self, volts: float):
+    def set_voltage_prot(self, volts: float):
         self.powerSupplyController.setVoltageProt(volts)
 
-    def setVoltageSlew(self, volts: float):
+    def set_voltage_slew(self, volts: float):
         self.powerSupplyController.setVoltageSlew(volts)
 
     # def setMaxVoltageMax(self):
     #     self.powerSupplyController.setVoltageMax()
 
     #### CURRENT #### CURRENT #### CURRENT #### CURRENT ####
-    def setCurrent(self, amps: float):
+    def set_current(self, amps: float):
         self.powerSupplyController.setCurrent(amps)
 
-    def setCurrentLimMax(self, amps: float):
+    def set_current_lim_max(self, amps: float):
         self.powerSupplyController.setCurrentLimMax(amps)
 
-    def setCurrentLimMin(self, amps: float):
+    def set_current_lim_min(self, amps: float):
         self.powerSupplyController.setCurrentLimMin(amps)
 
-    def setCurrentProt(self, amps: float):
+    def set_current_prot(self, amps: float):
         self.powerSupplyController.setCurrentProt(amps)
 
-    def setCurrentSlew(self, amps: float):
+    def set_current_slew(self, amps: float):
         self.powerSupplyController.setCurrentSlew(amps)
 
     # def setMaxCurrentMax(self):
     #     self.powerSupplyController.setCurrentMax()
 
     #### POWER #### POWER #### POWER #### POWER #### POWER ####
-    def setPowerProt(self, watts: float):
+    def set_power_prot(self, watts: float):
         self.powerSupplyController.setPowerProt(watts)
 
     # def setMaxPowerMax(self):
@@ -191,33 +191,33 @@ class TestController:
 
     # DISCHARGE functions ###### DC LOAD 63600-5
 
-    def startDischarge(self):
+    def start_discharge(self):
         self.electronicLoadController.startDischarge()  # Activates the electronic load
 
-    def stopDischarge(self):
+    def stop_discharge(self):
         self.electronicLoadController.stopDischarge()  # Inactivates the electronic load
 
-    def setCCLmode(self):
+    def set_ccl_mode(self):
         # Switch to CC mode Low Range (max 0.8 amper)
         self.electronicLoadController.setCCLmode()
 
-    def setCCMmode(self):
+    def set_ccm_mode(self):
         # Switch to CC mode Medium Range (max 8 amper)
         self.electronicLoadController.setCCMmode()
 
-    def setCCHmode(self):
+    def set_cch_mode(self):
         # Switch to CC mode High Range
         self.electronicLoadController.setCCHmode()
 
-    def setCCcurrentL1(self, amper: float):
+    def set_cc_current_l1(self, amper: float):
         self.electronicLoadController.setCCcurrentL1(
             amper)  # Set the desired current of Channel L1
 
-    def setCCcurrentL1MAX(self, amper: float):
+    def set_cc_current_l1_max(self, amper: float):
         self.electronicLoadController.setCCcurrentL1MAX(
             amper)  # Set the desired current of Channel L1
 
-    def getCCcurrentL1MAX(self):
+    def get_cc_current_l1_max(self):
         # Read the maximum amp setting of Channel 1
         try:
             return float(self.electronicLoadController.getCCcurrentL1MAX())
@@ -227,16 +227,16 @@ class TestController:
 
     # Helper methods for discharging and reading instrument values
 
-    def dischargeCC(self, amper):
+    def discharge_cc(self, amper):
         self.electronicLoadController.dischargeCC(amper)
 
-    def dischargeCV(self, volts):
+    def discharge_cv(self, volts):
         self.electronicLoadController.dischargeCV(volts)
 
-    def dischargeCP(self, watts):
+    def discharge_cp(self, watts):
         self.electronicLoadController.dischargeCP(watts)
 
-    def getVoltageELC(self):
+    def get_voltage_elc(self):
         try:
             x = self.electronicLoadController.getVoltage()
         except (VisaIOError, struct.error) as err:
@@ -244,7 +244,7 @@ class TestController:
             return float('nan')
         return float(x)
 
-    def getCurrentELC(self):
+    def get_current_elc(self):
         try:
             x = self.electronicLoadController.getCurrent()
         except (VisaIOError, struct.error) as err:
@@ -252,7 +252,7 @@ class TestController:
             return float('nan')
         return float(x)
 
-    def getVoltagePSC(self):
+    def get_voltage_psc(self):
         try:
             x = self.powerSupplyController.getVoltage()
         except (VisaIOError, struct.error) as err:
@@ -260,7 +260,7 @@ class TestController:
             return float('nan')
         return float(x)
 
-    def getCurrentPSC(self):
+    def get_current_psc(self):
         try:
             x = self.powerSupplyController.getCurrent()
         except (VisaIOError, struct.error) as err:
@@ -268,21 +268,21 @@ class TestController:
             return float('nan')
         return float(x)
 
-    def getVoltageMM(self):
+    def get_voltage_mm(self):
         try:
             return float(self.multimeterController.getVolts())
         except (VisaIOError, struct.error) as err:
             print(f"Multimeter read timeout: {err}")
             return float('nan')
 
-    def getTemperatureMM(self):
+    def get_temperature_mm(self):
         try:
             return float(self.multimeterController.getThermocoupleTemp())
         except (VisaIOError, struct.error) as err:
             print(f"Multimeter read timeout: {err}")
             return float('nan')
 
-    # def stopDischarge(self):
+    # def stop_discharge(self):
     #     self.electronicLoadController.stopDischarge()
 
     # Functions to read realtime VOLTAGE, CURRENT and POWER from the power supply
@@ -337,15 +337,15 @@ class TestController:
             else slew_current
         )
 
-        self.stopPSOutput()
-        self.stopDischarge()
-        self.setVoltageLimMax(charge_volt_end - 0.01)
-        self.setVoltageProt(charge_volt_prot)
-        self.setCurrentLimMax(charge_current_max - 0.01)
-        self.setCurrentProt(charge_current_prot)
-        self.setVoltageSlew(slew_volt)
-        self.setCurrentSlew(slew_current)
-        self.setPowerProt(charge_power_prot)
+        self.stop_ps_output()
+        self.stop_discharge()
+        self.set_voltageLimMax(charge_volt_end - 0.01)
+        self.set_voltageProt(charge_volt_prot)
+        self.set_currentLimMax(charge_current_max - 0.01)
+        self.set_currentProt(charge_current_prot)
+        self.set_voltageSlew(slew_volt)
+        self.set_currentSlew(slew_current)
+        self.set_power_prot(charge_power_prot)
 
     # Test protocal for testing the capacity of a battery
 
@@ -402,7 +402,7 @@ class TestController:
 
         print(f"Discharge time {dcharge_time}")
         print(f"Max Discharge Current {dcharge_current_max}")
-        print(f"Max allowable discharge current {self.getCCcurrentL1MAX()}")
+        print(f"Max allowable discharge current {self.get_cc_current_l1_max()}")
         print("===========================")
 
         # Charge each cycle for charge_time seconds
@@ -421,14 +421,14 @@ class TestController:
                 ChargestartTime = datetime.now()
                 try:
                     # Charging loop
-                    self.startPSOutput()
+                    self.start_ps_output()
                     if charge_mode == "CC":
-                        self.chargeCC(charge_current_max)
-                        self.setVoltage(charge_volt_start)
+                        self.charge_cc(charge_current_max)
+                        self.set_voltage(charge_volt_start)
                     elif charge_mode == "CV":
-                        self.chargeCV(charge_volt_end)
+                        self.charge_cv(charge_volt_end)
                     elif charge_mode == "CP":
-                        self.chargeCP(charge_volt_end * charge_current_max)
+                        self.charge_cp(charge_volt_end * charge_current_max)
                     print('Charging')
                     while datetime.now() < Cend_time and not self.stop_event.is_set():
                         time.sleep(self.timeInterval)
@@ -441,70 +441,70 @@ class TestController:
                             currentVolt = charge_volt_start + DeltaV * ratio
                             if currentVolt > charge_volt_end:
                                 currentVolt = charge_volt_end
-                            self.setVoltage(currentVolt)
-                        v_ps = self.getVoltagePSC()
-                        v = self.getVoltageELC()
-                        c = self.getCurrentPSC()
+                            self.set_voltage(currentVolt)
+                        v_ps = self.get_voltage_psc()
+                        v = self.get_voltage_elc()
+                        c = self.get_current_psc()
                         mm = None
                         if multimeter_mode == "voltage":
-                            mm = self.getVoltageMM()
+                            mm = self.get_voltage_mm()
                         elif multimeter_mode == "tcouple":
-                            mm = self.getTemperatureMM()
+                            mm = self.get_temperature_mm()
                         self._debug(
                             f"{cycleNumber} of {num_cycles} -CHARGING- {tmp.total_seconds():03.2f} s of {Cduration.total_seconds():.1f} s - V_PS:{v_ps:.4f} V:{v:.4f} C:{c:.4f}",
                             mm,
                         )
-                        dataStorage.addTime(float(tmp.total_seconds()))
-                        dataStorage.addVoltage(v)
-                        dataStorage.addCurrent(c)
+                        dataStorage.add_time(float(tmp.total_seconds()))
+                        dataStorage.add_voltage(v)
+                        dataStorage.add_current(c)
                         if multimeter_mode == "voltage":
                             assert mm is not None
-                            dataStorage.addMMVoltage(mm)
+                            dataStorage.add_mm_voltage(mm)
                         elif multimeter_mode == "tcouple":
                             assert mm is not None
-                            dataStorage.addMMTemperature(mm)
-                    self.stopPSOutput()
+                            dataStorage.add_mm_temperature(mm)
+                    self.stop_ps_output()
                     if rest_time > 0:
                         time.sleep(rest_time)
 
                     Dend_time = datetime.now() + Dduration
-                    self.stopDischarge()
+                    self.stop_discharge()
                     if discharge_mode == "CC":
-                        self.dischargeCC(dcharge_current_max)
+                        self.discharge_cc(dcharge_current_max)
                     elif discharge_mode == "CV":
-                        self.dischargeCV(dcharge_volt_min)
+                        self.discharge_cv(dcharge_volt_min)
                     elif discharge_mode == "CP":
-                        self.dischargeCP(dcharge_volt_min * dcharge_current_max)
+                        self.discharge_cp(dcharge_volt_min * dcharge_current_max)
 
                     DischargestartTime = datetime.now()
                     print('Discharging')
                     while datetime.now() < Dend_time and not self.stop_event.is_set():
                         time.sleep(self.timeInterval)
                         tmp = datetime.now()-DischargestartTime
-                        v = self.getVoltageELC()
-                        c = self.getCurrentELC()
+                        v = self.get_voltage_elc()
+                        c = self.get_current_elc()
                         mm = None
                         if multimeter_mode == "voltage":
-                            mm = self.getVoltageMM()
+                            mm = self.get_voltage_mm()
                         elif multimeter_mode == "tcouple":
-                            mm = self.getTemperatureMM()
+                            mm = self.get_temperature_mm()
                         self._debug(
                             f"{cycleNumber} of {num_cycles} -DISCHARGING- {tmp.total_seconds():03.2f} s of {Dduration.total_seconds():.1f} s - V:{v:.4f} C:{c:.4f}",
                             mm,
                         )
-                        dataStorage.addTime(float(tmp.total_seconds()))
-                        dataStorage.addVoltage(v)
-                        dataStorage.addCurrent(c)
+                        dataStorage.add_time(float(tmp.total_seconds()))
+                        dataStorage.add_voltage(v)
+                        dataStorage.add_current(c)
                         if multimeter_mode == "voltage":
                             assert mm is not None
-                            dataStorage.addMMVoltage(mm)
+                            dataStorage.add_mm_voltage(mm)
                         elif multimeter_mode == "tcouple":
                             assert mm is not None
-                            dataStorage.addMMTemperature(mm)
+                            dataStorage.add_mm_temperature(mm)
                         if v < dcharge_volt_min:
                             print(f"below {dcharge_volt_min} volts")
                             break
-                    self.stopDischarge()
+                    self.stop_discharge()
                     if rest_time > 0:
                         time.sleep(rest_time)
                 except KeyboardInterrupt:
@@ -512,7 +512,7 @@ class TestController:
                     self.abort()
                     raise
                 finally:
-                    dataStorage.createTable(
+                    dataStorage.create_table(
                         test_name,
                         dcharge_current_max,
                         cycleNumber,
@@ -520,15 +520,15 @@ class TestController:
                         self.timeInterval,
                         charge_time,
                     )
-                    self.stopPSOutput()
-                    self.stopDischarge()
+                    self.stop_ps_output()
+                    self.stop_discharge()
                 if self.stop_event.is_set():
                     break
         except KeyboardInterrupt:
             pass
         finally:
-            self.stopPSOutput()
-            self.stopDischarge()
+            self.stop_ps_output()
+            self.stop_discharge()
 
         # Set the event to indicate that testing is finished
         self.event.set()
@@ -609,74 +609,74 @@ class TestController:
 
         # ----- CC step -----
         print("Charging (CC stage)")
-        self.startPSOutput()
-        self.chargeCC(charge_current)
-        self.setVoltage(charge_voltage)
+        self.start_ps_output()
+        self.charge_cc(charge_current)
+        self.set_voltage(charge_voltage)
         while True:
             time.sleep(self.timeInterval)
             elapsed += self.timeInterval
-            v = self.getVoltagePSC()
-            c = self.getCurrentPSC()
+            v = self.get_voltage_psc()
+            c = self.get_current_psc()
             self._debug(
                 f"CC Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f}"
             )
             energy_in += v * c * self.timeInterval / 3600.0
-            dataStorage.addTime(elapsed)
-            dataStorage.addVoltage(v)
-            dataStorage.addCurrent(c)
+            dataStorage.add_time(elapsed)
+            dataStorage.add_voltage(v)
+            dataStorage.add_current(c)
             if v >= charge_voltage:
                 break
 
         # ----- CV step -----
         print("Charging (CV stage)")
-        self.chargeCV(charge_voltage)
+        self.charge_cv(charge_voltage)
         while True:
             time.sleep(self.timeInterval)
             elapsed += self.timeInterval
-            v = self.getVoltagePSC()
-            c = self.getCurrentPSC()
+            v = self.get_voltage_psc()
+            c = self.get_current_psc()
             self._debug(
                 f"CV Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f}"
             )
             energy_in += v * c * self.timeInterval / 3600.0
-            dataStorage.addTime(elapsed)
-            dataStorage.addVoltage(v)
-            dataStorage.addCurrent(c)
+            dataStorage.add_time(elapsed)
+            dataStorage.add_voltage(v)
+            dataStorage.add_current(c)
             if c <= 0.05 * charge_current:
                 break
 
-        self.stopPSOutput()
+        self.stop_ps_output()
 
         print("Resting for 10 minutes")
         time.sleep(600)
 
         # ----- Discharge step -----
         print("Discharging")
-        self.stopDischarge()
-        self.setCCLmode()
-        self.setCCcurrentL1(discharge_current)
-        self.startDischarge()
+        self.stop_discharge()
+        self.set_ccl_mode()
+        self.set_cc_current_l1(discharge_current)
+        self.start_discharge()
         while True:
             time.sleep(self.timeInterval)
             elapsed += self.timeInterval
-            v = self.getVoltageELC()
-            c = self.getCurrentELC()
+            v = self.get_voltage_elc()
+            c = self.get_current_elc()
             self._debug(
                 f"Discharging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f}"
             )
             energy_out += v * c * self.timeInterval / 3600.0
-            dataStorage.addTime(elapsed)
-            dataStorage.addVoltage(v)
-            dataStorage.addCurrent(c)
+            dataStorage.add_time(elapsed)
+            dataStorage.add_voltage(v)
+            dataStorage.add_current(c)
             if v <= discharge_voltage:
                 break
 
-        self.stopDischarge()
+        self.stop_discharge()
         efficiency = 0.0
         if energy_in > 0:
             efficiency = (energy_out / energy_in) * 100.0
         print(f"Efficiency: {efficiency:.2f}%")
-        dataStorage.createTable(
+        dataStorage.create_table(
             "efficiency_test", discharge_current, 0, temperature, self.timeInterval
         )
 
@@ -702,63 +702,63 @@ class TestController:
             elapsed = 0.0
 
             # -- charge cell using CC–CV --
-            self.startPSOutput()
-            self.chargeCC(charge_current)
-            self.setVoltage(charge_voltage)
+            self.start_ps_output()
+            self.charge_cc(charge_current)
+            self.set_voltage(charge_voltage)
             while True:
                 time.sleep(self.timeInterval)
                 elapsed += self.timeInterval
-                v = self.getVoltagePSC()
-                c = self.getCurrentPSC()
+                v = self.get_voltage_psc()
+                c = self.get_current_psc()
                 self._debug(
                     f"CC Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f}"
                 )
-                dataStorage.addTime(elapsed)
-                dataStorage.addVoltage(v)
-                dataStorage.addCurrent(c)
+                dataStorage.add_time(elapsed)
+                dataStorage.add_voltage(v)
+                dataStorage.add_current(c)
                 if v >= charge_voltage:
                     break
-            self.chargeCV(charge_voltage)
+            self.charge_cv(charge_voltage)
             while True:
                 time.sleep(self.timeInterval)
                 elapsed += self.timeInterval
-                v = self.getVoltagePSC()
-                c = self.getCurrentPSC()
+                v = self.get_voltage_psc()
+                c = self.get_current_psc()
                 self._debug(
                     f"CV Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f}"
                 )
-                dataStorage.addTime(elapsed)
-                dataStorage.addVoltage(v)
-                dataStorage.addCurrent(c)
+                dataStorage.add_time(elapsed)
+                dataStorage.add_voltage(v)
+                dataStorage.add_current(c)
                 if c <= 0.05 * charge_current:
                     break
-            self.stopPSOutput()
+            self.stop_ps_output()
 
             time.sleep(600)  # rest
 
             # -- discharge step --
-            self.stopDischarge()
-            self.setCCLmode()
-            self.setCCcurrentL1(d_current)
-            self.startDischarge()
+            self.stop_discharge()
+            self.set_ccl_mode()
+            self.set_cc_current_l1(d_current)
+            self.start_discharge()
             capacity = 0.0
             while True:
                 time.sleep(self.timeInterval)
                 elapsed += self.timeInterval
-                v = self.getVoltageELC()
-                c = self.getCurrentELC()
+                v = self.get_voltage_elc()
+                c = self.get_current_elc()
                 capacity += c * self.timeInterval / 3600.0
                 self._debug(
                     f"Discharging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}"
                 )
-                dataStorage.addTime(elapsed)
-                dataStorage.addVoltage(v)
-                dataStorage.addCurrent(c)
-                dataStorage.addCapacity(capacity)
+                dataStorage.add_time(elapsed)
+                dataStorage.add_voltage(v)
+                dataStorage.add_current(c)
+                dataStorage.add_capacity(capacity)
                 if v <= discharge_voltage:
                     break
-            self.stopDischarge()
-            dataStorage.createTable(
+            self.stop_discharge()
+            dataStorage.create_table(
                 f"rate_characteristic_{i}", d_current, i, temperature, self.timeInterval
             )
 
@@ -781,21 +781,21 @@ class TestController:
         elapsed = 0.0
         for i in range(steps + 1):
             # charge for one step
-            self.startPSOutput()
-            self.chargeCC(step_current)
+            self.start_ps_output()
+            self.charge_cc(step_current)
             time.sleep(60)
-            self.stopPSOutput()
+            self.stop_ps_output()
 
             print(f"Resting before OCV measurement {i}")
             time.sleep(rest_time)
-            v = self.getVoltageELC()
+            v = self.get_voltage_elc()
             elapsed += rest_time
-            dataStorage.addTime(elapsed)
-            dataStorage.addVoltage(v)
-            dataStorage.addCurrent(0.0)
+            dataStorage.add_time(elapsed)
+            dataStorage.add_voltage(v)
+            dataStorage.add_current(0.0)
             print(f"Step {i}: OCV {v:.4f} V")
 
-        dataStorage.createTable(
+        dataStorage.create_table(
             "ocv_curve_test", step_current, 0, temperature, self.timeInterval
         )
         self.event.set()
@@ -814,17 +814,17 @@ class TestController:
 
         # Open circuit voltage
         self.apply_safety_limits(charge_current_max=pulse_current)
-        ocv = self.getVoltageELC()
+        ocv = self.get_voltage_elc()
         print(f"OCV: {ocv:.4f} V")
 
         # Apply current pulse
-        self.stopDischarge()
-        self.setCCLmode()
-        self.setCCcurrentL1(pulse_current)
-        self.startDischarge()
+        self.stop_discharge()
+        self.set_ccl_mode()
+        self.set_cc_current_l1(pulse_current)
+        self.start_discharge()
         time.sleep(pulse_duration)
-        v_loaded = self.getVoltageELC()
-        self.stopDischarge()
+        v_loaded = self.get_voltage_elc()
+        self.stop_discharge()
 
         delta_v = ocv - v_loaded
         r_dc = 0.0
@@ -833,14 +833,14 @@ class TestController:
         r_ac = float(self.multimeterController.getResistance())
         print(f"DC resistance: {r_dc:.4f} ohm, AC resistance: {r_ac}")
 
-        dataStorage.addTime(0.0)
-        dataStorage.addVoltage(ocv)
-        dataStorage.addCurrent(0.0)
-        dataStorage.addTime(pulse_duration)
-        dataStorage.addVoltage(v_loaded)
-        dataStorage.addCurrent(pulse_current)
+        dataStorage.add_time(0.0)
+        dataStorage.add_voltage(ocv)
+        dataStorage.add_current(0.0)
+        dataStorage.add_time(pulse_duration)
+        dataStorage.add_voltage(v_loaded)
+        dataStorage.add_current(pulse_current)
 
-        dataStorage.createTable(
+        dataStorage.create_table(
             "internal_resistance_test", pulse_current, 0, temperature, self.timeInterval
         )
 
@@ -877,9 +877,9 @@ class TestController:
                     charge_volt_end=charge_voltage,
                     charge_current_max=charge_current_1c,
                 )
-                self.startPSOutput()
-                self.chargeCC(charge_current_1c)
-                self.setVoltage(charge_voltage)
+                self.start_ps_output()
+                self.charge_cc(charge_current_1c)
+                self.set_voltage(charge_voltage)
 
                 elapsed = 0.0
                 capacity = 0.0
@@ -890,27 +890,27 @@ class TestController:
                     elapsed += self.timeInterval
                     if self.stop_event.is_set():
                         break
-                    v = self.getVoltageELC()
-                    c = self.getCurrentPSC()
+                    v = self.get_voltage_elc()
+                    c = self.get_current_psc()
                     mm = None
                     if self.multimeter_mode == "voltage":
-                        mm = self.getVoltageMM()
+                        mm = self.get_voltage_mm()
                     elif self.multimeter_mode == "tcouple":
-                        mm = self.getTemperatureMM()
+                        mm = self.get_temperature_mm()
                     self._debug(
                         f"Charging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}",
                         mm,
                     )
-                    dataStorage.addTime(elapsed)
-                    dataStorage.addVoltage(v)
-                    dataStorage.addCurrent(c)
+                    dataStorage.add_time(elapsed)
+                    dataStorage.add_voltage(v)
+                    dataStorage.add_current(c)
                     if self.multimeter_mode == "voltage":
                         assert mm is not None
-                        dataStorage.addMMVoltage(mm)
+                        dataStorage.add_mm_voltage(mm)
                     elif self.multimeter_mode == "tcouple":
                         assert mm is not None
-                        dataStorage.addMMTemperature(mm)
-                    dataStorage.addCapacity(capacity)
+                        dataStorage.add_mm_temperature(mm)
+                    dataStorage.add_capacity(capacity)
                     if self.stop_event.is_set():
                         break
                     if c <= finish_current:
@@ -920,17 +920,17 @@ class TestController:
                     else:
                         low_current_time = 0.0
 
-                self.stopPSOutput()
+                self.stop_ps_output()
 
                 # ----- Rest step -----
                 print(f"Resting for {rest_time} seconds")
                 time.sleep(rest_time)
 
                 # ----- Discharge step -----
-                self.stopDischarge()
-                self.setCCHmode()
-                self.setCCcurrentL1(discharge_current_1c)
-                self.startDischarge()
+                self.stop_discharge()
+                self.set_cch_mode()
+                self.set_cc_current_l1(discharge_current_1c)
+                self.start_discharge()
 
                 print(f"Discharging to {min_voltage} V at {discharge_current_1c} A")
                 while not self.stop_event.is_set():
@@ -938,51 +938,51 @@ class TestController:
                     elapsed += self.timeInterval
                     if self.stop_event.is_set():
                         break
-                    v = self.getVoltageELC()
-                    c = self.getCurrentELC()
+                    v = self.get_voltage_elc()
+                    c = self.get_current_elc()
                     capacity += c * self.timeInterval / 3600.0
                     mm = None
                     if self.multimeter_mode == "voltage":
-                        mm = self.getVoltageMM()
+                        mm = self.get_voltage_mm()
                     elif self.multimeter_mode == "tcouple":
-                        mm = self.getTemperatureMM()
+                        mm = self.get_temperature_mm()
                     self._debug(
                         f"Discharging: {elapsed:.2f} s - V:{v:.4f} C:{c:.4f} Ah:{capacity:.3f}",
                         mm,
                     )
-                    dataStorage.addTime(elapsed)
-                    dataStorage.addVoltage(v)
-                    dataStorage.addCurrent(c)
+                    dataStorage.add_time(elapsed)
+                    dataStorage.add_voltage(v)
+                    dataStorage.add_current(c)
                     if self.multimeter_mode == "voltage":
                         assert mm is not None
-                        dataStorage.addMMVoltage(mm)
+                        dataStorage.add_mm_voltage(mm)
                     elif self.multimeter_mode == "tcouple":
                         assert mm is not None
-                        dataStorage.addMMTemperature(mm)
-                    dataStorage.addCapacity(capacity)
+                        dataStorage.add_mm_temperature(mm)
+                    dataStorage.add_capacity(capacity)
                     if v <= min_voltage or self.stop_event.is_set():
                         break
 
-                self.stopDischarge()
+                self.stop_discharge()
             except KeyboardInterrupt:
                 print("Keyboard interrupt - aborting test")
                 self.abort()
                 raise
             finally:
-                dataStorage.createTable(
+                dataStorage.create_table(
                     "actual_capacity_test",
                     discharge_current_1c,
                     0,
                     temperature,
                     self.timeInterval,
                 )
-                self.stopPSOutput()
-                self.stopDischarge()
+                self.stop_ps_output()
+                self.stop_discharge()
         except KeyboardInterrupt:
             pass
         finally:
-            self.stopPSOutput()
-            self.stopDischarge()
+            self.stop_ps_output()
+            self.stop_discharge()
 
         print(f"Accumulated capacity: {capacity:.3f} Ah")
         self.event.set()
