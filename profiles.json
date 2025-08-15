@@ -48,5 +48,27 @@
       "capacity_discharge_current": 20.0,
       "temperature": 23.4
     }
+  },
+  "YUASA_CUSTOM1": {
+    "test_type": "custom",
+    "parameters": {
+      "test_name": "YUASA_CUSTOM1",
+      "temperature": 23.4,
+      "charge_volt_prot": 10,
+      "charge_current_prot": 100,
+      "charge_power_prot": 2000,
+      "charge_volt_start": 4.0,
+      "charge_volt_end": 4.1,
+      "charge_current_max": 5.0,
+      "dcharge_volt_min": 2.75,
+      "dcharge_current_max": 5.0,
+      "slew_volt": 0.1,
+      "slew_current": 0.1,
+      "leadin_time": 1,
+      "charge_time": 5,
+      "dcharge_time": 5,
+      "num_cycles": 2,
+      "multimeter_mode": "tcouple"
+    }
   }
 }
