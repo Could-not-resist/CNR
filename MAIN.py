@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 from pprint import pprint
+from typing import Any
 from defaults import (
     DEFAULT_LIMITS,
     DEFAULT_TEST_PARAMS,
@@ -399,7 +400,7 @@ def main():
             val = default
         return val
 
-    def build_actual_capacity_params():
+    def build_actual_capacity_params() -> dict[str, Any]:
         return {
             "charge_current_1c": resolve_param(
                 "capacity_charge_current", "capacity_charge_current", 1.0
@@ -420,7 +421,7 @@ def main():
             ),
         }
 
-    def build_efficiency_params():
+    def build_efficiency_params() -> dict[str, Any]:
         return {
             "charge_current": resolve_param(
                 "charge_current_max", "charge_current_max", CHARGE_CURRENT_MAX
@@ -437,7 +438,7 @@ def main():
             "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
         }
 
-    def build_rate_params():
+    def build_rate_params() -> dict[str, Any]:
         rates_val = resolve_param("rates", "rates", "1.0,0.5,0.2")
         if isinstance(rates_val, str):
             rates = [float(r) for r in rates_val.split(",") if r]
@@ -457,7 +458,7 @@ def main():
             "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
         }
 
-    def build_ocv_params():
+    def build_ocv_params() -> dict[str, Any]:
         return {
             "step_current": resolve_param("step_current", "step_current", 1.0),
             "steps": resolve_param("steps", "steps", 10),
@@ -465,7 +466,7 @@ def main():
             "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
         }
 
-    def build_ir_params():
+    def build_ir_params() -> dict[str, Any]:
         return {
             "pulse_current": resolve_param("pulse_current", "pulse_current", 1.0),
             "pulse_duration": resolve_param(
@@ -474,7 +475,7 @@ def main():
             "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
         }
 
-    def build_custom_params():
+    def build_custom_params() -> dict[str, Any]:
         # Apply the same resolution order as ``resolve_param`` so that the CLI
         # can override values from the profile.  "config" is consulted only
         # after ``params_section`` to allow the profile's "parameters" section
