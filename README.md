@@ -68,6 +68,9 @@ Common commands:
   python MAIN.py --profile <name>
   ```
 
+  The profile name must exist in the configuration file; otherwise an error
+  is reported.
+
   When the profile supplies a `test_type` and all required parameters, tests
   can be launched without any additional command‑line options. The
   `required_keys` section in `profiles.json` lists the parameters that must

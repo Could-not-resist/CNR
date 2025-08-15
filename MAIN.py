@@ -76,7 +76,11 @@ class CustomTestSettings:
 def load_config(
     config_path: str, profile: str
 ) -> tuple[dict, dict, str | None, dict]:
-    """Load profile configuration, defaults, test type and required keys."""
+    """Load profile configuration, defaults, test type and required keys.
+
+    Raises:
+        KeyError: If ``profile`` is missing from the configuration data.
+    """
     try:
         data = json.loads(Path(config_path).read_text())
     except FileNotFoundError:
@@ -89,7 +93,10 @@ def load_config(
     if not isinstance(data, dict):
         return {}, {}, None, {}
 
-    profile_data = data.get(profile, {})
+    if profile not in data:
+        raise KeyError(f"Profile '{profile}' not found in {config_path}")
+
+    profile_data = data[profile]
     if not isinstance(profile_data, dict):
         return {}, data.get("capacity_defaults", {}), None, data.get("required_keys", {})
 
@@ -295,7 +302,11 @@ def main():
     if args.profile and not config_file:
         config_file = "profiles.json"
     if config_file:
-        config, _, test_type, required_keys = load_config(config_file, profile)
+        try:
+            config, _, test_type, required_keys = load_config(config_file, profile)
+        except KeyError as exc:
+            print(exc)
+            return
         if test_type and required_keys:
             try:
                 validate_required_keys(config, required_keys, test_type)
