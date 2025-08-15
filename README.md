@@ -53,13 +53,26 @@ drivers are enabled. Set the environment variable `USE_MOCK_DRIVERS=1`
 to force the built‑in mock drivers for development without hardware.
  Use the `-d` flag to print detailed progress messages during a test.
 
-To display the profiles defined in a configuration file run:
+Common commands:
 
-```bash
-python MAIN.py --list-profiles [--config-file other.json]
-```
+- Create or update a profile. The interactive builder saves the result to
+  `profiles.json`:
 
-Without `--config-file` the command looks for `profiles.json`.
+  ```bash
+  python build_test_config.py
+  ```
+
+- Run a stored profile:
+
+  ```bash
+  python MAIN.py --profile <name>
+  ```
+
+- List the available profiles in `profiles.json`:
+
+  ```bash
+  python MAIN.py --list-profiles
+  ```
 
 Charging and discharging default to constant current (`CC`). Select
 constant voltage (`CV`) or constant power (`CP`) with the
@@ -174,12 +187,6 @@ appropriate test based on `test_type`:
 
 ```bash
 python MAIN.py --profile YUASA
-```
-
-To use a different configuration file:
-
-```bash
-python MAIN.py --config-file custom.json --profile YUASA
 ```
 
 Command-line options still override the values loaded from the profile.
