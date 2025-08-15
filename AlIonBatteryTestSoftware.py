@@ -11,6 +11,7 @@ from AlIonTestSoftwareDataManagement import DataStorage
 from defaults import DEFAULT_LIMITS
 
 import struct
+import traceback
 try:
     import pyvisa
     VisaIOError = pyvisa.errors.VisaIOError
@@ -54,23 +55,41 @@ class TestController:
             self.electronicLoadController = ElectronicLoadControllerMock()
             self.multimeterController = MultimeterControllerMock()
         else:
+            # Trying to connect to the real device controllers.  Failures for
+            # each instrument are handled separately so the user knows exactly
+            # which device could not be reached.
             try:
-                # Trying to connect to the real device controllers
                 self.powerSupplyController = PowerSupplyController(ps_resource)
                 print("Testcontroller succesfully connected to Power Supply")
+            except Exception as exc:  # pragma: no cover - hardware dependent
+                if self.debug:
+                    traceback.print_exc()
+                raise SystemExit(f"Failed to connect to power supply: {exc}") from exc
+
+            try:
                 self.electronicLoadController = ElectronicLoadController(el_resource)
                 print("Testcontroller succesfully connected to Electronic Load")
-                if multimeter_mode:
+            except Exception as exc:  # pragma: no cover - hardware dependent
+                if self.debug:
+                    traceback.print_exc()
+                raise SystemExit(
+                    f"Failed to connect to electronic load: {exc}"
+                ) from exc
+
+            if multimeter_mode:
+                try:
                     self.multimeterController = MultimeterController(mm_resource)
                     print("Testcontroller succesfully connected to Multimeter")
                     if multimeter_mode == "tcouple":
                         self.multimeterController.configure_thermocouple()
-                else:
-                    self.multimeterController = MultimeterControllerMock()
-            except Exception as exc:
-                raise SystemExit(
-                    "Aborting: no connection to hardware and mock drivers disabled"
-                ) from exc
+                except Exception as exc:  # pragma: no cover - hardware dependent
+                    if self.debug:
+                        traceback.print_exc()
+                    raise SystemExit(
+                        f"Failed to connect to multimeter: {exc}"
+                    ) from exc
+            else:
+                self.multimeterController = MultimeterControllerMock()
 
         # Create an event to indicate if test is running
         self.event = threading.Event()
