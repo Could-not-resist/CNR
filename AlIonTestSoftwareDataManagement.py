@@ -9,6 +9,7 @@ import pandas as pd
 from pandas import errors as pd_errors
 import math
 import statistics
+from defaults import DEFAULT_SAMPLE_INTERVAL
 
 
 class DataStorage:
@@ -66,7 +67,7 @@ class DataStorage:
         c_rate: float,
         cycleNr: int,
         temperature: float,
-        timeInterval: float,
+        timeInterval: float = DEFAULT_SAMPLE_INTERVAL,
         chargeTime=0,
         export_xlsx: bool = False,
         verbose: bool = False,
@@ -170,7 +171,7 @@ class DataStorage:
         df = pd.DataFrame(data, columns=head)
         df.to_csv(filePath + ".csv", index=False, float_format="%.4f")
 
-    def exportXLSXFile(self, filePath, chargeTime, timeInterval):
+    def exportXLSXFile(self, filePath, chargeTime, timeInterval=DEFAULT_SAMPLE_INTERVAL):
         """Create an Excel workbook with optional graphs."""
         # Read in the CSV file that was just created
         csvDataframe = pd.read_csv(filePath + ".csv")
