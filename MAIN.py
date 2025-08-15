@@ -5,7 +5,6 @@ import argparse
 import json
 import os
 from pathlib import Path
-from AlIonBatteryTestSoftware import TestController
 from defaults import (
     DEFAULT_LIMITS,
     DEFAULT_TEST_PARAMS,
@@ -106,6 +105,7 @@ class TestTypes:
         el_resource: str | None = None,
         mm_resource: str | None = None,
     ):
+        from AlIonBatteryTestSoftware import TestController
         self.testController = TestController(
             multimeter_mode, debug, ps_resource, el_resource, mm_resource
         )
@@ -265,7 +265,7 @@ def main():
             print(f"Error reading {config_path}: {exc}")
             return
         for name in data:
-            if name != "capacity_defaults":
+            if name not in {"capacity_defaults", "required_keys"}:
                 print(name)
         return
 
@@ -410,6 +410,7 @@ def main():
                 kwargs[field] = val
         return vars(CustomTestSettings(**kwargs))
 
+    from AlIonBatteryTestSoftware import TestController
     tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
 
     dispatch = {
