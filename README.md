@@ -72,10 +72,11 @@ Common commands:
   is reported.
 
   When the profile supplies a `test_type` and all required parameters, tests
-  can be launched without any additional command‑line options. The
-  `required_keys` section in `profiles.json` lists the parameters that must
-  be present for each test type; missing entries trigger an error when a
-  profile is loaded. Examples:
+  can be launched without any additional command‑line options. Passing a
+  command-line test type flag (for example, `--efficiency-test`) overrides the
+  profile's `test_type`. The `required_keys` section in `profiles.json` lists
+  the parameters that must be present for each test type; missing entries
+  trigger an error when a profile is loaded. Examples:
 
   ```bash
   # Custom cycle test
@@ -222,7 +223,8 @@ appropriate test based on `test_type`:
 python MAIN.py --profile YUASA
 ```
 
-Command-line options still override the values loaded from the profile.
+Command-line options still override the values loaded from the profile,
+including any test type flags.
 
 The helper `build_test_config.py` prompts for a test name and `test_type`
 and then gathers the relevant parameters before adding the profile to
