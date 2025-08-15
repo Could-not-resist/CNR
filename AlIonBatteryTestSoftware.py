@@ -298,36 +298,43 @@ class TestController:
     ) -> None:
         """Disable outputs and configure protection limits.
 
-        If parameters are omitted, values are loaded from ``MAIN`` or fall back
-        to the defaults in ``profiles.json``.
+        If parameters are omitted, values from ``defaults.DEFAULT_LIMITS`` are
+        used.
         """
 
-        try:
-            from MAIN import (
-                CHARGE_VOLT_PROT,
-                CHARGE_CURRENT_PROT,
-                CHARGE_POWER_PROT,
-                CHARGE_VOLT_END,
-                CHARGE_CURRENT_MAX,
-                SLEW_VOLT,
-                SLEW_CURRENT,
-            )
-        except Exception:
-            CHARGE_VOLT_PROT = DEFAULT_LIMITS["CHARGE_VOLT_PROT"]
-            CHARGE_CURRENT_PROT = DEFAULT_LIMITS["CHARGE_CURRENT_PROT"]
-            CHARGE_POWER_PROT = DEFAULT_LIMITS["CHARGE_POWER_PROT"]
-            CHARGE_VOLT_END = DEFAULT_LIMITS["CHARGE_VOLT_END"]
-            CHARGE_CURRENT_MAX = DEFAULT_LIMITS["CHARGE_CURRENT_MAX"]
-            SLEW_VOLT = DEFAULT_LIMITS["SLEW_VOLT"]
-            SLEW_CURRENT = DEFAULT_LIMITS["SLEW_CURRENT"]
-
-        charge_volt_prot = CHARGE_VOLT_PROT if charge_volt_prot is None else charge_volt_prot
-        charge_current_prot = CHARGE_CURRENT_PROT if charge_current_prot is None else charge_current_prot
-        charge_power_prot = CHARGE_POWER_PROT if charge_power_prot is None else charge_power_prot
-        charge_volt_end = CHARGE_VOLT_END if charge_volt_end is None else charge_volt_end
-        charge_current_max = CHARGE_CURRENT_MAX if charge_current_max is None else charge_current_max
-        slew_volt = SLEW_VOLT if slew_volt is None else slew_volt
-        slew_current = SLEW_CURRENT if slew_current is None else slew_current
+        charge_volt_prot = (
+            DEFAULT_LIMITS["CHARGE_VOLT_PROT"]
+            if charge_volt_prot is None
+            else charge_volt_prot
+        )
+        charge_current_prot = (
+            DEFAULT_LIMITS["CHARGE_CURRENT_PROT"]
+            if charge_current_prot is None
+            else charge_current_prot
+        )
+        charge_power_prot = (
+            DEFAULT_LIMITS["CHARGE_POWER_PROT"]
+            if charge_power_prot is None
+            else charge_power_prot
+        )
+        charge_volt_end = (
+            DEFAULT_LIMITS["CHARGE_VOLT_END"]
+            if charge_volt_end is None
+            else charge_volt_end
+        )
+        charge_current_max = (
+            DEFAULT_LIMITS["CHARGE_CURRENT_MAX"]
+            if charge_current_max is None
+            else charge_current_max
+        )
+        slew_volt = (
+            DEFAULT_LIMITS["SLEW_VOLT"] if slew_volt is None else slew_volt
+        )
+        slew_current = (
+            DEFAULT_LIMITS["SLEW_CURRENT"]
+            if slew_current is None
+            else slew_current
+        )
 
         self.stopPSOutput()
         self.stopDischarge()
