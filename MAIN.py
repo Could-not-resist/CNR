@@ -354,12 +354,21 @@ def main():
     )
 
     def resolve_multimeter_mode() -> str:
-        """Return validated multimeter mode from CLI, params or config."""
-        mode = config.get("multimeter_mode")
+        """Return validated multimeter mode.
+
+        Resolution order:
+        1. Command line argument
+        2. Profile's "parameters" section
+        3. Top level of the profile
+        4. Default "tcouple"
+        """
+        mode = args.multimeter_mode
         if mode is None:
             mode = params_section.get("multimeter_mode")
         if mode is None:
-            mode = args.multimeter_mode or "tcouple"
+            mode = config.get("multimeter_mode")
+        if mode is None:
+            mode = "tcouple"
         if mode not in {"voltage", "tcouple"}:
             raise ValueError(f"Invalid multimeter_mode: {mode}")
         return mode
