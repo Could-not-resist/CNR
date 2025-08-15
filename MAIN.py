@@ -17,61 +17,28 @@ from defaults import (
     DEFAULT_SAMPLE_INTERVAL,
 )
 
-# Charge/discharge voltage and current limits
-CHARGE_VOLT_START: float = DEFAULT_TEST_PARAMS["CHARGE_VOLT_START"]
-CHARGE_VOLT_END: float = DEFAULT_LIMITS["CHARGE_VOLT_END"]
-CHARGE_CURRENT_MAX: float = DEFAULT_LIMITS["CHARGE_CURRENT_MAX"]
-
-DCHARGE_VOLT_MIN: float = DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"]
-DCHARGE_CURRENT_MAX: float = DEFAULT_TEST_PARAMS["DCHARGE_CURRENT_MAX"]
-
-CHARGE_VOLT_PROT: int = DEFAULT_LIMITS["CHARGE_VOLT_PROT"]
-CHARGE_CURRENT_PROT: int = DEFAULT_LIMITS["CHARGE_CURRENT_PROT"]
-CHARGE_POWER_PROT: int = DEFAULT_LIMITS["CHARGE_POWER_PROT"]
-
-
-# Slew (ramp) settings
-SLEW_VOLT: float = DEFAULT_LIMITS["SLEW_VOLT"]
-SLEW_CURRENT: float = DEFAULT_LIMITS["SLEW_CURRENT"]
-
-# Timing (in seconds)
-# Ramp duration for increasing the charge voltage from CHARGE_VOLT_START
-# to CHARGE_VOLT_END at the beginning of each cycle
-LEADIN_TIME: int = DEFAULT_TEST_PARAMS["LEADIN_TIME"]
-
-CHARGE_TIME: int = DEFAULT_TEST_PARAMS["CHARGE_TIME"]
-DCHARGE_TIME: int = DEFAULT_TEST_PARAMS["DCHARGE_TIME"]
-REST_TIME: int = DEFAULT_TEST_PARAMS["REST_TIME"]
-
-# Cycling
-NUM_CYCLES: int = DEFAULT_TEST_PARAMS["NUM_CYCLES"]
-
-# Misc
-TEST_NAME: str = DEFAULT_TEST_PARAMS["TEST_NAME"]
-TEMPERATURE: float = DEFAULT_TEST_PARAMS["TEMPERATURE"]
-
 
 @dataclass
 class CustomTestSettings:
     """Configuration for a custom test run."""
 
-    test_name: str = TEST_NAME
-    temperature: float = TEMPERATURE
-    charge_volt_prot: int = CHARGE_VOLT_PROT
-    charge_current_prot: int = CHARGE_CURRENT_PROT
-    charge_power_prot: int = CHARGE_POWER_PROT
-    charge_volt_start: float = CHARGE_VOLT_START
-    charge_volt_end: float = CHARGE_VOLT_END
-    charge_current_max: float = CHARGE_CURRENT_MAX
-    dcharge_volt_min: float = DCHARGE_VOLT_MIN
-    dcharge_current_max: float = DCHARGE_CURRENT_MAX
-    slew_volt: float = SLEW_VOLT
-    slew_current: float = SLEW_CURRENT
-    leadin_time: int = LEADIN_TIME
-    charge_time: int = CHARGE_TIME
-    dcharge_time: int = DCHARGE_TIME
-    rest_time: int = REST_TIME
-    num_cycles: int = NUM_CYCLES
+    test_name: str = DEFAULT_TEST_PARAMS["TEST_NAME"]
+    temperature: float = DEFAULT_TEST_PARAMS["TEMPERATURE"]
+    charge_volt_prot: int = DEFAULT_LIMITS["CHARGE_VOLT_PROT"]
+    charge_current_prot: int = DEFAULT_LIMITS["CHARGE_CURRENT_PROT"]
+    charge_power_prot: int = DEFAULT_LIMITS["CHARGE_POWER_PROT"]
+    charge_volt_start: float = DEFAULT_TEST_PARAMS["CHARGE_VOLT_START"]
+    charge_volt_end: float = DEFAULT_LIMITS["CHARGE_VOLT_END"]
+    charge_current_max: float = DEFAULT_LIMITS["CHARGE_CURRENT_MAX"]
+    dcharge_volt_min: float = DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"]
+    dcharge_current_max: float = DEFAULT_TEST_PARAMS["DCHARGE_CURRENT_MAX"]
+    slew_volt: float = DEFAULT_LIMITS["SLEW_VOLT"]
+    slew_current: float = DEFAULT_LIMITS["SLEW_CURRENT"]
+    leadin_time: int = DEFAULT_TEST_PARAMS["LEADIN_TIME"]
+    charge_time: int = DEFAULT_TEST_PARAMS["CHARGE_TIME"]
+    dcharge_time: int = DEFAULT_TEST_PARAMS["DCHARGE_TIME"]
+    rest_time: int = DEFAULT_TEST_PARAMS["REST_TIME"]
+    num_cycles: int = DEFAULT_TEST_PARAMS["NUM_CYCLES"]
     charge_mode: str = "CC"
     discharge_mode: str = "CC"
     sample_interval: float = DEFAULT_SAMPLE_INTERVAL
@@ -347,7 +314,7 @@ def main():
                 print(name)
         return
 
-    profile = args.profile or args.test_name or TEST_NAME
+    profile = args.profile or args.test_name or DEFAULT_TEST_PARAMS["TEST_NAME"]
     config: dict = {}
     test_type = None
     required_keys: dict = {}
@@ -437,12 +404,18 @@ def main():
             ),
             "rest_time": resolve_param("capacity_rest_time", "capacity_rest_time", 3600.0),
             "charge_voltage": resolve_param(
-                "capacity_charge_voltage", "capacity_charge_voltage", CHARGE_VOLT_END
+                "capacity_charge_voltage",
+                "capacity_charge_voltage",
+                DEFAULT_LIMITS["CHARGE_VOLT_END"],
             ),
             "min_voltage": resolve_param(
-                "capacity_min_voltage", "capacity_min_voltage", DCHARGE_VOLT_MIN
+                "capacity_min_voltage",
+                "capacity_min_voltage",
+                DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"],
             ),
-            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+            "temperature": resolve_param(
+                "temperature", "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+            ),
             "finish_current": resolve_param(
                 "capacity_finish_current", "capacity_finish_current", 1.5
             ),
@@ -451,18 +424,28 @@ def main():
     def build_efficiency_params() -> dict[str, Any]:
         return {
             "charge_current": resolve_param(
-                "charge_current_max", "charge_current_max", CHARGE_CURRENT_MAX
+                "charge_current_max",
+                "charge_current_max",
+                DEFAULT_LIMITS["CHARGE_CURRENT_MAX"],
             ),
             "discharge_current": resolve_param(
-                "dcharge_current_max", "dcharge_current_max", DCHARGE_CURRENT_MAX
+                "dcharge_current_max",
+                "dcharge_current_max",
+                DEFAULT_TEST_PARAMS["DCHARGE_CURRENT_MAX"],
             ),
             "charge_voltage": resolve_param(
-                "charge_volt_end", "charge_volt_end", CHARGE_VOLT_END
+                "charge_volt_end",
+                "charge_volt_end",
+                DEFAULT_LIMITS["CHARGE_VOLT_END"],
             ),
             "discharge_voltage": resolve_param(
-                "dcharge_volt_min", "dcharge_volt_min", DCHARGE_VOLT_MIN
+                "dcharge_volt_min",
+                "dcharge_volt_min",
+                DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"],
             ),
-            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+            "temperature": resolve_param(
+                "temperature", "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+            ),
         }
 
     def build_rate_params() -> dict[str, Any]:
@@ -474,15 +457,23 @@ def main():
         return {
             "discharge_currents": rates,
             "charge_current": resolve_param(
-                "charge_current_max", "charge_current_max", CHARGE_CURRENT_MAX
+                "charge_current_max",
+                "charge_current_max",
+                DEFAULT_LIMITS["CHARGE_CURRENT_MAX"],
             ),
             "charge_voltage": resolve_param(
-                "charge_volt_end", "charge_volt_end", CHARGE_VOLT_END
+                "charge_volt_end",
+                "charge_volt_end",
+                DEFAULT_LIMITS["CHARGE_VOLT_END"],
             ),
             "discharge_voltage": resolve_param(
-                "dcharge_volt_min", "dcharge_volt_min", DCHARGE_VOLT_MIN
+                "dcharge_volt_min",
+                "dcharge_volt_min",
+                DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"],
             ),
-            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+            "temperature": resolve_param(
+                "temperature", "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+            ),
         }
 
     def build_ocv_params() -> dict[str, Any]:
@@ -490,7 +481,9 @@ def main():
             "step_current": resolve_param("step_current", "step_current", 1.0),
             "steps": resolve_param("steps", "steps", 10),
             "rest_time": resolve_param("rest_time", "rest_time", 1800.0),
-            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+            "temperature": resolve_param(
+                "temperature", "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+            ),
         }
 
     def build_ir_params() -> dict[str, Any]:
@@ -499,7 +492,9 @@ def main():
             "pulse_duration": resolve_param(
                 "pulse_duration", "pulse_duration", 1.0
             ),
-            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+            "temperature": resolve_param(
+                "temperature", "temperature", DEFAULT_TEST_PARAMS["TEMPERATURE"]
+            ),
         }
 
     def build_custom_params() -> dict[str, Any]:
