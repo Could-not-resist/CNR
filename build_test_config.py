@@ -164,7 +164,7 @@ def _prompt_multimeter_mode() -> str:
         print(f"Enter one of: {choices}.")
 
 
-def build_custom_settings(test_name: str) -> dict:
+def build_custom_settings(test_name: str) -> dict[str, Any]:
     """Collect custom test settings from the user with range validation."""
     custom = {"test_name": test_name}
     for field, default in CUSTOM_DEFAULTS.items():
@@ -179,7 +179,7 @@ def build_custom_settings(test_name: str) -> dict:
     return custom
 
 
-def build_capacity_settings(test_name: str) -> dict:
+def build_capacity_settings(test_name: str) -> dict[str, Any]:
     """Collect parameters for ``actual_capacity_test``."""
     cap = {"test_name": test_name}
     for field, default in CAPACITY_DEFAULTS.items():
@@ -189,7 +189,7 @@ def build_capacity_settings(test_name: str) -> dict:
     return cap
 
 
-def build_efficiency_settings(test_name: str) -> dict:
+def build_efficiency_settings(test_name: str) -> dict[str, Any]:
     """Collect parameters for ``efficiency_test``."""
     eff = {"test_name": test_name}
     for field, default in EFFICIENCY_DEFAULTS.items():
@@ -199,7 +199,7 @@ def build_efficiency_settings(test_name: str) -> dict:
     return eff
 
 
-def build_rate_settings(test_name: str) -> dict:
+def build_rate_settings(test_name: str) -> dict[str, Any]:
     """Collect parameters for ``rate_characteristic_test``."""
     rate = {"test_name": test_name}
     default_rates = ",".join(str(r) for r in RATE_DEFAULTS["discharge_currents"])
@@ -218,7 +218,7 @@ def build_rate_settings(test_name: str) -> dict:
     return rate
 
 
-def build_ocv_settings(test_name: str) -> dict:
+def build_ocv_settings(test_name: str) -> dict[str, Any]:
     """Collect parameters for ``ocv_curve_test``."""
     ocv = {"test_name": test_name}
     ocv["step_current"] = _prompt_number(
@@ -253,7 +253,7 @@ def build_ocv_settings(test_name: str) -> dict:
     return ocv
 
 
-def build_resistance_settings(test_name: str) -> dict:
+def build_resistance_settings(test_name: str) -> dict[str, Any]:
     """Collect parameters for ``internal_resistance_test``."""
     res = {"test_name": test_name}
     for field, default in RESISTANCE_DEFAULTS.items():
