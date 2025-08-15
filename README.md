@@ -231,7 +231,10 @@ including any test type flags.
 The helper `build_test_config.py` prompts for a test name and `test_type`
 and then gathers the relevant parameters before adding the profile to
 `profiles.json`.
-It also asks for a multimeter mode (`voltage` or `tcouple`) and defaults to `tcouple`.
+It also asks for a multimeter mode (`voltage` or `tcouple`) and defaults to
+`tcouple`. At runtime the mode is resolved with command-line options taking
+priority, followed by the profile's `parameters` section, the top-level profile
+configuration and finally the built-in default `tcouple`.
 
 This charges the cell at 1C up to the voltage specified by
 `--capacity-charge-voltage` (default taken from `--charge-volt-end`),
