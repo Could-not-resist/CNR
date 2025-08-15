@@ -4,7 +4,7 @@ Command-line test type flags (e.g., ``--efficiency-test``) take priority
 over the ``test_type`` defined in a profile.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 import argparse
 import json
 import os
@@ -414,43 +414,39 @@ def main():
             val = default
         return val
 
+    def build_params(mapping: dict[str, tuple]):
+        """Build parameter dictionaries based on mapping definitions."""
+        params: dict[str, object] = {}
+        for name, spec in mapping.items():
+            if len(spec) == 3:
+                key, cli_attr, default = spec
+            else:
+                key, default = spec
+                cli_attr = key
+            params[name] = resolve_param(key, cli_attr, default)
+        return params
+
     def build_actual_capacity_params():
-        return {
-            "charge_current_1c": resolve_param(
-                "capacity_charge_current", "capacity_charge_current", 1.0
-            ),
-            "discharge_current_1c": resolve_param(
-                "capacity_discharge_current", "capacity_discharge_current", 1.0
-            ),
-            "rest_time": resolve_param("capacity_rest_time", "capacity_rest_time", 3600.0),
-            "charge_voltage": resolve_param(
-                "capacity_charge_voltage", "capacity_charge_voltage", CHARGE_VOLT_END
-            ),
-            "min_voltage": resolve_param(
-                "capacity_min_voltage", "capacity_min_voltage", DCHARGE_VOLT_MIN
-            ),
-            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
-            "finish_current": resolve_param(
-                "capacity_finish_current", "capacity_finish_current", 1.5
-            ),
+        mapping = {
+            "charge_current_1c": ("capacity_charge_current", 1.0),
+            "discharge_current_1c": ("capacity_discharge_current", 1.0),
+            "rest_time": ("capacity_rest_time", 3600.0),
+            "charge_voltage": ("capacity_charge_voltage", CHARGE_VOLT_END),
+            "min_voltage": ("capacity_min_voltage", DCHARGE_VOLT_MIN),
+            "temperature": ("temperature", TEMPERATURE),
+            "finish_current": ("capacity_finish_current", 1.5),
         }
+        return build_params(mapping)
 
     def build_efficiency_params():
-        return {
-            "charge_current": resolve_param(
-                "charge_current_max", "charge_current_max", CHARGE_CURRENT_MAX
-            ),
-            "discharge_current": resolve_param(
-                "dcharge_current_max", "dcharge_current_max", DCHARGE_CURRENT_MAX
-            ),
-            "charge_voltage": resolve_param(
-                "charge_volt_end", "charge_volt_end", CHARGE_VOLT_END
-            ),
-            "discharge_voltage": resolve_param(
-                "dcharge_volt_min", "dcharge_volt_min", DCHARGE_VOLT_MIN
-            ),
-            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+        mapping = {
+            "charge_current": ("charge_current_max", CHARGE_CURRENT_MAX),
+            "discharge_current": ("dcharge_current_max", DCHARGE_CURRENT_MAX),
+            "charge_voltage": ("charge_volt_end", CHARGE_VOLT_END),
+            "discharge_voltage": ("dcharge_volt_min", DCHARGE_VOLT_MIN),
+            "temperature": ("temperature", TEMPERATURE),
         }
+        return build_params(mapping)
 
     def build_rate_params():
         rates_val = resolve_param("rates", "rates", "1.0,0.5,0.2")
@@ -458,55 +454,42 @@ def main():
             rates = [float(r) for r in rates_val.split(",") if r]
         else:
             rates = [float(r) for r in rates_val]
-        return {
-            "discharge_currents": rates,
-            "charge_current": resolve_param(
-                "charge_current_max", "charge_current_max", CHARGE_CURRENT_MAX
-            ),
-            "charge_voltage": resolve_param(
-                "charge_volt_end", "charge_volt_end", CHARGE_VOLT_END
-            ),
-            "discharge_voltage": resolve_param(
-                "dcharge_volt_min", "dcharge_volt_min", DCHARGE_VOLT_MIN
-            ),
-            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+        mapping = {
+            "charge_current": ("charge_current_max", CHARGE_CURRENT_MAX),
+            "charge_voltage": ("charge_volt_end", CHARGE_VOLT_END),
+            "discharge_voltage": ("dcharge_volt_min", DCHARGE_VOLT_MIN),
+            "temperature": ("temperature", TEMPERATURE),
         }
+        params = build_params(mapping)
+        params["discharge_currents"] = rates
+        return params
 
     def build_ocv_params():
-        return {
-            "step_current": resolve_param("step_current", "step_current", 1.0),
-            "steps": resolve_param("steps", "steps", 10),
-            "rest_time": resolve_param("rest_time", "rest_time", 1800.0),
-            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+        mapping = {
+            "step_current": ("step_current", 1.0),
+            "steps": ("steps", 10),
+            "rest_time": ("rest_time", 1800.0),
+            "temperature": ("temperature", TEMPERATURE),
         }
+        return build_params(mapping)
 
     def build_ir_params():
-        return {
-            "pulse_current": resolve_param("pulse_current", "pulse_current", 1.0),
-            "pulse_duration": resolve_param(
-                "pulse_duration", "pulse_duration", 1.0
-            ),
-            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+        mapping = {
+            "pulse_current": ("pulse_current", 1.0),
+            "pulse_duration": ("pulse_duration", 1.0),
+            "temperature": ("temperature", TEMPERATURE),
         }
+        return build_params(mapping)
 
     def build_custom_params():
-        # Apply the same resolution order as ``resolve_param`` so that the CLI
-        # can override values from the profile.  "config" is consulted only
-        # after ``params_section`` to allow the profile's "parameters" section
-        # to take precedence over top level entries.
-        kwargs = {}
-        for field in CustomTestSettings.__annotations__.keys():
-            if field == "multimeter_mode":
-                continue
-            val = getattr(args, field, None)
-            if val is None:
-                val = params_section.get(field)
-            if val is None:
-                val = config.get(field)
-            if val is not None:
-                kwargs[field] = val
-        kwargs["multimeter_mode"] = multimeter_mode
-        return vars(CustomTestSettings(**kwargs))
+        mapping = {
+            f.name: (f.name, f.default)
+            for f in fields(CustomTestSettings)
+            if f.name != "multimeter_mode"
+        }
+        params = build_params(mapping)
+        params["multimeter_mode"] = multimeter_mode
+        return vars(CustomTestSettings(**params))
 
     dispatch = {
         "actual_capacity_test": ("actual_capacity_test", build_actual_capacity_params),
