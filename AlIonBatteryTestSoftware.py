@@ -523,7 +523,10 @@ class TestController:
         leadin_time: int,
         charge_time: int,
         dcharge_time: int,
+        rest_time: int,
         num_cycles: int,
+        charge_mode: str,
+        discharge_mode: str,
         sample_interval: float,
         multimeter_mode: str | None = None,
     ):
@@ -546,7 +549,10 @@ class TestController:
                 leadin_time,
                 charge_time,
                 dcharge_time,
+                rest_time,
                 num_cycles,
+                charge_mode,
+                discharge_mode,
                 multimeter_mode,
             )
         finally:
