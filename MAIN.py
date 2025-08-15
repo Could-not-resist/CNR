@@ -74,7 +74,7 @@ class CustomTestSettings:
     charge_mode: str = "CC"
     discharge_mode: str = "CC"
     sample_interval: float = DEFAULT_SAMPLE_INTERVAL
-    multimeter_mode: str | None = None
+    multimeter_mode: str = "tcouple"
 
 
 
@@ -291,7 +291,7 @@ def main():
     parser.add_argument(
         "--multimeter-mode",
         choices=["voltage", "tcouple"],
-        help="log measurement with multimeter (voltage or thermocouple)"
+        help="log measurement with multimeter (voltage or thermocouple, default: tcouple)"
     )
     parser.add_argument(
         "-d",
@@ -357,14 +357,14 @@ def main():
         or config.get("mm_resource")
     )
 
-    def resolve_multimeter_mode() -> str | None:
+    def resolve_multimeter_mode() -> str:
         """Return validated multimeter mode from CLI, params or config."""
         mode = config.get("multimeter_mode")
         if mode is None:
             mode = params_section.get("multimeter_mode")
         if mode is None:
-            mode = args.multimeter_mode
-        if mode not in {None, "voltage", "tcouple"}:
+            mode = args.multimeter_mode or "tcouple"
+        if mode not in {"voltage", "tcouple"}:
             raise ValueError(f"Invalid multimeter_mode: {mode}")
         return mode
 

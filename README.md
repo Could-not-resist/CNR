@@ -297,7 +297,7 @@ common flags accepted by `MAIN.py` are listed below. Run
 | `--rest-time` | Rest period in seconds between charge and discharge |
 | `--num-cycles` | Number of charge/discharge cycles |
 | `--sample-interval` | Time between measurements in seconds |
-| `--multimeter-mode` | Log measurement using the multimeter (`voltage` or `tcouple`) |
+| `--multimeter-mode` | Log measurement using the multimeter (`voltage` or `tcouple`, default `tcouple`) |
 | `-d`, `--debug` | Print detailed progress information |
 | `--dry-run` | Display resolved parameters and exit without running a test |
 
