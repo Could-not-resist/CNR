@@ -15,13 +15,13 @@ except Exception:  # pyvisa may not be installed when using mock drivers
         """Fallback VisaIOError when pyvisa is unavailable."""
         pass
 
-from AlIonTestSoftwareDataManagement import DataStorage
-from AlIonTestSoftwareDeviceDrivers import (
+from al_ion_test_software_data_management import DataStorage
+from al_ion_test_software_device_drivers import (
     PowerSupplyController,
     ElectronicLoadController,
     MultimeterController,
 )
-from AlIonTestSoftwareDeviceDriversMock import (
+from al_ion_test_software_device_drivers_mock import (
     PowerSupplyControllerMock,
     ElectronicLoadControllerMock,
     MultimeterControllerMock,
