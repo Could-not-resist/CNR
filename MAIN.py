@@ -189,6 +189,21 @@ class TestTypes:
 
 
 def main():
+    """Entry point for the command-line interface.
+
+    Builds an :class:`argparse.ArgumentParser` for test configuration, then
+    loads an optional profile from ``profiles.json`` (or ``--config-file``).
+    Test parameters are resolved with the following precedence:
+
+    1. Command-line arguments
+    2. ``parameters`` section inside the selected profile
+    3. Top-level keys of the profile
+    4. Fallback values from :mod:`defaults`
+
+    Defaults imported from :mod:`defaults` provide a central source of truth
+    for safety limits and test parameters, easing future updates.
+    """
+
     parser = argparse.ArgumentParser(description="Run custom test")
     parser.add_argument(
         "--config-file", help="JSON file with cell settings (defaults to profiles.json)"
