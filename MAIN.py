@@ -339,6 +339,13 @@ def main():
         resolved_test_type = test_type or "custom"
 
     def resolve_param(key: str, cli_attr: str, default):
+        # Parameter resolution hierarchy:
+        # 1. Command line argument
+        # 2. Profile's "parameters" section
+        # 3. Top level of the profile
+        # 4. Hard coded defaults
+        # "config" is checked after "params_section" so that values inside the
+        # dedicated "parameters" block override broader profile settings.
         val = getattr(args, cli_attr, None)
         if val is None:
             val = params_section.get(key)
@@ -424,6 +431,10 @@ def main():
         }
 
     def build_custom_params():
+        # Apply the same resolution order as ``resolve_param`` so that the CLI
+        # can override values from the profile.  "config" is consulted only
+        # after ``params_section`` to allow the profile's "parameters" section
+        # to take precedence over top level entries.
         kwargs = {}
         for field in CustomTestSettings.__annotations__.keys():
             val = getattr(args, field, None)
