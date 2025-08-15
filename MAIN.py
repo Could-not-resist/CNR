@@ -99,69 +99,6 @@ def validate_required_keys(profile: dict, required: dict, test_type: str) -> Non
         )
 
 
-
-class TestTypes:
-    def __init__(
-        self,
-        multimeter_mode: str | None = None,
-        debug: bool = False,
-        ps_resource: str | None = None,
-        el_resource: str | None = None,
-        mm_resource: str | None = None,
-    ):
-        from AlIonBatteryTestSoftware import TestController
-        self.testController = TestController(
-            multimeter_mode, debug, ps_resource, el_resource, mm_resource
-        )
-        self.custom_thread = None
-
-    def run_custom_test(self, settings: CustomTestSettings):
-        """Start a custom test using the provided settings."""
-        import threading
-        valid_modes = {"CC", "CV", "CP"}
-        if settings.charge_mode not in valid_modes:
-            raise ValueError(f"Invalid charge_mode: {settings.charge_mode}")
-        if settings.discharge_mode not in valid_modes:
-            raise ValueError(f"Invalid discharge_mode: {settings.discharge_mode}")
-
-        self.testController.event.clear()
-        self.custom_thread = threading.Thread(
-            target=self.testController.custom_test,
-            args=(
-                settings.test_name,
-                settings.temperature,
-                settings.charge_volt_prot,
-                settings.charge_current_prot,
-                settings.charge_power_prot,
-                settings.charge_volt_start,
-                settings.charge_volt_end,
-                settings.charge_current_max,
-                settings.dcharge_volt_min,
-                settings.dcharge_current_max,
-                settings.slew_volt,
-                settings.slew_current,
-                settings.leadin_time,
-                settings.charge_time,
-                settings.dcharge_time,
-                settings.rest_time,
-                settings.num_cycles,
-                settings.charge_mode,
-                settings.discharge_mode,
-                settings.sample_interval,
-                settings.multimeter_mode,
-            ),
-        )
-        self.custom_thread.start()
-        return self.custom_thread
-
-    def stop(self):
-        """Abort the running test and wait for it to finish."""
-        if self.testController:
-            self.testController.abort()
-        if self.custom_thread is not None:
-            self.custom_thread.join()
-
-
 def main():
     """Entry point for the command-line interface.
 
