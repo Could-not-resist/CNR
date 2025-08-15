@@ -267,14 +267,13 @@ def main():
         return
 
     profile = args.profile or args.test_name or TEST_NAME
-    config = {}
-    capacity_defaults = {}
+    config: dict = {}
     test_type = None
     config_file = args.config_file
     if args.profile and not config_file:
         config_file = "profiles.json"
     if config_file:
-        config, capacity_defaults, test_type = load_config(config_file, profile)
+        config, _, test_type = load_config(config_file, profile)
 
     ps_resource = (
         args.ps_resource
@@ -292,212 +291,134 @@ def main():
         or config.get("mm_resource")
     )
 
-
-    for field in CustomTestSettings.__annotations__.keys():
-        if getattr(args, field) is None:
-            if field in config:
-                setattr(args, field, config[field])
-        if getattr(args, field) is None:
-            # fall back to dataclass default by leaving as None
-            pass
-
-    # apply defaults for standalone tests
-    charge_volt_end = args.charge_volt_end if args.charge_volt_end is not None else CHARGE_VOLT_END
-    dcharge_volt_min = args.dcharge_volt_min if args.dcharge_volt_min is not None else DCHARGE_VOLT_MIN
-    charge_current_max = args.charge_current_max if args.charge_current_max is not None else CHARGE_CURRENT_MAX
-    dcharge_current_max = args.dcharge_current_max if args.dcharge_current_max is not None else DCHARGE_CURRENT_MAX
-    temperature = args.temperature if args.temperature is not None else TEMPERATURE
-
-    rest_time = args.capacity_rest_time
-    if rest_time is None:
-        rest_time = config.get(
-            "rest_time", capacity_defaults.get("rest_time", 3600.0)
-        )
-
-    cap_charge_current = args.capacity_charge_current
-    if cap_charge_current is None:
-        cap_charge_current = config.get(
-            "charge_current", capacity_defaults.get("charge_current", 1.0)
-        )
-
-    cap_discharge_current = args.capacity_discharge_current
-    if cap_discharge_current is None:
-        cap_discharge_current = config.get(
-            "discharge_current", capacity_defaults.get("discharge_current", 1.0)
-        )
-
-    multimeter_mode = args.multimeter_mode
+    multimeter_mode = config.get("multimeter_mode")
     if multimeter_mode is None:
-        multimeter_mode = capacity_defaults.get("multimeter_mode")
+        multimeter_mode = args.multimeter_mode
 
-    cap_charge_volt = args.capacity_charge_voltage
-    if cap_charge_volt is None:
-        cap_charge_volt = config.get(
-            "charge_voltage", capacity_defaults.get("charge_voltage", charge_volt_end)
-        )
+    cli_flags = {
+        "actual_capacity_test": args.actual_capacity_test,
+        "efficiency_test": args.efficiency_test,
+        "rate_characteristic_test": args.rate_characteristic_test,
+        "ocv_curve_test": args.ocv_curve_test,
+        "internal_resistance_test": args.internal_resistance_test,
+    }
+    resolved_test_type = next((t for t, flag in cli_flags.items() if flag), None)
+    if resolved_test_type is None:
+        resolved_test_type = test_type or "custom"
 
-    cap_min_volt = args.capacity_min_voltage
-    if cap_min_volt is None:
-        cap_min_volt = config.get(
-            "min_voltage", capacity_defaults.get("min_voltage", dcharge_volt_min)
-        )
+    def resolve_param(key: str, cli_attr: str, default):
+        val = config.get(key)
+        if val is None:
+            val = getattr(args, cli_attr, None)
+        if val is None:
+            val = default
+        return val
 
-    finish_current = args.capacity_finish_current
-    if finish_current is None:
-        finish_current = config.get(
-            "finish_current", capacity_defaults.get("finish_current", 1.5)
-        )
+    def build_actual_capacity_params():
+        return {
+            "charge_current_1c": resolve_param(
+                "capacity_charge_current", "capacity_charge_current", 1.0
+            ),
+            "discharge_current_1c": resolve_param(
+                "capacity_discharge_current", "capacity_discharge_current", 1.0
+            ),
+            "rest_time": resolve_param("capacity_rest_time", "capacity_rest_time", 3600.0),
+            "charge_voltage": resolve_param(
+                "capacity_charge_voltage", "capacity_charge_voltage", CHARGE_VOLT_END
+            ),
+            "min_voltage": resolve_param(
+                "capacity_min_voltage", "capacity_min_voltage", DCHARGE_VOLT_MIN
+            ),
+            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+            "finish_current": resolve_param(
+                "capacity_finish_current", "capacity_finish_current", 1.5
+            ),
+        }
 
-    if args.actual_capacity_test:
-        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
-        tc.actual_capacity_test(
-            cap_charge_current,
-            cap_discharge_current,
-            rest_time,
-            cap_charge_volt,
-            cap_min_volt,
-            temperature,
-            finish_current,
-        )
-    elif args.efficiency_test:
-        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
-        tc.efficiency_test(
-            charge_current_max,
-            dcharge_current_max,
-            charge_volt_end,
-            dcharge_volt_min,
-            temperature,
-        )
-    elif args.rate_characteristic_test:
-        rates = [float(r) for r in args.rates.split(',') if r]
-        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
-        tc.rate_characteristic_test(
-            rates,
-            charge_current_max,
-            charge_volt_end,
-            dcharge_volt_min,
-            temperature,
-        )
-    elif args.ocv_curve_test:
-        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
-        tc.ocv_curve_test(
-            args.step_current,
-            args.steps,
-            1800.0,
-            temperature,
-        )
-    elif args.internal_resistance_test:
+    def build_efficiency_params():
+        return {
+            "charge_current": resolve_param(
+                "charge_current_max", "charge_current_max", CHARGE_CURRENT_MAX
+            ),
+            "discharge_current": resolve_param(
+                "dcharge_current_max", "dcharge_current_max", DCHARGE_CURRENT_MAX
+            ),
+            "charge_voltage": resolve_param(
+                "charge_volt_end", "charge_volt_end", CHARGE_VOLT_END
+            ),
+            "discharge_voltage": resolve_param(
+                "dcharge_volt_min", "dcharge_volt_min", DCHARGE_VOLT_MIN
+            ),
+            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+        }
 
-        tc.internal_resistance_test(
-            args.pulse_current,
-            args.pulse_duration,
-            temperature,
-        )
-        capacity = tc.actual_capacity_test(
-            cap_charge_current,
-            cap_discharge_current,
-            rest_time,
-            cap_charge_volt,
-            cap_min_volt,
-            temperature,
-            finish_current,
-        )
-        print(f"Measured capacity: {capacity:.3f} Ah")
-    elif config_file and test_type:
-        tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
-        if test_type == "actual_capacity_test":
-            tc.actual_capacity_test(
-                cap_charge_current,
-                cap_discharge_current,
-                rest_time,
-                cap_charge_volt,
-                cap_min_volt,
-                temperature,
-                finish_current,
-            )
-        elif test_type == "efficiency_test":
-            tc.efficiency_test(
-                charge_current_max,
-                dcharge_current_max,
-                charge_volt_end,
-                dcharge_volt_min,
-                temperature,
-            )
-        elif test_type == "rate_characteristic_test":
-            rates_cfg = config.get("rates", args.rates)
-            if isinstance(rates_cfg, str):
-                rates = [float(r) for r in rates_cfg.split(',') if r]
-            else:
-                rates = [float(r) for r in rates_cfg]
-            tc.rate_characteristic_test(
-                rates,
-                charge_current_max,
-                charge_volt_end,
-                dcharge_volt_min,
-                temperature,
-            )
-        elif test_type == "ocv_curve_test":
-            step_current = config.get("step_current", args.step_current)
-            steps = config.get("steps", args.steps)
-            tc.ocv_curve_test(
-                step_current,
-                steps,
-                1800.0,
-                temperature,
-            )
-        elif test_type == "internal_resistance_test":
-            pulse_current = config.get("pulse_current", args.pulse_current)
-            pulse_duration = config.get("pulse_duration", args.pulse_duration)
-            tc.internal_resistance_test(
-                pulse_current,
-                pulse_duration,
-                temperature,
-            )
-            capacity = tc.actual_capacity_test(
-                cap_charge_current,
-                cap_discharge_current,
-                rest_time,
-                cap_charge_volt,
-                cap_min_volt,
-                temperature,
-                finish_current,
-            )
-            print(f"Measured capacity: {capacity:.3f} Ah")
-        elif test_type == "custom":
-            kwargs = {}
-            for field in CustomTestSettings.__annotations__.keys():
-                val = getattr(args, field, None)
-                if val is not None:
-                    kwargs[field] = val
-            settings = CustomTestSettings(**kwargs)
-            TObj = TestTypes(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
-            thread = TObj.run_custom_test(settings)
-            try:
-                while thread.is_alive():
-                    thread.join(0.5)
-            except KeyboardInterrupt:
-                print("Keyboard interrupt received, stopping test")
-                TObj.stop()
+    def build_rate_params():
+        rates_val = resolve_param("rates", "rates", "1.0,0.5,0.2")
+        if isinstance(rates_val, str):
+            rates = [float(r) for r in rates_val.split(",") if r]
         else:
-            print(f"Unsupported test_type: {test_type}")
-            return
+            rates = [float(r) for r in rates_val]
+        return {
+            "discharge_currents": rates,
+            "charge_current": resolve_param(
+                "charge_current_max", "charge_current_max", CHARGE_CURRENT_MAX
+            ),
+            "charge_voltage": resolve_param(
+                "charge_volt_end", "charge_volt_end", CHARGE_VOLT_END
+            ),
+            "discharge_voltage": resolve_param(
+                "dcharge_volt_min", "dcharge_volt_min", DCHARGE_VOLT_MIN
+            ),
+            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+        }
 
-    else:
+    def build_ocv_params():
+        return {
+            "step_current": resolve_param("step_current", "step_current", 1.0),
+            "steps": resolve_param("steps", "steps", 10),
+            "rest_time": resolve_param("rest_time", "rest_time", 1800.0),
+            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+        }
+
+    def build_ir_params():
+        return {
+            "pulse_current": resolve_param("pulse_current", "pulse_current", 1.0),
+            "pulse_duration": resolve_param(
+                "pulse_duration", "pulse_duration", 1.0
+            ),
+            "temperature": resolve_param("temperature", "temperature", TEMPERATURE),
+        }
+
+    def build_custom_params():
         kwargs = {}
         for field in CustomTestSettings.__annotations__.keys():
-            val = getattr(args, field, None)
+            val = config.get(field)
+            if val is None:
+                val = getattr(args, field, None)
             if val is not None:
                 kwargs[field] = val
-        settings = CustomTestSettings(**kwargs)
+        return vars(CustomTestSettings(**kwargs))
 
-        TObj = TestTypes(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
-        thread = TObj.run_custom_test(settings)
-        try:
-            while thread.is_alive():
-                thread.join(0.5)
-        except KeyboardInterrupt:
-            print("Keyboard interrupt received, stopping test")
-            TObj.stop()
+    tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
+
+    dispatch = {
+        "actual_capacity_test": (tc.actual_capacity_test, build_actual_capacity_params),
+        "efficiency_test": (tc.efficiency_test, build_efficiency_params),
+        "rate_characteristic_test": (tc.rate_characteristic_test, build_rate_params),
+        "ocv_curve_test": (tc.ocv_curve_test, build_ocv_params),
+        "internal_resistance_test": (tc.internal_resistance_test, build_ir_params),
+        "custom": (tc.custom_test, build_custom_params),
+    }
+
+    method, builder = dispatch.get(resolved_test_type, dispatch["custom"])
+    params = builder()
+    try:
+        result = method(**params)
+        if resolved_test_type == "actual_capacity_test" and result is not None:
+            print(f"Measured capacity: {result:.3f} Ah")
+    except KeyboardInterrupt:
+        print("Keyboard interrupt received, stopping test")
+        tc.abort()
 
 
 if __name__ == "__main__":
