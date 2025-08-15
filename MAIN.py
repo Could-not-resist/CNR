@@ -503,9 +503,18 @@ def main():
         return
 
     from AlIonBatteryTestSoftware import TestController
-    tc = TestController(
-        multimeter_mode, args.debug, ps_resource, el_resource, mm_resource
-    )
+    try:
+        from AlIonBatteryTestSoftware import VisaIOError
+    except ImportError:  # pragma: no cover - falls back when mock is used
+        VisaIOError = Exception
+    try:
+        tc = TestController(
+            multimeter_mode, args.debug, ps_resource, el_resource, mm_resource
+        )
+    except (SystemExit, ConnectionError, OSError, VisaIOError) as exc:
+        print(f"Failed to initialize TestController: {exc}")
+        return
+
     method = getattr(tc, method_name)
     try:
         result = method(**params)
