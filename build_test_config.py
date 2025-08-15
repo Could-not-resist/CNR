@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Callable, Any
 from defaults import DEFAULT_LIMITS, DEFAULT_TEST_PARAMS
 
-# Default custom test settings matching MAIN.py constants
+# Default custom test settings matching main.py constants
 DEFAULT_TEST_NAME = DEFAULT_TEST_PARAMS["TEST_NAME"]
 
 # Multimeter mode options

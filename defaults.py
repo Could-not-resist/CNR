@@ -1,7 +1,7 @@
 """Shared default configuration values for safety limits.
 
 This module centralises fallback values used across the project so that
-`MAIN.py` and `AlIonBatteryTestSoftware.py` reference a single source of
+`main.py` and `al_ion_battery_test_software.py` reference a single source of
 truth. Importing from here keeps the defaults consistent should they need
 to be updated in the future.
 """

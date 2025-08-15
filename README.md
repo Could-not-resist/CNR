@@ -10,11 +10,11 @@ measurements while logging the resulting data.
 
 | File | Purpose |
 | --- | --- |
-| `MAIN.py` | Command-line interface and entry point. Parses arguments, loads configuration from `profiles.json` and invokes tests in `TestController`. |
-| `AlIonBatteryTestSoftware.py` | Implements `TestController`, coordinating the power supply, electronic load and multimeter. Contains high level test routines such as custom tests, efficiency tests and capacity measurements. |
-| `AlIonTestSoftwareDataManagement.py` | Provides the `DataStorage` class used to store and export measurement data to CSV/Excel and to create graphs. |
-| `AlIonTestSoftwareDeviceDrivers.py` | Low level device drivers using NI-VISA to control the power supply, electronic load and multimeter. |
-| `AlIonTestSoftwareDeviceDriversMock.py` | Mock versions of the device drivers for running the software without hardware attached. |
+| `main.py` | Command-line interface and entry point. Parses arguments, loads configuration from `profiles.json` and invokes tests in `TestController`. |
+| `al_ion_battery_test_software.py` | Implements `TestController`, coordinating the power supply, electronic load and multimeter. Contains high level test routines such as custom tests, efficiency tests and capacity measurements. |
+| `al_ion_test_software_data_management.py` | Provides the `DataStorage` class used to store and export measurement data to CSV/Excel and to create graphs. |
+| `al_ion_test_software_device_drivers.py` | Low level device drivers using NI-VISA to control the power supply, electronic load and multimeter. |
+| `al_ion_test_software_device_drivers_mock.py` | Mock versions of the device drivers for running the software without hardware attached. |
 | `build_test_config.py` | Interactive helper that writes profile entries for any test type. |
 | `scpi_commands.py` | Quick reference of SCPI command strings used by the drivers. |
 | `profiles.json` | Example configuration profiles containing test parameters, their `test_type`, and a `required_keys` map. |
@@ -46,7 +46,7 @@ pip install pyvisa pandas openpyxl matplotlib tabulate
 3. Run the test script:
 
 ```bash
-python MAIN.py
+python main.py
 ```
    If no hardware connection is detected the program aborts unless mock
 drivers are enabled. Set the environment variable `USE_MOCK_DRIVERS=1`
@@ -66,7 +66,7 @@ Common commands:
 - Run a stored profile:
 
   ```bash
-  python MAIN.py --profile <name>
+  python main.py --profile <name>
   ```
 
   The profile name must exist in the configuration file; otherwise an error
@@ -86,22 +86,22 @@ Common commands:
 
   ```bash
   # Custom cycle test
-  python MAIN.py --profile MY_CUSTOM_PROFILE
+  python main.py --profile MY_CUSTOM_PROFILE
 
   # Actual capacity test
-  python MAIN.py --profile YUASA_ACT1
+  python main.py --profile YUASA_ACT1
 
   # Efficiency test
-  python MAIN.py --profile MY_EFFICIENCY_PROFILE
+  python main.py --profile MY_EFFICIENCY_PROFILE
 
   # Rate characteristic test
-  python MAIN.py --profile MY_RATE_PROFILE
+  python main.py --profile MY_RATE_PROFILE
 
   # OCV curve test
-  python MAIN.py --profile MY_OCV_PROFILE
+  python main.py --profile MY_OCV_PROFILE
 
   # Internal resistance test
-  python MAIN.py --profile MY_IR_PROFILE
+  python main.py --profile MY_IR_PROFILE
   ```
 
   The script prints the resolved parameter set before starting a test. Use
@@ -111,7 +111,7 @@ Common commands:
 - List the available profiles in `profiles.json`:
 
   ```bash
-  python MAIN.py --list-profiles
+  python main.py --list-profiles
   ```
 
 Charging and discharging default to constant current (`CC`). Select
@@ -119,7 +119,7 @@ constant voltage (`CV`) or constant power (`CP`) with the
 `--charge-mode` and `--discharge-mode` options:
 
 ```bash
-python MAIN.py --charge-mode CV --discharge-mode CP
+python main.py --charge-mode CV --discharge-mode CP
 ```
 
 ### Instrument resource names
@@ -138,7 +138,7 @@ If none of these are provided the built-in defaults are used.
 To perform a full capacity measurement instead of the default cycling test run:
 
 ```bash
-python MAIN.py --actual-capacity-test \
+python main.py --actual-capacity-test \
   --capacity-charge-current 1.0 \
   --capacity-discharge-current 1.0 \
   [--capacity-rest-time 3600] \
@@ -156,14 +156,14 @@ The configuration file may define ``rest_time``, ``charge_voltage``,
 ``min_voltage``, ``charge_current``, ``discharge_current``,
 ``finish_current``, ``temperature`` and ``multimeter_mode`` keys inside
 ``capacity_defaults``. These values override the built‑in defaults in
-``MAIN.py`` but any command-line options still take precedence.
+``main.py`` but any command-line options still take precedence.
 
 Additional tests can be invoked with the following flags:
 
 - **Efficiency test**
 
   ```bash
-  python MAIN.py --efficiency-test
+  python main.py --efficiency-test
   ```
 
   Performs a CC–CV charge followed by a discharge and prints the round
@@ -172,7 +172,7 @@ Additional tests can be invoked with the following flags:
 - **Rate characteristic test**
 
   ```bash
-  python MAIN.py --rate-characteristic-test --rates 1.0,0.5,0.2
+  python main.py --rate-characteristic-test --rates 1.0,0.5,0.2
   ```
 
   Charges the cell and then discharges sequentially at the specified currents
@@ -181,7 +181,7 @@ Additional tests can be invoked with the following flags:
 - **OCV curve test**
 
   ```bash
-  python MAIN.py --ocv-curve-test --step-current 1.0 --steps 10
+  python main.py --ocv-curve-test --step-current 1.0 --steps 10
   ```
 
   Steps the state of charge and logs the open circuit voltage after each rest
@@ -190,7 +190,7 @@ Additional tests can be invoked with the following flags:
 - **Internal resistance test**
 
   ```bash
-  python MAIN.py --internal-resistance-test --pulse-current 1 --pulse-duration 1
+  python main.py --internal-resistance-test --pulse-current 1 --pulse-duration 1
   ```
 
   Applies a short current pulse to determine the DC and AC resistance of the
@@ -222,11 +222,11 @@ Profiles follow this structure:
 }
 ```
 
-Run the profile without additional flags and `MAIN.py` selects the
+Run the profile without additional flags and `main.py` selects the
 appropriate test based on `test_type`:
 
 ```bash
-python MAIN.py --profile YUASA
+python main.py --profile YUASA
 ```
 
 Command-line options still override the values loaded from the profile,
@@ -283,8 +283,8 @@ Refer to the device programming manuals for the meaning of each setting.
 ### Command-line options
 
 The parameters above can be overridden on the command line. The most
-common flags accepted by `MAIN.py` are listed below. Run
-`python MAIN.py --help` for the full set of options.
+common flags accepted by `main.py` are listed below. Run
+`python main.py --help` for the full set of options.
 
 | Option | Description |
 | --- | --- |
