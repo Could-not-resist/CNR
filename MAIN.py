@@ -273,15 +273,15 @@ def main():
                 logger.info(name)
         return
 
-    profile = args.profile or args.test_name or DEFAULT_TEST_PARAMS["TEST_NAME"]
+    profile = args.profile
     config: dict = {}
     test_type = None
     required_keys: dict = {}
-    config_file = args.config_file
-    if args.profile and not config_file:
-        config_file = "profiles.json"
     capacity_defaults: dict[str, Any] = {}
-    if config_file:
+    config_file = args.config_file
+    if profile:
+        if not config_file:
+            config_file = "profiles.json"
         try:
             config, capacity_defaults, test_type, required_keys = load_config(
                 config_file, profile
@@ -498,7 +498,10 @@ def main():
         for field in CustomTestSettings.__annotations__.keys():
             if field == "multimeter_mode":
                 continue
-            val = getattr(args, field, None)
+            if field == "test_name" and profile:
+                val = None
+            else:
+                val = getattr(args, field, None)
             if val is None:
                 val = params_section.get(field)
             if val is None:
