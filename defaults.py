@@ -61,5 +61,9 @@ DEFAULT_TEST_PARAMS: TestDefaults = {
 }
 
 
-__all__ = ["DEFAULT_LIMITS", "DEFAULT_TEST_PARAMS"]
+# Default time interval between each measurement in seconds
+DEFAULT_SAMPLE_INTERVAL: float = 0.2
+
+
+__all__ = ["DEFAULT_LIMITS", "DEFAULT_TEST_PARAMS", "DEFAULT_SAMPLE_INTERVAL"]
 

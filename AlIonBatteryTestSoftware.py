@@ -8,7 +8,7 @@ import os
 from AlIonTestSoftwareDeviceDrivers import PowerSupplyController, ElectronicLoadController, MultimeterController
 from AlIonTestSoftwareDeviceDriversMock import PowerSupplyControllerMock, ElectronicLoadControllerMock, MultimeterControllerMock
 from AlIonTestSoftwareDataManagement import DataStorage
-from defaults import DEFAULT_LIMITS
+from defaults import DEFAULT_LIMITS, DEFAULT_SAMPLE_INTERVAL
 
 import struct
 import traceback
@@ -24,11 +24,9 @@ except Exception:  # pyvisa may not be installed when using mock drivers
 # Class used to control test procedures
 class TestController:
     """Coordinate power supply, load and measurement devices for tests."""
-    # Indicates the number of seconds between each measurement
-    timeInterval = 0.2
-    # Variable for keeping track of the open circuit voltage of a full battery
-    # Variable for keeping track of the open circuit voltage of an empty battery
-    # Variable for keeping track of the C-rate of the battery
+    # Default number of seconds between each measurement. Instances store the
+    # current interval in ``self.timeInterval`` which defaults to
+    # ``DEFAULT_SAMPLE_INTERVAL`` but can be overridden.
 
     # Initiating function
     def __init__(
@@ -39,6 +37,7 @@ class TestController:
         el_resource: str | None = None,
         mm_resource: str | None = None,
         use_mock: bool | None = None,
+        sample_interval: float = DEFAULT_SAMPLE_INTERVAL,
     ) -> None:
         self.multimeter_mode = multimeter_mode
         self.debug = debug
@@ -95,6 +94,8 @@ class TestController:
         self.event = threading.Event()
         # Event used to gracefully abort a running test
         self.stop_event = threading.Event()
+        # Sampling interval between measurements
+        self.timeInterval = sample_interval
 
     def _debug(self, message: str, mm_value: float | None = None) -> None:
         """Print debug message when debug mode is enabled.

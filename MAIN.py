@@ -6,7 +6,11 @@ import json
 import os
 from pathlib import Path
 from AlIonBatteryTestSoftware import TestController
-from defaults import DEFAULT_LIMITS, DEFAULT_TEST_PARAMS
+from defaults import (
+    DEFAULT_LIMITS,
+    DEFAULT_TEST_PARAMS,
+    DEFAULT_SAMPLE_INTERVAL,
+)
 
 # Charge/discharge voltage and current limits
 CHARGE_VOLT_START: float = DEFAULT_TEST_PARAMS["CHARGE_VOLT_START"]
@@ -65,7 +69,7 @@ class CustomTestSettings:
     num_cycles: int = NUM_CYCLES
     charge_mode: str = "CC"
     discharge_mode: str = "CC"
-    sample_interval: float = TestController.timeInterval
+    sample_interval: float = DEFAULT_SAMPLE_INTERVAL
     multimeter_mode: str | None = None
 
 
