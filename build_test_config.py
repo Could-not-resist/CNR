@@ -18,25 +18,26 @@ The tool asks for a ``test_name`` and a ``test_type`` such as
 import json
 from pathlib import Path
 from typing import Callable, Any
+from defaults import DEFAULT_LIMITS, DEFAULT_TEST_PARAMS
 
 # Default custom test settings matching MAIN.py constants
-DEFAULT_TEST_NAME = "YUASA"
+DEFAULT_TEST_NAME = DEFAULT_TEST_PARAMS["TEST_NAME"]
 CUSTOM_DEFAULTS = {
-    "temperature": 23.4,
-    "charge_volt_prot": 10,
-    "charge_current_prot": 100,
-    "charge_power_prot": 2000,
-    "charge_volt_start": 4.1,
-    "charge_volt_end": 4.1,
-    "charge_current_max": 5.0,
-    "dcharge_volt_min": 2.75,
-    "dcharge_current_max": 20.0,
-    "slew_volt": 0.1,
-    "slew_current": 0.1,
-    "leadin_time": 1,
-    "charge_time": 5,
-    "dcharge_time": 5,
-    "num_cycles": 1,
+    "temperature": DEFAULT_TEST_PARAMS["TEMPERATURE"],
+    "charge_volt_prot": DEFAULT_LIMITS["CHARGE_VOLT_PROT"],
+    "charge_current_prot": DEFAULT_LIMITS["CHARGE_CURRENT_PROT"],
+    "charge_power_prot": DEFAULT_LIMITS["CHARGE_POWER_PROT"],
+    "charge_volt_start": DEFAULT_TEST_PARAMS["CHARGE_VOLT_START"],
+    "charge_volt_end": DEFAULT_LIMITS["CHARGE_VOLT_END"],
+    "charge_current_max": DEFAULT_LIMITS["CHARGE_CURRENT_MAX"],
+    "dcharge_volt_min": DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"],
+    "dcharge_current_max": DEFAULT_TEST_PARAMS["DCHARGE_CURRENT_MAX"],
+    "slew_volt": DEFAULT_LIMITS["SLEW_VOLT"],
+    "slew_current": DEFAULT_LIMITS["SLEW_CURRENT"],
+    "leadin_time": DEFAULT_TEST_PARAMS["LEADIN_TIME"],
+    "charge_time": DEFAULT_TEST_PARAMS["CHARGE_TIME"],
+    "dcharge_time": DEFAULT_TEST_PARAMS["DCHARGE_TIME"],
+    "num_cycles": DEFAULT_TEST_PARAMS["NUM_CYCLES"],
     "multimeter_mode": None,
 }
 
@@ -61,8 +62,8 @@ CUSTOM_RANGES = {
 
 CAPACITY_DEFAULTS = {
     "rest_time": 60.0,
-    "charge_voltage": 4.1,
-    "min_voltage": 2.75,
+    "charge_voltage": DEFAULT_LIMITS["CHARGE_VOLT_END"],
+    "min_voltage": DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"],
     "charge_current": 1.0,
     "finish_current": 1.5,
     "discharge_current": 1.0,
@@ -80,9 +81,9 @@ CAPACITY_RANGES = {
 EFFICIENCY_DEFAULTS = {
     "charge_current": 1.0,
     "discharge_current": 1.0,
-    "charge_voltage": 4.1,
-    "discharge_voltage": 2.75,
-    "temperature": 20.0,
+    "charge_voltage": DEFAULT_LIMITS["CHARGE_VOLT_END"],
+    "discharge_voltage": DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"],
+    "temperature": DEFAULT_TEST_PARAMS["TEMPERATURE"],
 }
 
 EFFICIENCY_RANGES = {
@@ -96,9 +97,9 @@ EFFICIENCY_RANGES = {
 RATE_DEFAULTS = {
     "discharge_currents": [1.0, 0.5, 0.2],
     "charge_current": 1.0,
-    "charge_voltage": 4.1,
-    "discharge_voltage": 2.75,
-    "temperature": 20.0,
+    "charge_voltage": DEFAULT_LIMITS["CHARGE_VOLT_END"],
+    "discharge_voltage": DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"],
+    "temperature": DEFAULT_TEST_PARAMS["TEMPERATURE"],
 }
 
 RATE_RANGES = {
@@ -112,7 +113,7 @@ OCV_DEFAULTS = {
     "step_current": 1.0,
     "steps": 10,
     "rest_time": 1800.0,
-    "temperature": 20.0,
+    "temperature": DEFAULT_TEST_PARAMS["TEMPERATURE"],
 }
 
 OCV_RANGES = {
@@ -125,7 +126,7 @@ OCV_RANGES = {
 RESISTANCE_DEFAULTS = {
     "pulse_current": 1.0,
     "pulse_duration": 1.0,
-    "temperature": 20.0,
+    "temperature": DEFAULT_TEST_PARAMS["TEMPERATURE"],
 }
 
 RESISTANCE_RANGES = {

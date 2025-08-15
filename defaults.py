@@ -32,5 +32,34 @@ DEFAULT_LIMITS: LimitDefaults = {
 }
 
 
-__all__ = ["DEFAULT_LIMITS"]
+class TestDefaults(TypedDict):
+    """Type definition for general test parameter defaults."""
+
+    CHARGE_VOLT_START: float
+    DCHARGE_VOLT_MIN: float
+    DCHARGE_CURRENT_MAX: float
+    LEADIN_TIME: int
+    CHARGE_TIME: int
+    DCHARGE_TIME: int
+    REST_TIME: int
+    NUM_CYCLES: int
+    TEST_NAME: str
+    TEMPERATURE: float
+
+
+DEFAULT_TEST_PARAMS: TestDefaults = {
+    "CHARGE_VOLT_START": 4.1,  # V
+    "DCHARGE_VOLT_MIN": 2.75,  # V
+    "DCHARGE_CURRENT_MAX": 20,  # A
+    "LEADIN_TIME": 1,  # s
+    "CHARGE_TIME": 5,  # s
+    "DCHARGE_TIME": 5,  # s
+    "REST_TIME": 0,  # s
+    "NUM_CYCLES": 1,
+    "TEST_NAME": "YUASA",
+    "TEMPERATURE": 23.4,  # °C
+}
+
+
+__all__ = ["DEFAULT_LIMITS", "DEFAULT_TEST_PARAMS"]
 
