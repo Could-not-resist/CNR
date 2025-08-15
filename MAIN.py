@@ -245,7 +245,8 @@ def main():
         help="discharging mode: CC, CV or CP",
     )
     parser.add_argument("--num-cycles", type=int)
-    parser.add_argument(
+    test_group = parser.add_mutually_exclusive_group()
+    test_group.add_argument(
         "--actual-capacity-test",
         action="store_true",
         help="run actual capacity test (overrides profile test_type)",
@@ -262,22 +263,22 @@ def main():
                         help="minimum discharge voltage for capacity test")
     parser.add_argument("--capacity-finish-current", type=float,
                         help="current threshold to end charging during capacity test")
-    parser.add_argument(
+    test_group.add_argument(
         "--efficiency-test",
         action="store_true",
         help="run efficiency test (overrides profile test_type)",
     )
-    parser.add_argument(
+    test_group.add_argument(
         "--rate-characteristic-test",
         action="store_true",
         help="run rate characteristic test (overrides profile test_type)",
     )
-    parser.add_argument(
+    test_group.add_argument(
         "--ocv-curve-test",
         action="store_true",
         help="run OCV curve test (overrides profile test_type)",
     )
-    parser.add_argument(
+    test_group.add_argument(
         "--internal-resistance-test",
         action="store_true",
         help=(
@@ -392,7 +393,9 @@ def main():
         "ocv_curve_test": args.ocv_curve_test,
         "internal_resistance_test": args.internal_resistance_test,
     }
-    # Command-line flags override the ``test_type`` loaded from a profile
+    # Argparse's mutually exclusive group ensures only one of these flags can be
+    # provided. Command-line flags override the ``test_type`` loaded from a
+    # profile.
     resolved_test_type = next((t for t, flag in cli_flags.items() if flag), None)
     if resolved_test_type is None:
         resolved_test_type = test_type or "custom"

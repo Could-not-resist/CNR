@@ -74,7 +74,9 @@ Common commands:
   When the profile supplies a `test_type` and all required parameters, tests
   can be launched without any additional command‑line options. Passing a
   command-line test type flag (for example, `--efficiency-test`) overrides the
-  profile's `test_type`. The `required_keys` section in `profiles.json` lists
+  profile's `test_type`. These flags are mutually exclusive; specifying more
+  than one will result in an error. The `required_keys` section in
+  `profiles.json` lists
   the parameters that must be present for each test type; missing entries
   trigger an error when a profile is loaded. Examples:
 
