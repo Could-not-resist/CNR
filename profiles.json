@@ -1,14 +1,52 @@
 {
+  "required_keys": {
+    "actual_capacity_test": [
+      "capacity_charge_current",
+      "capacity_discharge_current",
+      "capacity_rest_time",
+      "capacity_charge_voltage",
+      "capacity_min_voltage",
+      "capacity_finish_current",
+      "temperature"
+    ],
+    "efficiency_test": [
+      "charge_current_max",
+      "dcharge_current_max",
+      "charge_volt_end",
+      "dcharge_volt_min",
+      "temperature"
+    ],
+    "rate_characteristic_test": [
+      "rates",
+      "charge_current_max",
+      "charge_volt_end",
+      "dcharge_volt_min",
+      "temperature"
+    ],
+    "ocv_curve_test": [
+      "step_current",
+      "steps",
+      "rest_time",
+      "temperature"
+    ],
+    "internal_resistance_test": [
+      "pulse_current",
+      "pulse_duration",
+      "temperature"
+    ],
+    "custom": []
+  },
   "YUASA_ACT1": {
     "test_type": "actual_capacity_test",
     "parameters": {
       "test_name": "YUASA_ACT1",
-      "rest_time": 60.0,
-      "charge_voltage": 4.1,
-      "min_voltage": 2.75,
-      "charge_current": 20.0,
-      "finish_current": 1.5,
-      "discharge_current": 20.0
+      "capacity_rest_time": 60.0,
+      "capacity_charge_voltage": 4.1,
+      "capacity_min_voltage": 2.75,
+      "capacity_charge_current": 20.0,
+      "capacity_finish_current": 1.5,
+      "capacity_discharge_current": 20.0,
+      "temperature": 23.4
     }
   }
 }
