@@ -6,15 +6,15 @@ import json
 import os
 from pathlib import Path
 from AlIonBatteryTestSoftware import TestController
-from defaults import DEFAULT_LIMITS
+from defaults import DEFAULT_LIMITS, DEFAULT_TEST_PARAMS
 
 # Charge/discharge voltage and current limits
-CHARGE_VOLT_START: float = 4.1    # V
+CHARGE_VOLT_START: float = DEFAULT_TEST_PARAMS["CHARGE_VOLT_START"]
 CHARGE_VOLT_END: float = DEFAULT_LIMITS["CHARGE_VOLT_END"]
 CHARGE_CURRENT_MAX: float = DEFAULT_LIMITS["CHARGE_CURRENT_MAX"]
 
-DCHARGE_VOLT_MIN: float = 2.75    # V
-DCHARGE_CURRENT_MAX: float = 20    # A
+DCHARGE_VOLT_MIN: float = DEFAULT_TEST_PARAMS["DCHARGE_VOLT_MIN"]
+DCHARGE_CURRENT_MAX: float = DEFAULT_TEST_PARAMS["DCHARGE_CURRENT_MAX"]
 
 CHARGE_VOLT_PROT: int = DEFAULT_LIMITS["CHARGE_VOLT_PROT"]
 CHARGE_CURRENT_PROT: int = DEFAULT_LIMITS["CHARGE_CURRENT_PROT"]
@@ -28,18 +28,18 @@ SLEW_CURRENT: float = DEFAULT_LIMITS["SLEW_CURRENT"]
 # Timing (in seconds)
 # Ramp duration for increasing the charge voltage from CHARGE_VOLT_START
 # to CHARGE_VOLT_END at the beginning of each cycle
-LEADIN_TIME: int = 1    # s
+LEADIN_TIME: int = DEFAULT_TEST_PARAMS["LEADIN_TIME"]
 
-CHARGE_TIME: int = 5    # s
-DCHARGE_TIME: int = 5   # s
-REST_TIME: int = 0      # s
+CHARGE_TIME: int = DEFAULT_TEST_PARAMS["CHARGE_TIME"]
+DCHARGE_TIME: int = DEFAULT_TEST_PARAMS["DCHARGE_TIME"]
+REST_TIME: int = DEFAULT_TEST_PARAMS["REST_TIME"]
 
 # Cycling
-NUM_CYCLES: int = 1   # n
+NUM_CYCLES: int = DEFAULT_TEST_PARAMS["NUM_CYCLES"]
 
 # Misc
-TEST_NAME: str = "YUASA"
-TEMPERATURE: float = 23.4    # °C
+TEST_NAME: str = DEFAULT_TEST_PARAMS["TEST_NAME"]
+TEMPERATURE: float = DEFAULT_TEST_PARAMS["TEMPERATURE"]
 
 
 @dataclass

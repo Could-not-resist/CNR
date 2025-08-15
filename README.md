@@ -225,14 +225,14 @@ at 20&nbsp;±&nbsp;2 °C and then discharges at 1C down to
 `--capacity-min-voltage` (default **2.75&nbsp;V**) while recording the
 delivered ampere hours.
 
-By default the parameters in `MAIN.py` define a single cycle with
+By default the parameters in `defaults.py` define a single cycle with
 16.21&ndash;16.4&nbsp;V charging at 5&nbsp;A and a discharge down to 11&nbsp;V.
 You can override any of these values using the command-line options
 documented below.
 
 ### Main parameters
 
-The top of `MAIN.py` contains constants used to configure a test run:
+The default values in `defaults.py` configure a test run:
 
 | Variable | Default | Units |
 | --- | --- | --- |
