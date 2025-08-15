@@ -1,17 +1,12 @@
 """Core routines for controlling custom battery test sequences."""
 
-import time
-from datetime import datetime
-from datetime import timedelta
-import threading
+from datetime import datetime, timedelta
 import os
-from AlIonTestSoftwareDeviceDrivers import PowerSupplyController, ElectronicLoadController, MultimeterController
-from AlIonTestSoftwareDeviceDriversMock import PowerSupplyControllerMock, ElectronicLoadControllerMock, MultimeterControllerMock
-from AlIonTestSoftwareDataManagement import DataStorage
-from defaults import DEFAULT_LIMITS, DEFAULT_SAMPLE_INTERVAL
-
 import struct
+import threading
+import time
 import traceback
+
 try:
     import pyvisa
     VisaIOError = pyvisa.errors.VisaIOError
@@ -19,6 +14,19 @@ except Exception:  # pyvisa may not be installed when using mock drivers
     class VisaIOError(Exception):
         """Fallback VisaIOError when pyvisa is unavailable."""
         pass
+
+from AlIonTestSoftwareDataManagement import DataStorage
+from AlIonTestSoftwareDeviceDrivers import (
+    PowerSupplyController,
+    ElectronicLoadController,
+    MultimeterController,
+)
+from AlIonTestSoftwareDeviceDriversMock import (
+    PowerSupplyControllerMock,
+    ElectronicLoadControllerMock,
+    MultimeterControllerMock,
+)
+from defaults import DEFAULT_LIMITS, DEFAULT_SAMPLE_INTERVAL
 
 
 # Class used to control test procedures
