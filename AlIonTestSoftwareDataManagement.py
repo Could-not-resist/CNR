@@ -17,7 +17,7 @@ class DataStorage:
 
     The class buffers time stamped voltage and current readings and can
     export the accumulated data to ``.csv`` or ``.xlsx`` files.  Excel files
-    are optional and disabled by default when calling :meth:`createTable`.
+    are optional and disabled by default when calling :meth:`create_table`.
     """
 
     def __init__(self) -> None:
@@ -32,36 +32,36 @@ class DataStorage:
         self.mm_temp = []
 
     # Function to add time value
-    def addTime(self, Mtime_sec: float):
+    def add_time(self, Mtime_sec: float):
         """Record the measurement timestamp and elapsed time."""
         timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
         self.timestamp.append(timestamp)
         self.time.append(round(Mtime_sec, 4))
 
     # Function to add voltage value
-    def addVoltage(self, volts: float):
+    def add_voltage(self, volts: float):
         """Append a voltage measurement in volts."""
         self.volts.append(round(volts, 4))
 
     # Function to add current value
-    def addCurrent(self, amps: float):
+    def add_current(self, amps: float):
         """Append a current reading in amperes."""
         self.current.append(round(amps, 4))
 
-    def addMMVoltage(self, volts: float):
+    def add_mm_voltage(self, volts: float):
         """Append a multimeter voltage reading."""
         self.mm_volts.append(round(volts, 4))
 
-    def addMMTemperature(self, temp_c: float):
+    def add_mm_temperature(self, temp_c: float):
         """Append a temperature measurement from the multimeter."""
         self.mm_temp.append(round(temp_c, 4))
 
-    def addCapacity(self, ah: float):
+    def add_capacity(self, ah: float):
         """Store capacity value in ampere-hours."""
         self.capacity.append(round(ah, 4))
 
     # Function for creating a table
-    def createTable(
+    def create_table(
         self,
         testName,
         c_rate: float,
@@ -146,12 +146,12 @@ class DataStorage:
             if verbose:
                 print(abs_path)
             # Export to CSV file
-            self.exportCSVFile(filePath, data, head)
+            self.export_csv_file(filePath, data, head)
             if export_xlsx:
                 # Optional Excel output with graphs
                 if verbose:
                     print(f"Saving results to {filePath}.xlsx")
-                self.exportXLSXFile(filePath, chargeTime, timeInterval)
+                self.export_xlsx_file(filePath, chargeTime, timeInterval)
                 if verbose:
                     print(f"Charge time configured: {chargeTime}")
         except (OSError, pd_errors.PandasError) as err:
@@ -166,12 +166,12 @@ class DataStorage:
         self.mm_volts = []
         self.mm_temp = []
 
-    def exportCSVFile(self, filePath, data, head):
+    def export_csv_file(self, filePath, data, head):
         """Write the collected data to a CSV file."""
         df = pd.DataFrame(data, columns=head)
         df.to_csv(filePath + ".csv", index=False, float_format="%.4f")
 
-    def exportXLSXFile(self, filePath, chargeTime, timeInterval=DEFAULT_SAMPLE_INTERVAL):
+    def export_xlsx_file(self, filePath, chargeTime, timeInterval=DEFAULT_SAMPLE_INTERVAL):
         """Create an Excel workbook with optional graphs."""
         # Read in the CSV file that was just created
         csvDataframe = pd.read_csv(filePath + ".csv")
@@ -346,4 +346,4 @@ class DataStorage:
 
 # Notað til að keyra sjálfvirk gröf á utanaðkomandi csv skrár
 # dataStorage = DataStorage()
-# dataStorage.exportXLSXFile("C:/Users/runson/Dropbox/Sharing/Alor test/custom test for 1C nr. 2 at 20° celsius     03_01_2023 15_21_10",chargeTime="180",timeInterval=0.2)
+# dataStorage.export_xlsx_file("C:/Users/runson/Dropbox/Sharing/Alor test/custom test for 1C nr. 2 at 20° celsius     03_01_2023 15_21_10",chargeTime="180",timeInterval=0.2)
