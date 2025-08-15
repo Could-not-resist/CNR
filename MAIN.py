@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 from pathlib import Path
+from pprint import pprint
 from defaults import (
     DEFAULT_LIMITS,
     DEFAULT_TEST_PARAMS,
@@ -272,6 +273,11 @@ def main():
         action="store_true",
         help="print detailed progress information",
     )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="show resolved parameters and exit",
+    )
 
     args = parser.parse_args()
 
@@ -435,20 +441,26 @@ def main():
                 kwargs[field] = val
         return vars(CustomTestSettings(**kwargs))
 
-    from AlIonBatteryTestSoftware import TestController
-    tc = TestController(multimeter_mode, args.debug, ps_resource, el_resource, mm_resource)
-
     dispatch = {
-        "actual_capacity_test": (tc.actual_capacity_test, build_actual_capacity_params),
-        "efficiency_test": (tc.efficiency_test, build_efficiency_params),
-        "rate_characteristic_test": (tc.rate_characteristic_test, build_rate_params),
-        "ocv_curve_test": (tc.ocv_curve_test, build_ocv_params),
-        "internal_resistance_test": (tc.internal_resistance_test, build_ir_params),
-        "custom": (tc.custom_test, build_custom_params),
+        "actual_capacity_test": ("actual_capacity_test", build_actual_capacity_params),
+        "efficiency_test": ("efficiency_test", build_efficiency_params),
+        "rate_characteristic_test": ("rate_characteristic_test", build_rate_params),
+        "ocv_curve_test": ("ocv_curve_test", build_ocv_params),
+        "internal_resistance_test": ("internal_resistance_test", build_ir_params),
+        "custom": ("custom_test", build_custom_params),
     }
 
-    method, builder = dispatch.get(resolved_test_type, dispatch["custom"])
+    method_name, builder = dispatch.get(resolved_test_type, dispatch["custom"])
     params = builder()
+    pprint(params)
+    if args.dry_run:
+        return
+
+    from AlIonBatteryTestSoftware import TestController
+    tc = TestController(
+        multimeter_mode, args.debug, ps_resource, el_resource, mm_resource
+    )
+    method = getattr(tc, method_name)
     try:
         result = method(**params)
         if resolved_test_type == "actual_capacity_test" and result is not None:

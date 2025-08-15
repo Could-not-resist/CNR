@@ -56,7 +56,7 @@ to force the built‑in mock drivers for development without hardware.
 Common commands:
 
 - Create or update a profile. The interactive builder saves the result to
-  `profiles.json`:
+ `profiles.json`:
 
   ```bash
   python build_test_config.py
@@ -93,6 +93,10 @@ Common commands:
   # Internal resistance test
   python MAIN.py --profile MY_IR_PROFILE
   ```
+
+  The script prints the resolved parameter set before starting a test. Use
+  `--dry-run` to show the parameters and exit without connecting to any
+  instruments.
 
 - List the available profiles in `profiles.json`:
 
@@ -290,6 +294,7 @@ common flags accepted by `MAIN.py` are listed below. Run
 | `--sample-interval` | Time between measurements in seconds |
 | `--multimeter-mode` | Log measurement using the multimeter (`voltage` or `tcouple`) |
 | `-d`, `--debug` | Print detailed progress information |
+| `--dry-run` | Display resolved parameters and exit without running a test |
 
 
 ## Manufacturer Programming Manuals
